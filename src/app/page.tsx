@@ -14,7 +14,7 @@ export default function Home() {
           </span>
         </div>
         <a
-          href="mailto:hello@onenept.com"
+          href="mailto:admin@onenept.com"
           className="text-sm text-zinc-400 hover:text-white transition-colors"
         >
           Contact
@@ -170,10 +170,10 @@ export default function Home() {
           </div>
           <div className="flex flex-col gap-1 text-center sm:text-right">
             <a
-              href="mailto:hello@onenept.com"
+              href="mailto:admin@onenept.com"
               className="hover:text-zinc-300 transition-colors"
             >
-              hello@onenept.com
+              admin@onenept.com
             </a>
             <span>&copy; {new Date().getFullYear()} Onenept Studios Inc.</span>
           </div>
