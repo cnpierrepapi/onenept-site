@@ -3,10 +3,12 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-[#09090b] text-white font-sans">
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 sm:px-12 py-6 max-w-6xl mx-auto w-full">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center">
-            <span className="text-black font-bold text-sm">O</span>
-          </div>
+        <div className="flex items-center gap-3">
+          <img
+            src="/logo.jpg"
+            alt="Onenept Studios"
+            className="w-9 h-9 rounded-lg"
+          />
           <span className="text-lg font-semibold tracking-tight">
             Onenept Studios
           </span>
