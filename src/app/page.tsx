@@ -1,3 +1,5 @@
+import Image from 'next/image'
+
 const STACK = [
   'Claude API', 'AI Agents & Tool Use', 'RAG / pgvector',
   'Next.js', 'TypeScript', 'Supabase', 'Solana / Web3', 'Stripe',
@@ -53,7 +55,7 @@ export default function Home() {
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 sm:px-12 py-6 max-w-5xl mx-auto w-full">
         <div className="flex items-center gap-3">
-          <img src="/logo.jpg" alt="Onenept" className="w-8 h-8 rounded-md" />
+          <Image src="/logo.jpg" alt="Onenept Studios" width={32} height={32} className="rounded-md" />
           <span className="text-sm font-medium text-zinc-400 tracking-tight">Onenept</span>
         </div>
         <a
@@ -68,15 +70,20 @@ export default function Home() {
       </nav>
 
       {/* Hero */}
-      <main className="px-6 sm:px-12 pt-16 pb-24 max-w-5xl mx-auto w-full">
+      <main className="px-6 sm:px-12 pt-12 pb-24 max-w-5xl mx-auto w-full">
         <div className="flex flex-col sm:flex-row items-start gap-10">
-          <img
-            src="/founder.jpg"
-            alt="Chukwudumaga Nnawuogo-Pierre"
-            className="w-24 h-24 rounded-2xl object-cover object-top shrink-0"
-          />
-          <div>
-            <p className="text-xs font-medium text-zinc-500 uppercase tracking-widest mb-2">
+          <div className="shrink-0">
+            <Image
+              src="/founder.jpg"
+              alt="Chukwudumaga Nnawuogo-Pierre — AI Integration Developer"
+              width={220}
+              height={220}
+              priority
+              className="rounded-2xl object-cover object-top w-44 h-44 sm:w-56 sm:h-56"
+            />
+          </div>
+          <div className="pt-2">
+            <p className="text-xs font-medium text-zinc-500 uppercase tracking-widest mb-3">
               AI Integration Developer · Malta
             </p>
             <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-tight">
