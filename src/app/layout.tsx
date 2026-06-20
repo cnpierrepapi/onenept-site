@@ -2,22 +2,22 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Onenept Studios | AI Tools for Digital Freelancers",
+  title: "Chukwudumaga Nnawuogo-Pierre — AI Integration Developer",
   description:
-    "Onenept Studios is an AI development corporation building tools that help digital freelancers grow their business.",
+    "I build AI agents, RAG pipelines, and workflow automations — connecting LLM APIs to real products, from prototype to production.",
   openGraph: {
-    title: "Onenept Studios | AI Tools for Digital Freelancers",
+    title: "Chukwudumaga Nnawuogo-Pierre — AI Integration Developer",
     description:
-      "Building AI-powered tools that help digital freelancers grow their business.",
+      "I build AI agents, RAG pipelines, and workflow automations — connecting LLM APIs to real products, from prototype to production.",
     url: "https://onenept.com",
     siteName: "Onenept Studios",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Onenept Studios",
+    title: "Chukwudumaga Nnawuogo-Pierre — AI Integration Developer",
     description:
-      "AI-powered tools that help digital freelancers grow their business.",
+      "AI agents, RAG pipelines, and workflow automations — from prototype to production.",
   },
 };
 
