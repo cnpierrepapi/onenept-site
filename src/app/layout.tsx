@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AI Integration Developer — Chukwudumaga Nnawuogo-Pierre",
+  title: "AI Integration Developer — Chukwudumaga Nnawuogo",
   description:
     "I build AI agents, RAG pipelines, and workflow automations — connecting LLM APIs to real products, from prototype to production. Available for hire on Upwork.",
   metadataBase: new URL("https://onenept.com"),
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "AI Integration Developer — Chukwudumaga Nnawuogo-Pierre",
+    title: "AI Integration Developer — Chukwudumaga Nnawuogo",
     description:
       "I build AI agents, RAG pipelines, and workflow automations — connecting LLM APIs to real products, from prototype to production.",
     url: "https://onenept.com",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Integration Developer — Chukwudumaga Nnawuogo-Pierre",
+    title: "AI Integration Developer — Chukwudumaga Nnawuogo",
     description:
       "AI agents, RAG pipelines, and workflow automations — from prototype to production.",
   },
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
-  name: "Chukwudumaga Nnawuogo-Pierre",
+  name: "Chukwudumaga Nnawuogo",
   jobTitle: "AI Integration Developer",
   description:
     "I build AI agents, RAG pipelines, and workflow automations — connecting LLM APIs to real products, from prototype to production.",

@@ -75,7 +75,7 @@ export default function Home() {
           <div className="shrink-0">
             <Image
               src="/founder.jpg"
-              alt="Chukwudumaga Nnawuogo-Pierre — AI Integration Developer"
+              alt="Chukwudumaga Nnawuogo — AI Integration Developer"
               width={220}
               height={220}
               priority
@@ -88,7 +88,7 @@ export default function Home() {
             </p>
             <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-tight">
               Chukwudumaga<br />
-              <span className="text-zinc-400">Nnawuogo-Pierre</span>
+              <span className="text-zinc-400">Nnawuogo</span>
             </h1>
             <p className="mt-5 text-lg text-zinc-400 max-w-xl leading-relaxed">
               I build AI agents, RAG pipelines, and workflow automations —
