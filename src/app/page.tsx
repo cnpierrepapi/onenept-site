@@ -121,7 +121,7 @@ export default function Home() {
         <span className="font-display text-lg font-bold tracking-tight">
           one<span className="rounded-md bg-sun px-1.5 py-0.5">nept</span>
         </span>
-        <div className="flex items-center gap-5 font-mono text-xs text-ink/60">
+        <div className="hidden items-center gap-5 font-mono text-xs text-ink/60 sm:flex">
           <a href="#positions" className="hover:text-sun">POSITIONS</a>
           <a href="#deadbook" className="hover:text-sun">DEAD BOOK</a>
           <a href="#rules" className="hover:text-sun">RULES</a>
@@ -130,6 +130,28 @@ export default function Home() {
             className="rounded-full border border-ink/20 px-3 py-1.5 hover:border-sun hover:text-sun"
           >
             CONTACT
+          </a>
+        </div>
+        <span className="inline-flex items-center gap-2 rounded-full border border-ink/20 px-3 py-1.5 font-mono text-[10px] tracking-[0.2em] text-ink/70 sm:hidden">
+          <span className="live-dot h-1.5 w-1.5 rounded-full bg-sun" />
+          2 LIVE
+        </span>
+      </nav>
+
+      {/* mobile desk bar */}
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-ink/15 bg-night/95 backdrop-blur sm:hidden">
+        <div className="grid grid-cols-4 font-mono text-[10px] tracking-[0.08em] text-ink/70">
+          <a href="#positions" className="flex flex-col items-center gap-1 py-3 active:text-sun">
+            <span className="text-sun">01</span>POSITIONS
+          </a>
+          <a href="#deadbook" className="flex flex-col items-center gap-1 py-3 active:text-sun">
+            <span className="text-rust">02</span>DEAD BOOK
+          </a>
+          <a href="#rules" className="flex flex-col items-center gap-1 py-3 active:text-sun">
+            <span className="text-sun">03</span>RULES
+          </a>
+          <a href="mailto:admin@onenept.com" className="flex flex-col items-center gap-1 py-3 active:text-sun">
+            <span className="text-sun">@</span>CONTACT
           </a>
         </div>
       </nav>
@@ -142,14 +164,28 @@ export default function Home() {
         <p className="reveal font-mono text-xs tracking-[0.3em] text-ink/50">
           ONENEPT STUDIOS :: ONE OPERATOR :: MALTA
         </p>
-        <h1 className="reveal mt-6 font-display font-extrabold leading-[0.92]">
-          <span className="block text-[17vw] tracking-tight sm:text-8xl md:text-9xl">
-            SHIP <span className="text-outline-sun">LIVE.</span>
+        {/* mobile hero: mixed-scale stack, every line sized to fit the screen */}
+        <h1 className="reveal mt-6 font-display font-extrabold leading-[0.95] sm:hidden">
+          <span className="block text-[21vw] tracking-tight">SHIP</span>
+          <span className="block text-[21vw] tracking-tight text-outline-sun">
+            LIVE.
           </span>
-          <span className="block text-[17vw] tracking-tight sm:text-8xl md:text-9xl">
+          <span className="mt-2 block text-[12vw] tracking-tight">
             <span className="text-outline">KILL</span> WITH
           </span>
-          <span className="block text-[17vw] tracking-tight text-sun sm:text-8xl md:text-9xl">
+          <span className="block text-[12vw] tracking-tight text-sun">
+            EVIDENCE.
+          </span>
+        </h1>
+        {/* desktop hero */}
+        <h1 className="reveal mt-6 hidden font-display font-extrabold leading-[0.92] sm:block">
+          <span className="block tracking-tight sm:text-8xl md:text-9xl">
+            SHIP <span className="text-outline-sun">LIVE.</span>
+          </span>
+          <span className="block tracking-tight sm:text-8xl md:text-9xl">
+            <span className="text-outline">KILL</span> WITH
+          </span>
+          <span className="block tracking-tight text-sun sm:text-8xl md:text-9xl">
             EVIDENCE.
           </span>
         </h1>
@@ -197,7 +233,7 @@ export default function Home() {
               href={f.href}
               target="_blank"
               rel="noopener noreferrer"
-              className={`reveal group relative flex flex-col rounded-3xl border border-ink/15 bg-card p-8 shadow-brut transition-transform hover:-translate-y-1.5 ${
+              className={`reveal group relative flex min-w-0 flex-col overflow-hidden rounded-3xl border border-ink/15 bg-card p-6 shadow-brut transition-transform hover:-translate-y-1.5 sm:p-8 ${
                 i === 1 ? "md:translate-y-10" : ""
               }`}
             >
@@ -208,15 +244,15 @@ export default function Home() {
                 </span>
                 <ExternalArrow className="h-5 w-5 text-ink/30 transition-colors group-hover:text-sun" />
               </div>
-              <h3 className="mt-6 font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
+              <h3 className="mt-6 font-display text-[8.5vw] font-extrabold tracking-tight sm:text-5xl">
                 {f.name}
               </h3>
               <p className="mt-4 flex-1 leading-relaxed text-ink/70">{f.thesis}</p>
               <div className="mt-8 space-y-2 font-mono text-xs">
                 {f.rows.map(([k, v]) => (
-                  <div key={k} className="flex justify-between gap-4 border-b border-ink/10 pb-2">
-                    <span className="text-ink/40">{k}</span>
-                    <span className="text-right text-ink/80">{v}</span>
+                  <div key={k} className="flex min-w-0 justify-between gap-4 border-b border-ink/10 pb-2">
+                    <span className="shrink-0 text-ink/40">{k}</span>
+                    <span className="min-w-0 break-words text-right text-ink/80">{v}</span>
                   </div>
                 ))}
               </div>
@@ -304,7 +340,7 @@ export default function Home() {
 
       {/* footer */}
       <footer className="relative z-10 border-t border-ink/10 bg-night">
-        <div className="mx-auto w-full max-w-6xl px-5 py-14">
+        <div className="mx-auto w-full max-w-6xl px-5 pb-28 pt-14 sm:py-14">
           <p className="font-display text-4xl font-extrabold tracking-tight sm:text-6xl">
             ONENEPT <span className="text-outline">STUDIOS</span>
           </p>
