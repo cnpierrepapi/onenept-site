@@ -170,10 +170,10 @@ export default function Home() {
           <span className="block text-[21vw] tracking-tight text-outline-sun">
             LIVE.
           </span>
-          <span className="mt-2 block text-[12vw] tracking-tight">
+          <span className="mt-2 block text-[9.5vw] tracking-tight">
             <span className="text-outline">KILL</span> WITH
           </span>
-          <span className="block text-[12vw] tracking-tight text-sun">
+          <span className="block text-[9.5vw] tracking-tight text-sun">
             EVIDENCE.
           </span>
         </h1>
@@ -244,7 +244,7 @@ export default function Home() {
                 </span>
                 <ExternalArrow className="h-5 w-5 text-ink/30 transition-colors group-hover:text-sun" />
               </div>
-              <h3 className="mt-6 font-display text-[8.5vw] font-extrabold tracking-tight sm:text-5xl">
+              <h3 className="mt-6 font-display text-[7.2vw] font-extrabold tracking-tight sm:text-5xl">
                 {f.name}
               </h3>
               <p className="mt-4 flex-1 leading-relaxed text-ink/70">{f.thesis}</p>
