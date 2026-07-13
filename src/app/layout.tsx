@@ -1,57 +1,62 @@
 import type { Metadata } from "next";
+import { Syne, Space_Grotesk, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+const syne = Syne({
+  variable: "--font-syne",
+  subsets: ["latin"],
+  weight: ["400", "600", "700", "800"],
+});
+
+const grotesk = Space_Grotesk({
+  variable: "--font-grotesk",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
-  title: "AI Integration Developer — Chukwudumaga Nnawuogo",
+  title: "Onenept Studios :: live products, settled with evidence",
   description:
-    "I build AI agents, RAG pipelines, and workflow automations — connecting LLM APIs to real products, from prototype to production. Available for hire on Upwork.",
+    "A one-person product studio run like a trading desk. Flagships Lagisalpha and Spikelines are live now. Every product settles against the real world, and the ones that missed are named in the Dead Book.",
   metadataBase: new URL("https://onenept.com"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "AI Integration Developer — Chukwudumaga Nnawuogo",
+    title: "Onenept Studios :: live products, settled with evidence",
     description:
-      "I build AI agents, RAG pipelines, and workflow automations — connecting LLM APIs to real products, from prototype to production.",
+      "A one-person product studio run like a trading desk. Flagships Lagisalpha and Spikelines are live now.",
     url: "https://onenept.com",
     siteName: "Onenept Studios",
-    type: "profile",
+    type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Integration Developer — Chukwudumaga Nnawuogo",
+    title: "Onenept Studios :: live products, settled with evidence",
     description:
-      "AI agents, RAG pipelines, and workflow automations — from prototype to production.",
+      "A one-person product studio run like a trading desk. Flagships Lagisalpha and Spikelines are live now.",
   },
 };
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "Person",
-  name: "Chukwudumaga Nnawuogo",
-  jobTitle: "AI Integration Developer",
-  description:
-    "I build AI agents, RAG pipelines, and workflow automations — connecting LLM APIs to real products, from prototype to production.",
+  "@type": "Organization",
+  name: "Onenept Studios Inc.",
   url: "https://onenept.com",
   email: "admin@onenept.com",
-  sameAs: [
-    "https://www.linkedin.com/in/cenpierrepapi/",
-    "https://github.com/cnpierrepapi",
-  ],
-  knowsAbout: [
-    "Artificial Intelligence",
-    "Large Language Models",
-    "AI Agents",
-    "Retrieval Augmented Generation",
-    "Next.js",
-    "TypeScript",
-    "Supabase",
-    "Solana",
-  ],
-  worksFor: {
-    "@type": "Organization",
-    name: "Onenept Studios Inc.",
-    url: "https://onenept.com",
+  description:
+    "A one-person product studio run like a trading desk. Live-market products, settled with evidence.",
+  founder: {
+    "@type": "Person",
+    name: "Chukwudumaga Nnawuogo",
+    sameAs: [
+      "https://www.linkedin.com/in/cenpierrepapi/",
+      "https://github.com/cnpierrepapi",
+    ],
   },
 };
 
@@ -61,14 +66,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html
+      lang="en"
+      className={`${syne.variable} ${grotesk.variable} ${geistMono.variable} h-full antialiased`}
+    >
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>
   );
 }

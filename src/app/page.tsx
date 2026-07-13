@@ -1,191 +1,346 @@
-import Image from 'next/image'
+import Image from "next/image";
+import Reveal from "./reveal";
 
-const STACK = [
-  'Claude API', 'AI Agents & Tool Use', 'RAG / pgvector',
-  'Next.js', 'TypeScript', 'Supabase', 'Solana / Web3', 'Stripe',
-]
+const TICKER = [
+  "LAGISALPHA :: LIVE",
+  "SPIKELINES :: LIVE",
+  "DEAD BOOK :: 5 SETTLED",
+  "SHIP LIVE",
+  "KILL WITH EVIDENCE",
+  "SETTLE EVERYTHING",
+  "ONENEPT STUDIOS INC",
+];
 
-const PROJECTS = [
+const FLAGSHIPS = [
   {
-    title: 'Company Intelligence Agent',
-    description:
-      'ReAct agent that researches any company via live web search, returns a structured brief — decision makers, pain points, talking points, and a suggested opening line.',
-    tags: ['AI Agent', 'Tool Use', 'Next.js'],
-    href: 'https://company-intel-tau.vercel.app',
-    label: 'company-intel',
+    name: "LAGISALPHA",
+    href: "https://lagisalpha.vercel.app",
+    label: "lagisalpha.vercel.app",
+    thesis:
+      "The lead-lag edge in prediction markets. When a market trades behind the vig-free fair, the cheap side is underpriced until it converges. Lagisalpha finds that side, trades it on paper, and settles every call against the close.",
+    rows: [
+      ["TERMINAL", "npx lagisalpha"],
+      ["SIGNAL", "lead-lag vs de-vigged fair"],
+      ["SETTLEMENT", "closing line, no exceptions"],
+    ],
   },
   {
-    title: 'Document Chat (RAG)',
-    description:
-      'Upload a PDF, paste text, or drop a URL. The app chunks and embeds the content into pgvector, then streams answers with source citations via Claude Haiku.',
-    tags: ['RAG', 'Voyage AI', 'pgvector'],
-    href: 'https://doc-chat-beige-beta.vercel.app',
-    label: 'doc-chat',
+    name: "SPIKELINES",
+    href: "https://spikelines.vercel.app",
+    label: "spikelines.vercel.app",
+    thesis:
+      "Feel the match. A real-time micro-prediction game on live World Cup data: what happens next, called in seconds, scored on a streak, verified on Solana.",
+    rows: [
+      ["ARENA", "live World Cup fixtures"],
+      ["STAKES", "USDC spike packs"],
+      ["PROOF", "on-chain settlement"],
+    ],
+  },
+];
+
+const DEAD_BOOK = [
+  {
+    name: "WETOWS",
+    span: "2026",
+    thesis: "Zero-capital social commerce for Africa.",
+    cause: "off-thesis. A two-sided cold start is the opposite of the desk.",
   },
   {
-    title: 'Warmleads',
-    description:
-      'Full-stack lead intelligence SaaS. Natural-language search returns AI-scored business leads with enriched contact info. Live with Stripe + Paystack billing.',
-    tags: ['SaaS', 'Claude', 'Supabase'],
-    href: 'https://warmleads.app',
-    label: 'warmleads.app',
+    name: "CONFAM",
+    span: "2026",
+    thesis: "Verified tipsters for Nigerian bettors.",
+    cause: "a nine-year incumbent already owned the lane. Dead in two days.",
   },
-]
+  {
+    name: "BOOTROOM",
+    span: "2026",
+    thesis: "Live football calls for the group chat.",
+    cause: "lost the three-product race it was born into. The other two shipped.",
+  },
+  {
+    name: "HUSTLEBOOKS",
+    span: "2026",
+    thesis: "Books, bookings and an AI sales desk for the multi-hustle economy.",
+    cause:
+      "a market that never pays. Its dark theme survives as the skin of this page.",
+  },
+  {
+    name: "SPOTR",
+    span: "2026",
+    thesis: "Bet on anything, as long as it is live.",
+    cause:
+      "the truth engine judged the oracle before launch. The oracle missed the bar.",
+  },
+];
 
-function ArrowRight({ className }: { className?: string }) {
+const RULES = [
+  ["01", "Live or nothing.", "If it does not run against the real world, it is a slide, not a product."],
+  ["02", "Evidence holds the kill switch.", "Sunk cost does not get a vote. A position that misses its gate closes the same day."],
+  ["03", "The other side is scraped, not onboarded.", "No cold starts. The product is useful to customer number one."],
+  ["04", "Settle everything.", "A claim that cannot be settled is marketing. Every call gets graded against what actually happened."],
+  ["05", "One operator, many positions.", "Small desk, sharp knife. The portfolio is the strategy."],
+];
+
+function ExternalArrow({ className }: { className?: string }) {
   return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+    <svg
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M7 17L17 7M17 7H9m8 0v8"
+      />
     </svg>
-  )
-}
-
-function ExternalLink({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-4.5-6H18m0 0v4.5m0-4.5L10.5 13.5" />
-    </svg>
-  )
+  );
 }
 
 export default function Home() {
+  const tape = [...TICKER, ...TICKER];
   return (
-    <div className="min-h-screen bg-[#09090b] text-white font-sans">
+    <div className="relative min-h-screen overflow-x-clip">
+      <Reveal />
 
-      {/* Nav */}
-      <nav className="flex items-center justify-between px-6 sm:px-12 py-6 max-w-5xl mx-auto w-full">
-        <div className="flex items-center gap-3">
-          <Image src="/logo.jpg" alt="Onenept Studios" width={32} height={32} className="rounded-md" />
-          <span className="text-sm font-medium text-zinc-400 tracking-tight">Onenept</span>
+      {/* desk feed ticker */}
+      <div className="marquee border-b border-ink/15 bg-night py-2.5 font-mono text-[11px] tracking-[0.18em] text-sun">
+        <div className="marquee-track">
+          {tape.map((t, i) => (
+            <span key={i} className="mx-6">
+              {t} <span className="mx-6 text-ink/30">///</span>
+            </span>
+          ))}
         </div>
-        <a
-          href="https://www.upwork.com/freelancers/~yourprofile"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-zinc-700 bg-zinc-900 text-sm text-zinc-300 hover:border-zinc-500 hover:text-white transition-all"
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-          Available for work
-        </a>
+      </div>
+
+      {/* nav */}
+      <nav className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-6">
+        <span className="font-display text-lg font-bold tracking-tight">
+          one<span className="rounded-md bg-sun px-1.5 py-0.5">nept</span>
+        </span>
+        <div className="flex items-center gap-5 font-mono text-xs text-ink/60">
+          <a href="#positions" className="hover:text-sun">POSITIONS</a>
+          <a href="#deadbook" className="hover:text-sun">DEAD BOOK</a>
+          <a href="#rules" className="hover:text-sun">RULES</a>
+          <a
+            href="mailto:admin@onenept.com"
+            className="rounded-full border border-ink/20 px-3 py-1.5 hover:border-sun hover:text-sun"
+          >
+            CONTACT
+          </a>
+        </div>
       </nav>
 
-      {/* Hero */}
-      <main className="px-6 sm:px-12 pt-12 pb-24 max-w-5xl mx-auto w-full">
-        <div className="flex flex-col sm:flex-row items-start gap-10">
-          <div className="shrink-0">
+      {/* hero */}
+      <header className="relative z-10 mx-auto w-full max-w-6xl px-5 pb-24 pt-14 sm:pt-20">
+        <span className="rail absolute right-2 top-8 hidden font-mono text-[10px] uppercase text-ink/25 lg:block">
+          run like a trading desk
+        </span>
+        <p className="reveal font-mono text-xs tracking-[0.3em] text-ink/50">
+          ONENEPT STUDIOS :: ONE OPERATOR :: MALTA
+        </p>
+        <h1 className="reveal mt-6 font-display font-extrabold leading-[0.92]">
+          <span className="block text-[17vw] tracking-tight sm:text-8xl md:text-9xl">
+            SHIP <span className="text-outline-sun">LIVE.</span>
+          </span>
+          <span className="block text-[17vw] tracking-tight sm:text-8xl md:text-9xl">
+            <span className="text-outline">KILL</span> WITH
+          </span>
+          <span className="block text-[17vw] tracking-tight text-sun sm:text-8xl md:text-9xl">
+            EVIDENCE.
+          </span>
+        </h1>
+        <div className="reveal mt-10 flex max-w-2xl flex-col gap-6 sm:flex-row sm:items-end">
+          <p className="text-lg leading-relaxed text-ink/70">
+            A one-person product studio run like a trading desk. Every product
+            is a position: opened live against the real world, priced honestly,
+            and closed the moment the numbers say no.
+          </p>
+          <div className="flex shrink-0 items-center gap-3 rounded-2xl border border-ink/15 bg-card/70 p-3 shadow-brut-sm">
             <Image
               src="/founder.jpg"
-              alt="Chukwudumaga Nnawuogo — AI Integration Developer"
-              width={220}
-              height={220}
-              priority
-              className="rounded-2xl object-cover object-top w-44 h-44 sm:w-56 sm:h-56"
+              alt="Chukwudumaga Nnawuogo"
+              width={52}
+              height={52}
+              className="h-13 w-13 rounded-xl object-cover object-top"
             />
-          </div>
-          <div className="pt-2">
-            <p className="text-xs font-medium text-zinc-500 uppercase tracking-widest mb-3">
-              AI Integration Developer · Malta
-            </p>
-            <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-tight">
-              Chukwudumaga<br />
-              <span className="text-zinc-400">Nnawuogo</span>
-            </h1>
-            <p className="mt-5 text-lg text-zinc-400 max-w-xl leading-relaxed">
-              I build AI agents, RAG pipelines, and workflow automations —
-              connecting LLM APIs to real products, from prototype to production.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                href="https://www.upwork.com/freelancers/~yourprofile"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-black text-sm font-semibold hover:bg-zinc-100 transition-colors"
-              >
-                Hire me on Upwork
-                <ArrowRight className="w-4 h-4" />
-              </a>
-              <a
-                href="mailto:admin@onenept.com"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-zinc-700 text-sm font-medium text-zinc-300 hover:border-zinc-500 hover:text-white transition-all"
-              >
-                admin@onenept.com
-              </a>
+            <div className="font-mono text-[11px] leading-4 text-ink/60">
+              CHUKWUDUMAGA
+              <br />
+              NNAWUOGO
+              <br />
+              <span className="text-sun">FOUNDER + DESK</span>
             </div>
           </div>
         </div>
-      </main>
+      </header>
 
-      {/* Work */}
-      <section className="px-6 sm:px-12 py-16 max-w-5xl mx-auto w-full">
-        <h2 className="text-xs font-medium text-zinc-500 uppercase tracking-widest mb-8">
-          Selected work
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {PROJECTS.map((p) => (
+      {/* open positions */}
+      <section id="positions" className="relative z-10 mx-auto w-full max-w-6xl px-5 pb-24">
+        <div className="reveal mb-10 flex items-baseline justify-between gap-4">
+          <h2 className="font-display text-3xl font-bold sm:text-5xl">
+            <span className="font-mono text-base text-sun sm:text-xl">01 ::</span>{" "}
+            OPEN POSITIONS
+          </h2>
+          <p className="hidden font-mono text-xs text-ink/40 sm:block">
+            FLAGSHIPS. BOTH LIVE RIGHT NOW.
+          </p>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          {FLAGSHIPS.map((f, i) => (
             <a
-              key={p.title}
-              href={p.href}
+              key={f.name}
+              href={f.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex flex-col rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 hover:border-zinc-600 hover:bg-zinc-900/70 transition-all"
+              className={`reveal group relative flex flex-col rounded-3xl border border-ink/15 bg-card p-8 shadow-brut transition-transform hover:-translate-y-1.5 ${
+                i === 1 ? "md:translate-y-10" : ""
+              }`}
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex flex-wrap gap-1.5">
-                  {p.tags.map((t) => (
-                    <span key={t} className="px-2 py-0.5 rounded-md bg-zinc-800 text-xs text-zinc-400">
-                      {t}
-                    </span>
-                  ))}
-                </div>
-                <ExternalLink className="w-4 h-4 text-zinc-600 group-hover:text-zinc-400 transition-colors shrink-0 mt-0.5" />
+              <div className="flex items-center justify-between">
+                <span className="inline-flex items-center gap-2 rounded-full border border-ink/20 px-3 py-1 font-mono text-[10px] tracking-[0.2em] text-ink/70">
+                  <span className="live-dot h-1.5 w-1.5 rounded-full bg-sun" />
+                  LIVE
+                </span>
+                <ExternalArrow className="h-5 w-5 text-ink/30 transition-colors group-hover:text-sun" />
               </div>
-              <h3 className="text-base font-semibold text-white mb-2">{p.title}</h3>
-              <p className="text-sm text-zinc-400 leading-relaxed flex-1">{p.description}</p>
-              <span className="mt-5 text-xs text-zinc-600 group-hover:text-zinc-400 transition-colors">
-                {p.label} ↗
+              <h3 className="mt-6 font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
+                {f.name}
+              </h3>
+              <p className="mt-4 flex-1 leading-relaxed text-ink/70">{f.thesis}</p>
+              <div className="mt-8 space-y-2 font-mono text-xs">
+                {f.rows.map(([k, v]) => (
+                  <div key={k} className="flex justify-between gap-4 border-b border-ink/10 pb-2">
+                    <span className="text-ink/40">{k}</span>
+                    <span className="text-right text-ink/80">{v}</span>
+                  </div>
+                ))}
+              </div>
+              <span className="mt-6 font-mono text-[11px] text-sun/80 group-hover:text-sun">
+                {f.label} ↗
               </span>
             </a>
           ))}
         </div>
       </section>
 
-      {/* Stack */}
-      <section className="px-6 sm:px-12 py-16 max-w-5xl mx-auto w-full border-t border-zinc-900">
-        <h2 className="text-xs font-medium text-zinc-500 uppercase tracking-widest mb-6">
-          Stack
-        </h2>
-        <div className="flex flex-wrap gap-2">
-          {STACK.map((s) => (
-            <span
-              key={s}
-              className="px-3 py-1.5 rounded-full border border-zinc-800 bg-zinc-900/50 text-sm text-zinc-300"
-            >
-              {s}
-            </span>
-          ))}
+      {/* dead book */}
+      <section id="deadbook" className="relative z-10 border-y border-ink/10 bg-night/60">
+        <div className="mx-auto w-full max-w-6xl px-5 py-24">
+          <div className="reveal mb-4 flex items-baseline justify-between gap-4">
+            <h2 className="font-display text-3xl font-bold sm:text-5xl">
+              <span className="font-mono text-base text-rust sm:text-xl">02 ::</span>{" "}
+              THE DEAD BOOK
+            </h2>
+            <p className="hidden font-mono text-xs text-ink/40 sm:block">
+              MEMENTO :: THE ONES THAT CAME BEFORE
+            </p>
+          </div>
+          <p className="reveal max-w-2xl leading-relaxed text-ink/60">
+            Five products came before the flagships. Each one was a position:
+            opened with conviction, closed by evidence. They are named here
+            because the kills are the process, not the shame.
+          </p>
+
+          <div className="mt-12">
+            {DEAD_BOOK.map((d) => (
+              <div key={d.name} className="reveal">
+                <div className="receipt-tear" />
+                <div className="flex flex-col gap-3 py-7 sm:flex-row sm:items-center sm:gap-8">
+                  <span className="stamp inline-block w-fit shrink-0 rounded-md px-2.5 py-1 font-mono text-[10px] font-bold">
+                    SETTLED :: NO
+                  </span>
+                  <h3 className="font-display text-3xl font-extrabold tracking-tight text-ink/85 sm:w-64 sm:shrink-0">
+                    {d.name}
+                    <span className="ml-3 align-middle font-mono text-xs font-normal text-ink/35">
+                      {d.span}
+                    </span>
+                  </h3>
+                  <div className="flex-1">
+                    <p className="text-ink/70">{d.thesis}</p>
+                    <p className="mt-1 font-mono text-xs text-rust/90">
+                      CAUSE :: {d.cause}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div className="receipt-tear" />
+          </div>
+
+          <p className="reveal mt-8 font-mono text-xs text-ink/35">
+            BOOK CLOSED AT 5. THE NEXT ENTRY EARNS ITS LINE THE SAME WAY.
+          </p>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="px-6 sm:px-12 py-10 border-t border-zinc-900 max-w-5xl mx-auto w-full">
-        <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-4 text-sm text-zinc-600">
-          <span>© {new Date().getFullYear()} Onenept Studios Inc.</span>
-          <div className="flex items-center gap-6">
-            <a
-              href="https://www.linkedin.com/in/cenpierrepapi/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-zinc-300 transition-colors"
-            >
-              LinkedIn
-            </a>
-            <a href="mailto:admin@onenept.com" className="hover:text-zinc-300 transition-colors">
-              Email
-            </a>
+      {/* desk rules */}
+      <section id="rules" className="relative z-10 mx-auto w-full max-w-6xl px-5 py-24">
+        <h2 className="reveal mb-12 font-display text-3xl font-bold sm:text-5xl">
+          <span className="font-mono text-base text-sun sm:text-xl">03 ::</span>{" "}
+          DESK RULES
+        </h2>
+        <div className="grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          {RULES.map(([n, title, body]) => (
+            <div key={n} className="reveal">
+              <p className="font-mono text-4xl font-bold text-outline">{n}</p>
+              <h3 className="mt-3 font-display text-xl font-bold">{title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink/60">{body}</p>
+            </div>
+          ))}
+          <div className="reveal flex items-end">
+            <p className="font-mono text-xs leading-6 text-ink/35">
+              THE RULES ARE NOT ASPIRATIONAL.
+              <br />
+              SCROLL UP: FIVE NAMES PAID FOR THEM.
+            </p>
           </div>
         </div>
-      </footer>
+      </section>
 
+      {/* footer */}
+      <footer className="relative z-10 border-t border-ink/10 bg-night">
+        <div className="mx-auto w-full max-w-6xl px-5 py-14">
+          <p className="font-display text-4xl font-extrabold tracking-tight sm:text-6xl">
+            ONENEPT <span className="text-outline">STUDIOS</span>
+          </p>
+          <div className="mt-8 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+            <div className="font-mono text-xs leading-6 text-ink/50">
+              ONENEPT STUDIOS INC.
+              <br />
+              LIVE PRODUCTS, SETTLED WITH EVIDENCE.
+            </div>
+            <div className="flex items-center gap-6 font-mono text-xs text-ink/60">
+              <a href="mailto:admin@onenept.com" className="hover:text-sun">
+                EMAIL
+              </a>
+              <a
+                href="https://github.com/cnpierrepapi"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-sun"
+              >
+                GITHUB
+              </a>
+              <a
+                href="https://www.linkedin.com/in/cenpierrepapi/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-sun"
+              >
+                LINKEDIN
+              </a>
+            </div>
+          </div>
+          <p className="mt-10 font-mono text-[10px] text-ink/30">
+            © {new Date().getFullYear()} ONENEPT STUDIOS INC. /// DARK MODE ONLY. THERE IS NO LIGHT MODE.
+          </p>
+        </div>
+      </footer>
     </div>
-  )
+  );
 }
