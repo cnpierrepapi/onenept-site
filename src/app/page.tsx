@@ -41,13 +41,13 @@ const FLAGSHIPS = [
 const DEAD_BOOK = [
   {
     name: "WETOWS",
-    span: "2026",
+    span: "2018",
     thesis: "Zero-capital social commerce for Africa.",
     cause: "off-thesis. A two-sided cold start is the opposite of the desk.",
   },
   {
     name: "CONFAM",
-    span: "2026",
+    span: "2025",
     thesis: "Verified tipsters for Nigerian bettors.",
     cause: "a nine-year incumbent already owned the lane. Dead in two days.",
   },
@@ -69,7 +69,7 @@ const DEAD_BOOK = [
     span: "2026",
     thesis: "Bet on anything, as long as it is live.",
     cause:
-      "the truth engine judged the oracle before launch. The oracle missed the bar.",
+      "bad actors found the exploit and named their price, and the marketing partner walked at halftime with nothing delivered. The tech held up better than the environment.",
   },
 ];
 
@@ -250,18 +250,18 @@ export default function Home() {
             {DEAD_BOOK.map((d) => (
               <div key={d.name} className="reveal">
                 <div className="receipt-tear" />
-                <div className="flex flex-col gap-3 py-7 sm:flex-row sm:items-center sm:gap-8">
-                  <span className="stamp inline-block w-fit shrink-0 rounded-md px-2.5 py-1 font-mono text-[10px] font-bold">
+                <div className="flex flex-col gap-3 py-7 sm:flex-row sm:items-start sm:gap-8">
+                  <span className="stamp mt-1 inline-block w-fit shrink-0 rounded-md px-2.5 py-1 font-mono text-[10px] font-bold">
                     SETTLED :: NO
                   </span>
-                  <h3 className="font-display text-3xl font-extrabold tracking-tight text-ink/85 sm:w-64 sm:shrink-0">
-                    {d.name}
-                    <span className="ml-3 align-middle font-mono text-xs font-normal text-ink/35">
-                      {d.span}
-                    </span>
-                  </h3>
-                  <div className="flex-1">
-                    <p className="text-ink/70">{d.thesis}</p>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-display text-2xl font-extrabold tracking-tight text-ink/85 sm:text-3xl">
+                      {d.name}
+                      <span className="ml-3 align-middle font-mono text-xs font-normal text-ink/35">
+                        {d.span}
+                      </span>
+                    </h3>
+                    <p className="mt-2 text-ink/70">{d.thesis}</p>
                     <p className="mt-1 font-mono text-xs text-rust/90">
                       CAUSE :: {d.cause}
                     </p>
