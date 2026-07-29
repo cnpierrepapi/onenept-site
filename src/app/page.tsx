@@ -2,16 +2,40 @@ import Image from "next/image";
 import Reveal from "./reveal";
 
 const TICKER = [
+  "HALLMARK :: LIVE",
+  "ARIADNE :: LIVE",
   "LAGISALPHA :: LIVE",
-  "SPIKELINES :: LIVE",
-  "DEAD BOOK :: 5 SETTLED",
-  "SHIP LIVE",
-  "KILL WITH EVIDENCE",
+  "WHERE DID THIS COME FROM",
+  "PROVENANCE OVER PROMISES",
   "SETTLE EVERYTHING",
   "ONENEPT STUDIOS INC",
 ];
 
 const FLAGSHIPS = [
+  {
+    name: "HALLMARK",
+    href: "https://hallmark-rust.vercel.app",
+    label: "hallmark-rust.vercel.app",
+    thesis:
+      "Data provenance for AI advertising. Every generated asset carries its own record inside the file: which model made it, from which prompt, which person signed it off. Change one byte after sign-off and the file says so.",
+    rows: [
+      ["MARK", "C2PA credential, signed"],
+      ["PRIVACY", "public proof, private prompts"],
+      ["TAMPER", "one edited byte fails the check"],
+    ],
+  },
+  {
+    name: "ARIADNE",
+    href: "https://ariadne-five.vercel.app",
+    label: "ariadne-five.vercel.app",
+    thesis:
+      "Lineage-grounded root cause for production ML. When a model starts behaving differently, the cause is upstream. Ariadne walks the column-level lineage from the prediction back to the table that moved, then reads that hop against the rules the model has to answer to.",
+    rows: [
+      ["TRACE", "column level, prediction to source"],
+      ["REGIMES", "four, one unchanged engine"],
+      ["OUTPUT", "a record a regulator can read"],
+    ],
+  },
   {
     name: "LAGISALPHA",
     href: "https://lagisalpha.vercel.app",
@@ -22,18 +46,6 @@ const FLAGSHIPS = [
       ["TERMINAL", "npx lagisalpha"],
       ["SIGNAL", "lead-lag vs de-vigged fair"],
       ["SETTLEMENT", "closing line, no exceptions"],
-    ],
-  },
-  {
-    name: "SPIKELINES",
-    href: "https://spikelines.vercel.app",
-    label: "spikelines.vercel.app",
-    thesis:
-      "Feel the match. A real-time micro-prediction game on live World Cup data: what happens next, called in seconds, scored on a streak, verified on Solana.",
-    rows: [
-      ["ARENA", "live World Cup fixtures"],
-      ["STAKES", "USDC spike packs"],
-      ["PROOF", "on-chain settlement"],
     ],
   },
 ];
@@ -74,11 +86,12 @@ const DEAD_BOOK = [
 ];
 
 const RULES = [
-  ["01", "Live or nothing.", "If it does not run against the real world, it is a slide, not a product."],
-  ["02", "Evidence holds the kill switch.", "Sunk cost does not get a vote. A position that misses its gate closes the same day."],
-  ["03", "The other side is scraped, not onboarded.", "No cold starts. The product is useful to customer number one."],
-  ["04", "Settle everything.", "A claim that cannot be settled is marketing. Every call gets graded against what actually happened."],
-  ["05", "One operator, many positions.", "Small desk, sharp knife. The portfolio is the strategy."],
+  ["01", "Live data or nothing.", "If it does not run against real data arriving in real time, it is a slide, not a product."],
+  ["02", "Every output carries its record.", "Where it came from travels inside the thing itself, not in a spreadsheet somebody has to be trusted to keep."],
+  ["03", "Evidence holds the kill switch.", "Sunk cost does not get a vote. A position that misses its gate closes the same day."],
+  ["04", "The other side is scraped, not onboarded.", "No cold starts. The data is already there on day one, so the product is useful to customer number one."],
+  ["05", "Settle everything.", "A claim that cannot be traced back to a record is marketing. Every call gets graded against what actually happened."],
+  ["06", "One operator, many positions.", "Small desk, sharp knife. The portfolio is the strategy."],
 ];
 
 function ExternalArrow({ className }: { className?: string }) {
@@ -134,7 +147,7 @@ export default function Home() {
         </div>
         <span className="inline-flex items-center gap-2 rounded-full border border-ink/20 px-3 py-1.5 font-mono text-[10px] tracking-[0.2em] text-ink/70 sm:hidden">
           <span className="live-dot h-1.5 w-1.5 rounded-full bg-sun" />
-          2 LIVE
+          3 LIVE
         </span>
       </nav>
 
@@ -171,10 +184,10 @@ export default function Home() {
             LIVE.
           </span>
           <span className="mt-2 block text-[9.5vw] tracking-tight">
-            <span className="text-outline">KILL</span> WITH
+            <span className="text-outline">PROVE</span> THE
           </span>
           <span className="block text-[9.5vw] tracking-tight text-sun">
-            EVIDENCE.
+            DATA.
           </span>
         </h1>
         {/* desktop hero */}
@@ -183,17 +196,17 @@ export default function Home() {
             SHIP <span className="text-outline-sun">LIVE.</span>
           </span>
           <span className="block tracking-tight sm:text-8xl md:text-9xl">
-            <span className="text-outline">KILL</span> WITH
+            <span className="text-outline">PROVE</span> THE
           </span>
           <span className="block tracking-tight text-sun sm:text-8xl md:text-9xl">
-            EVIDENCE.
+            DATA.
           </span>
         </h1>
         <div className="reveal mt-10 flex max-w-2xl flex-col gap-6 sm:flex-row sm:items-end">
           <p className="text-lg leading-relaxed text-ink/70">
-            A one-person product studio run like a trading desk. Every product
-            is a position: opened live against the real world, priced honestly,
-            and closed the moment the numbers say no.
+            A one-person data studio run like a trading desk. Three products,
+            one question: where did this come from. A picture, a prediction, a
+            price. Each one ships with the record that answers it.
           </p>
           <div className="flex shrink-0 items-center gap-3 rounded-2xl border border-ink/15 bg-card/70 p-3 shadow-brut-sm">
             <Image
@@ -222,11 +235,11 @@ export default function Home() {
             OPEN POSITIONS
           </h2>
           <p className="hidden font-mono text-xs text-ink/40 sm:block">
-            FLAGSHIPS. BOTH LIVE RIGHT NOW.
+            THREE DATA PRODUCTS. ALL LIVE RIGHT NOW.
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {FLAGSHIPS.map((f, i) => (
             <a
               key={f.name}
@@ -244,7 +257,7 @@ export default function Home() {
                 </span>
                 <ExternalArrow className="h-5 w-5 text-ink/30 transition-colors group-hover:text-sun" />
               </div>
-              <h3 className="mt-6 font-display text-[7.2vw] font-extrabold tracking-tight sm:text-5xl">
+              <h3 className="mt-6 font-display text-[7.2vw] font-extrabold tracking-tight sm:text-4xl">
                 {f.name}
               </h3>
               <p className="mt-4 flex-1 leading-relaxed text-ink/70">{f.thesis}</p>
@@ -277,7 +290,7 @@ export default function Home() {
             </p>
           </div>
           <p className="reveal max-w-2xl leading-relaxed text-ink/60">
-            Five products came before the flagships. Each one was a position:
+            Five products came before the data desk. Each one was a position:
             opened with conviction, closed by evidence. They are named here
             because the kills are the process, not the shame.
           </p>
@@ -348,7 +361,7 @@ export default function Home() {
             <div className="font-mono text-xs leading-6 text-ink/50">
               ONENEPT STUDIOS INC.
               <br />
-              LIVE PRODUCTS, SETTLED WITH EVIDENCE.
+              DATA PRODUCTS. EVERY OUTPUT TRACED TO ITS SOURCE.
             </div>
             <div className="flex items-center gap-6 font-mono text-xs text-ink/60">
               <a href="mailto:admin@onenept.com" className="hover:text-sun">

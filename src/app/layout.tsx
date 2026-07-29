@@ -18,27 +18,28 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const TITLE = "Onenept Studios :: data products, traced to the source";
+const SHORT_DESC =
+  "A one-person data studio run like a trading desk. Hallmark for provenance in AI advertising, Ariadne for lineage-grounded root cause in production ML, Lagisalpha for settled market calls.";
+
 export const metadata: Metadata = {
-  title: "Onenept Studios :: live products, settled with evidence",
-  description:
-    "A one-person product studio run like a trading desk. Flagships Lagisalpha and Spikelines are live now. Every product settles against the real world, and the ones that missed are named in the Dead Book.",
+  title: TITLE,
+  description: `${SHORT_DESC} Three products, one question: where did this come from.`,
   metadataBase: new URL("https://onenept.com"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Onenept Studios :: live products, settled with evidence",
-    description:
-      "A one-person product studio run like a trading desk. Flagships Lagisalpha and Spikelines are live now.",
+    title: TITLE,
+    description: SHORT_DESC,
     url: "https://onenept.com",
     siteName: "Onenept Studios",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Onenept Studios :: live products, settled with evidence",
-    description:
-      "A one-person product studio run like a trading desk. Flagships Lagisalpha and Spikelines are live now.",
+    title: TITLE,
+    description: SHORT_DESC,
   },
 };
 
@@ -49,7 +50,7 @@ const jsonLd = {
   url: "https://onenept.com",
   email: "admin@onenept.com",
   description:
-    "A one-person product studio run like a trading desk. Live-market products, settled with evidence.",
+    "A one-person data studio run like a trading desk. Provenance, lineage and settlement products, each one traced to its source.",
   founder: {
     "@type": "Person",
     name: "Chukwudumaga Nnawuogo",
