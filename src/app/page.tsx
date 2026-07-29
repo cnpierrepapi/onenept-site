@@ -192,13 +192,13 @@ export default function Home() {
         </h1>
         {/* desktop hero */}
         <h1 className="reveal mt-6 hidden font-display font-extrabold leading-[0.92] sm:block">
-          <span className="block tracking-tight sm:text-8xl md:text-9xl">
+          <span className="block tracking-tight sm:text-8xl lg:text-9xl">
             SHIP <span className="text-outline-sun">LIVE.</span>
           </span>
-          <span className="block tracking-tight sm:text-8xl md:text-9xl">
+          <span className="block tracking-tight sm:text-8xl lg:text-9xl">
             <span className="text-outline">PROVE</span> THE
           </span>
-          <span className="block tracking-tight text-sun sm:text-8xl md:text-9xl">
+          <span className="block tracking-tight text-sun sm:text-8xl lg:text-9xl">
             DATA.
           </span>
         </h1>
@@ -246,7 +246,7 @@ export default function Home() {
               href={f.href}
               target="_blank"
               rel="noopener noreferrer"
-              className={`reveal group relative flex min-w-0 flex-col overflow-hidden rounded-3xl border border-ink/15 bg-card p-6 shadow-brut transition-transform hover:-translate-y-1.5 sm:p-8 ${
+              className={`reveal group relative @container flex min-w-0 flex-col overflow-hidden rounded-3xl border border-ink/15 bg-card p-6 shadow-brut transition-transform hover:-translate-y-1.5 sm:p-8 ${
                 i === 1 ? "md:translate-y-10" : ""
               }`}
             >
@@ -257,7 +257,7 @@ export default function Home() {
                 </span>
                 <ExternalArrow className="h-5 w-5 text-ink/30 transition-colors group-hover:text-sun" />
               </div>
-              <h3 className="mt-6 font-display text-[7.2vw] font-extrabold tracking-tight sm:text-4xl">
+              <h3 className="mt-6 font-display text-[min(9.4cqw,2.25rem)] font-extrabold leading-[1.1] tracking-tight">
                 {f.name}
               </h3>
               <p className="mt-4 flex-1 leading-relaxed text-ink/70">{f.thesis}</p>
@@ -304,9 +304,9 @@ export default function Home() {
                     SETTLED :: NO
                   </span>
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-display text-2xl font-extrabold tracking-tight text-ink/85 sm:text-3xl">
+                    <h3 className="font-display text-[min(6.8vw,1.5rem)] font-extrabold tracking-tight text-ink/85 sm:text-3xl">
                       {d.name}
-                      <span className="ml-3 align-middle font-mono text-xs font-normal text-ink/35">
+                      <span className="mt-1 block font-mono text-xs font-normal text-ink/35 sm:ml-3 sm:mt-0 sm:inline sm:align-middle">
                         {d.span}
                       </span>
                     </h3>
@@ -354,7 +354,7 @@ export default function Home() {
       {/* footer */}
       <footer className="relative z-10 border-t border-ink/10 bg-night">
         <div className="mx-auto w-full max-w-6xl px-5 pb-28 pt-14 sm:py-14">
-          <p className="font-display text-4xl font-extrabold tracking-tight sm:text-6xl">
+          <p className="font-display text-[min(10.2vw,2.25rem)] font-extrabold tracking-tight sm:text-6xl">
             ONENEPT <span className="text-outline">STUDIOS</span>
           </p>
           <div className="mt-8 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
