@@ -4,7 +4,6 @@ import Reveal from "./reveal";
 const TICKER = [
   "HALLMARK :: LIVE",
   "ARIADNE :: LIVE",
-  "LAGISALPHA :: LIVE",
   "WHERE DID THIS COME FROM",
   "PROVENANCE OVER PROMISES",
   "SETTLE EVERYTHING",
@@ -34,18 +33,6 @@ const FLAGSHIPS = [
       ["TRACE", "column level, prediction to source"],
       ["REGIMES", "four, one unchanged engine"],
       ["OUTPUT", "a record a regulator can read"],
-    ],
-  },
-  {
-    name: "LAGISALPHA",
-    href: "https://lagisalpha.vercel.app",
-    label: "lagisalpha.vercel.app",
-    thesis:
-      "The lead-lag edge in prediction markets. When a market trades behind the vig-free fair, the cheap side is underpriced until it converges. Lagisalpha finds that side, trades it on paper, and settles every call against the close.",
-    rows: [
-      ["TERMINAL", "npx lagisalpha"],
-      ["SIGNAL", "lead-lag vs de-vigged fair"],
-      ["SETTLEMENT", "closing line, no exceptions"],
     ],
   },
 ];
@@ -147,7 +134,7 @@ export default function Home() {
         </div>
         <span className="inline-flex items-center gap-2 rounded-full border border-ink/20 px-3 py-1.5 font-mono text-[10px] tracking-[0.2em] text-ink/70 sm:hidden">
           <span className="live-dot h-1.5 w-1.5 rounded-full bg-sun" />
-          3 LIVE
+          2 LIVE
         </span>
       </nav>
 
@@ -204,9 +191,9 @@ export default function Home() {
         </h1>
         <div className="reveal mt-10 flex max-w-2xl flex-col gap-6 sm:flex-row sm:items-end">
           <p className="text-lg leading-relaxed text-ink/70">
-            A one-person data studio run like a trading desk. Three products,
-            one question: where did this come from. A picture, a prediction, a
-            price. Each one ships with the record that answers it.
+            A one-person data studio run like a trading desk. Two products, one
+            question: where did this come from. A picture, a prediction. Each
+            one ships with the record that answers it.
           </p>
           <div className="flex shrink-0 items-center gap-3 rounded-2xl border border-ink/15 bg-card/70 p-3 shadow-brut-sm">
             <Image
@@ -235,11 +222,11 @@ export default function Home() {
             OPEN POSITIONS
           </h2>
           <p className="hidden font-mono text-xs text-ink/40 sm:block">
-            THREE DATA PRODUCTS. ALL LIVE RIGHT NOW.
+            TWO DATA PRODUCTS. BOTH LIVE RIGHT NOW.
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2">
           {FLAGSHIPS.map((f, i) => (
             <a
               key={f.name}

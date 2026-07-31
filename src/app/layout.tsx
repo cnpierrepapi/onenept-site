@@ -20,11 +20,11 @@ const geistMono = Geist_Mono({
 
 const TITLE = "Onenept Studios :: data products, traced to the source";
 const SHORT_DESC =
-  "A one-person data studio run like a trading desk. Hallmark for provenance in AI advertising, Ariadne for lineage-grounded root cause in production ML, Lagisalpha for settled market calls.";
+  "A one-person data studio run like a trading desk. Hallmark for provenance in AI advertising, Ariadne for lineage-grounded root cause in production ML.";
 
 export const metadata: Metadata = {
   title: TITLE,
-  description: `${SHORT_DESC} Three products, one question: where did this come from.`,
+  description: `${SHORT_DESC} Two products, one question: where did this come from.`,
   metadataBase: new URL("https://onenept.com"),
   alternates: {
     canonical: "/",
