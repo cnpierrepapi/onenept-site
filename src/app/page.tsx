@@ -37,6 +37,54 @@ const FLAGSHIPS = [
   },
 ];
 
+const BENCH = [
+  {
+    name: "WARMLEADS",
+    href: "https://warmleads.app",
+    label: "warmleads.app",
+    tag: "LIVE",
+    thesis:
+      "Local businesses scored on what they actually need, then the verified contact behind the score. Live, paying, and run from this desk.",
+    stack: "NEXT.JS / SUPABASE / STRIPE + PAYSTACK",
+  },
+  {
+    name: "DOC-CHAT",
+    href: "https://doc-chat-beige-beta.vercel.app",
+    label: "doc-chat-beige-beta.vercel.app",
+    tag: "LIVE",
+    thesis:
+      "Upload a PDF or point it at a URL, then ask. Every answer comes back with the passages it was built from.",
+    stack: "RETRIEVAL / VOYAGE EMBEDDINGS / PGVECTOR",
+  },
+  {
+    name: "COMPANY INTEL",
+    href: "https://company-intel-tau.vercel.app",
+    label: "company-intel-tau.vercel.app",
+    tag: "LIVE",
+    thesis:
+      "Type a company name, get a sales brief. A tool-using agent searches the web, reads the company site, and streams every step of its work.",
+    stack: "TOOL USE / TAVILY / FIRECRAWL",
+  },
+  {
+    name: "ERROR DOCTOR",
+    href: "https://github.com/cnpierrepapi/solana-error-doctor",
+    label: "github.com/cnpierrepapi/solana-error-doctor",
+    tag: "OPEN SOURCE",
+    thesis:
+      "Paste a Solana error, get the root cause. A diagnostic skill written for AI coding agents, published and merged into the public registry.",
+    stack: "MIT / PUBLISHED SKILL",
+  },
+  {
+    name: "HEIMDALL",
+    href: "https://github.com/cnpierrepapi/heimdall",
+    label: "github.com/cnpierrepapi/heimdall",
+    tag: "OPEN SOURCE",
+    thesis:
+      "Agent observability for DataHub. Watch what every agent did, score it per kind of work, and keep the kill switch on the evidence.",
+    stack: "PYTHON / APACHE 2.0",
+  },
+];
+
 const DEAD_BOOK = [
   {
     name: "WETOWS",
@@ -258,6 +306,54 @@ export default function Home() {
               </div>
               <span className="mt-6 font-mono text-[11px] text-sun/80 group-hover:text-sun">
                 {f.label} ↗
+              </span>
+            </a>
+          ))}
+        </div>
+
+        {/* also on the desk */}
+        <div className="reveal mt-20 flex items-baseline justify-between gap-4 border-t border-ink/10 pt-10">
+          <h3 className="font-display text-xl font-bold sm:text-2xl">
+            ALSO ON THE DESK
+          </h3>
+          <p className="hidden font-mono text-xs text-ink/40 sm:block">
+            SHIPPED AND STILL RUNNING
+          </p>
+        </div>
+        <p className="reveal mt-3 max-w-2xl leading-relaxed text-ink/60">
+          Smaller positions, all of them built end to end and still up. Three
+          you can open and use right now, two you can read line by line.
+        </p>
+
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {BENCH.map((b) => (
+            <a
+              key={b.name}
+              href={b.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="reveal group @container flex min-w-0 flex-col overflow-hidden rounded-2xl border border-ink/15 bg-card/60 p-5 transition-transform hover:-translate-y-1 hover:border-ink/30"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <span className="inline-flex min-w-0 items-center gap-2 rounded-full border border-ink/20 px-2.5 py-1 font-mono text-[9px] tracking-[0.18em] text-ink/60">
+                  {b.tag === "LIVE" && (
+                    <span className="live-dot h-1.5 w-1.5 shrink-0 rounded-full bg-sun" />
+                  )}
+                  {b.tag}
+                </span>
+                <ExternalArrow className="h-4 w-4 shrink-0 text-ink/25 transition-colors group-hover:text-sun" />
+              </div>
+              <h4 className="mt-4 font-display text-[min(9cqw,1.3rem)] font-extrabold leading-[1.1] tracking-tight">
+                {b.name}
+              </h4>
+              <p className="mt-3 flex-1 text-sm leading-relaxed text-ink/65">
+                {b.thesis}
+              </p>
+              <p className="mt-5 break-words border-t border-ink/10 pt-3 font-mono text-[10px] tracking-[0.12em] text-ink/40">
+                {b.stack}
+              </p>
+              <span className="mt-3 min-w-0 break-all font-mono text-[10px] text-sun/70 group-hover:text-sun">
+                {b.label} ↗
               </span>
             </a>
           ))}
