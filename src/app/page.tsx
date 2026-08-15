@@ -16,9 +16,9 @@ const UPSTREAM = [
     href: "https://github.com/datahub-project/datahub/pull/18685",
     label: "PR #18685 and the thread around it",
     found:
-      "The page listing which entity types support incidents was wrong, and so was my first correction of it. Support is declared in six separate files that no longer agree, and nobody had counted them.",
+      "The page listing which entity types support incidents was wrong, and so was my first correction of it. Support is declared in six separate files that no longer agree.",
     proof:
-      "Derived all six from the source with a script after the hand-written version had already been wrong once. Ten entity types accept an incident, seven carry the summary aspect, five can be read back. The table is now generated at build time instead of typed by hand.",
+      "Derived all six with a script, after the hand-written version had already been wrong once. Ten types accept an incident, seven carry the summary aspect, five can be read back. The table is now generated at build time.",
     rows: [
       ["SURFACES", "six, where the maintainer named three"],
       ["DRIFT", "10 write / 7 summary / 5 readable"],
@@ -30,9 +30,9 @@ const UPSTREAM = [
     href: "https://github.com/datahub-project/datahub/issues/18999",
     label: "Issue #18999 and PR #19115",
     found:
-      "Raising an incident on an ML model returns a URN and looks like it worked. Nothing can read it back. The write is accepted at one layer and invisible at the next, so no error is ever reported.",
+      "Raising an incident on an ML model returns a URN and looks like it worked. Nothing can read it back, and no error is ever reported.",
     proof:
-      "Opened the issue, released the ML half of the claim to another contributor who had scoped it first rather than duplicating him, and took the schemaField half. Held it in draft while an authorization question was open instead of pushing it through.",
+      "Opened the issue, released the ML half to a contributor who scoped it first rather than duplicating him, took the schemaField half, and held it in draft while an authorization question was open.",
     rows: [
       ["BEHAVIOUR", "accepted, unreadable, no error"],
       ["SCOPE", "released the overlap, kept one piece"],
@@ -46,13 +46,13 @@ const UPSTREAM_MORE = [
     name: "DATAHUB #18684",
     href: "https://github.com/datahub-project/datahub/pull/18684",
     label: "datahub-project/datahub",
-    line: "Two self-hosted failures that produce no error at all. The startup ping blocks the handshake for forty seconds on a host that cannot reach telemetry; entity type is silently trimmed out of search results. Each cost an afternoon and left nothing to search for.",
+    line: "Two self-hosted failures that produce no error at all. Each cost an afternoon and left nothing to search for.",
   },
   {
     name: "DATAHUB SKILLS #66",
     href: "https://github.com/datahub-project/datahub-skills/pull/66",
     label: "datahub-project/datahub-skills",
-    line: "A skill that answers the question every data team asks before a migration: what breaks downstream if this table or column changes.",
+    line: "What breaks downstream if this table or column changes. The question every data team asks before a migration.",
   },
 ];
 
@@ -62,7 +62,7 @@ const FLAGSHIPS = [
     href: "https://ariadne-five.vercel.app",
     label: "ariadne-five.vercel.app",
     thesis:
-      "Lineage-grounded root cause for production ML, built on DataHub. When a model starts behaving differently, the cause is upstream. Ariadne walks the column-level lineage from the prediction back to the table that moved, then reads that hop against the rules the model has to answer to.",
+      "Lineage-grounded root cause for production ML, built on DataHub. When a model behaves differently, the cause is upstream. Ariadne walks column-level lineage from the prediction back to the table that moved.",
     rows: [
       ["TRACE", "column level, prediction to source"],
       ["CATALOG", "DataHub, real lineage graph"],
@@ -166,35 +166,34 @@ export default function Home() {
         </p>
         {/* mobile hero: mixed-scale stack, every line sized to fit the screen */}
         <h1 className="reveal mt-6 font-display font-extrabold leading-[0.95] sm:hidden">
-          <span className="block text-[21vw] tracking-tight">READ</span>
-          <span className="block text-[21vw] tracking-tight text-outline-sun">
+          <span className="block text-[15vw] tracking-tight">READ</span>
+          <span className="block text-[15vw] tracking-tight text-outline-sun">
             CODE.
           </span>
-          <span className="mt-2 block text-[9.5vw] tracking-tight">
+          <span className="mt-2 block text-[7.5vw] tracking-tight">
             <span className="text-outline">PROVE</span> THE
           </span>
-          <span className="block text-[9.5vw] tracking-tight text-sun">
+          <span className="block text-[7.5vw] tracking-tight text-sun">
             GAPS.
           </span>
         </h1>
         {/* desktop hero */}
         <h1 className="reveal mt-6 hidden font-display font-extrabold leading-[0.92] sm:block">
-          <span className="block tracking-tight sm:text-8xl lg:text-9xl">
+          <span className="block tracking-tight sm:text-6xl lg:text-7xl">
             READ <span className="text-outline-sun">CODE.</span>
           </span>
-          <span className="block tracking-tight sm:text-8xl lg:text-9xl">
+          <span className="block tracking-tight sm:text-6xl lg:text-7xl">
             <span className="text-outline">PROVE</span> THE
           </span>
-          <span className="block tracking-tight text-sun sm:text-8xl lg:text-9xl">
+          <span className="block tracking-tight text-sun sm:text-6xl lg:text-7xl">
             GAPS.
           </span>
         </h1>
         <div className="reveal mt-10 flex max-w-2xl flex-col gap-6 sm:flex-row sm:items-end">
-          <p className="text-lg leading-relaxed text-ink/70">
-            I find the places where a codebase and its own documentation
-            disagree, and I prove it with a script anyone can run. Then I build
-            products on the same principle. Available now for contract work,
-            remote, through Onenept Studios Inc.
+          <p className="text-base leading-relaxed text-ink/70">
+            I find where a codebase and its own documentation disagree, and
+            prove it with a script anyone can run. Available for contract work,
+            remote.
           </p>
           <div className="flex shrink-0 items-center gap-3 rounded-2xl border border-ink/15 bg-card/70 p-3 shadow-brut-sm">
             <Image
@@ -218,8 +217,8 @@ export default function Home() {
       {/* upstream work */}
       <section id="upstream" className="relative z-10 mx-auto w-full max-w-6xl px-5 pb-24">
         <div className="reveal mb-6 flex items-baseline justify-between gap-4">
-          <h2 className="font-display text-3xl font-bold sm:text-5xl">
-            <span className="font-mono text-base text-sun sm:text-xl">01 ::</span>{" "}
+          <h2 className="font-display text-2xl font-bold sm:text-4xl">
+            <span className="font-mono text-sm text-sun sm:text-base">01 ::</span>{" "}
             IN OTHER PEOPLE&apos;S CODEBASES
           </h2>
           <p className="hidden font-mono text-xs text-ink/40 sm:block">
@@ -227,15 +226,12 @@ export default function Home() {
           </p>
         </div>
         <p className="reveal max-w-2xl leading-relaxed text-ink/60">
-          The work I would most want read. Every line below is a public thread
-          with named maintainers in it, including the parts where I was wrong
-          and said so.
+          Public threads with named maintainers in them, including the parts
+          where I was wrong and said so.
         </p>
         <p className="reveal mb-10 mt-4 max-w-2xl border-l-2 border-ink/20 pl-4 font-mono text-xs leading-6 text-ink/45">
-          NOTHING HERE IS MERGED YET. Every one of these is open. I would rather
-          say that than round it up, and it is the same reason the work is worth
-          reading: the finding stands on a script you can run, not on whether a
-          busy maintainer got to it.
+          NOTHING HERE IS MERGED YET. All open. The finding stands on a script
+          you can run, not on whether a busy maintainer got to it.
         </p>
 
         <div className="grid gap-6 md:grid-cols-2">
@@ -255,7 +251,7 @@ export default function Home() {
                 </span>
                 <ExternalArrow className="h-5 w-5 shrink-0 text-ink/30 transition-colors group-hover:text-sun" />
               </div>
-              <h3 className="mt-6 font-display text-[min(7.2cqw,1.6rem)] font-extrabold leading-[1.15] tracking-tight">
+              <h3 className="mt-6 font-display text-[min(6cqw,1.3rem)] font-extrabold leading-[1.15] tracking-tight">
                 {u.label}
               </h3>
               <p className="mt-5 font-mono text-[10px] tracking-[0.18em] text-sun/70">
@@ -291,7 +287,7 @@ export default function Home() {
               className="reveal group @container flex min-w-0 flex-col overflow-hidden rounded-2xl border border-ink/15 bg-card/60 p-5 transition-transform hover:-translate-y-1 hover:border-ink/30"
             >
               <div className="flex items-start justify-between gap-3">
-                <h4 className="font-display text-[min(9cqw,1.15rem)] font-extrabold leading-[1.15] tracking-tight">
+                <h4 className="font-display text-[min(8cqw,1rem)] font-extrabold leading-[1.15] tracking-tight">
                   {m.name}
                 </h4>
                 <ExternalArrow className="h-4 w-4 shrink-0 text-ink/25 transition-colors group-hover:text-sun" />
@@ -310,8 +306,8 @@ export default function Home() {
       {/* open positions */}
       <section id="positions" className="relative z-10 mx-auto w-full max-w-6xl px-5 pb-24">
         <div className="reveal mb-10 flex items-baseline justify-between gap-4">
-          <h2 className="font-display text-3xl font-bold sm:text-5xl">
-            <span className="font-mono text-base text-sun sm:text-xl">02 ::</span>{" "}
+          <h2 className="font-display text-2xl font-bold sm:text-4xl">
+            <span className="font-mono text-sm text-sun sm:text-base">02 ::</span>{" "}
             BUILT ON DATAHUB
           </h2>
           <p className="hidden font-mono text-xs text-ink/40 sm:block">
@@ -335,7 +331,7 @@ export default function Home() {
                 </span>
                 <ExternalArrow className="h-5 w-5 text-ink/30 transition-colors group-hover:text-sun" />
               </div>
-              <h3 className="mt-6 font-display text-[min(9.4cqw,2.25rem)] font-extrabold leading-[1.1] tracking-tight">
+              <h3 className="mt-6 font-display text-[min(8cqw,1.75rem)] font-extrabold leading-[1.1] tracking-tight">
                 {f.name}
               </h3>
               <p className="mt-4 flex-1 leading-relaxed text-ink/70">{f.thesis}</p>
@@ -358,15 +354,15 @@ export default function Home() {
 
       {/* desk rules */}
       <section id="rules" className="relative z-10 mx-auto w-full max-w-6xl px-5 py-24">
-        <h2 className="reveal mb-12 font-display text-3xl font-bold sm:text-5xl">
-          <span className="font-mono text-base text-sun sm:text-xl">03 ::</span>{" "}
+        <h2 className="reveal mb-12 font-display text-2xl font-bold sm:text-4xl">
+          <span className="font-mono text-sm text-sun sm:text-base">03 ::</span>{" "}
           DESK RULES
         </h2>
         <div className="grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
           {RULES.map(([n, title, body]) => (
             <div key={n} className="reveal">
-              <p className="font-mono text-4xl font-bold text-outline">{n}</p>
-              <h3 className="mt-3 font-display text-xl font-bold">{title}</h3>
+              <p className="font-mono text-2xl font-bold text-outline">{n}</p>
+              <h3 className="mt-3 font-display text-lg font-bold">{title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-ink/60">{body}</p>
             </div>
           ))}
@@ -384,7 +380,7 @@ export default function Home() {
       <section className="relative z-10 border-t border-ink/10 bg-night/60">
         <div className="mx-auto w-full max-w-6xl px-5 py-20">
           <div className="reveal grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
-            <h2 className="font-display text-2xl font-bold leading-tight sm:text-4xl">
+            <h2 className="font-display text-xl font-bold leading-tight sm:text-3xl">
               WHY ONENEPT.COM
               <br />
               <span className="text-outline">AND NOT MY NAME</span>
@@ -392,13 +388,8 @@ export default function Home() {
             <div className="max-w-2xl space-y-4 leading-relaxed text-ink/70">
               <p>
                 Onenept Studios is a real company. It is how the work ships and
-                how it gets invoiced, and it is why a first contract needs no
-                paperwork set up from scratch.
-              </p>
-              <p>
-                Putting my name on the door would suggest these are portfolio
-                exercises. They are not. Five of them are dead on the record so
-                that the ones still running have to have earned it.
+                how it gets invoiced, so a first contract needs no paperwork set
+                up from scratch.
               </p>
               <p className="text-ink/85">
                 If you are hiring, you are hiring me, and I am on this page. If
@@ -419,7 +410,7 @@ export default function Home() {
       {/* footer */}
       <footer className="relative z-10 border-t border-ink/10 bg-night">
         <div className="mx-auto w-full max-w-6xl px-5 pb-28 pt-14 sm:py-14">
-          <p className="font-display text-[min(10.2vw,2.25rem)] font-extrabold tracking-tight sm:text-6xl">
+          <p className="font-display text-[min(8vw,1.75rem)] font-extrabold tracking-tight sm:text-4xl">
             ONENEPT <span className="text-outline">STUDIOS</span>
           </p>
           <div className="mt-8 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
