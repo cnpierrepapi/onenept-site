@@ -18,13 +18,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const TITLE = "Onenept Studios :: data products, traced to the source";
+const TITLE = "Onenept Studios :: read code, prove the gaps";
 const SHORT_DESC =
-  "A one-person data studio run like a trading desk. Hallmark for provenance in AI advertising, Ariadne for lineage-grounded root cause in production ML.";
+  "I find the places where a codebase and its own documentation disagree, and prove it with a script anyone can run. Public work in datahub-project/datahub and elsewhere, plus products running in production.";
 
 export const metadata: Metadata = {
   title: TITLE,
-  description: `${SHORT_DESC} Two products, one question: where did this come from.`,
+  description: `${SHORT_DESC} Available for contract work, remote.`,
   metadataBase: new URL("https://onenept.com"),
   alternates: {
     canonical: "/",
@@ -50,7 +50,7 @@ const jsonLd = {
   url: "https://onenept.com",
   email: "admin@onenept.com",
   description:
-    "A one-person data studio run like a trading desk. Provenance, lineage and settlement products, each one traced to its source.",
+    "Metadata and lineage work. Public contributions to datahub-project/datahub, and Ariadne, a lineage-grounded root cause tool built on DataHub. Available for contract work, remote.",
   founder: {
     "@type": "Person",
     name: "Chukwudumaga Nnawuogo",
