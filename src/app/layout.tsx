@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
 
 const TITLE = "Onenept Studios :: read code, prove the gaps";
 const SHORT_DESC =
-  "I find the places where a codebase and its own documentation disagree, and prove it with a script anyone can run. My schemaField incident support is merged into datahub-project/datahub, and the finding behind it became the tracker the project plans that work from.";
+  "I find the places where a codebase and its own documentation disagree, and prove it with a script anyone can run. Two pull requests of mine are merged into datahub-project/datahub, and the finding behind them became the tracker the project plans that work from.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -50,7 +50,7 @@ const jsonLd = {
   url: "https://onenept.com",
   email: "admin@onenept.com",
   description:
-    "Metadata and lineage work. Merged contributions to datahub-project/datahub, and Ariadne, a lineage-grounded root cause tool built on DataHub. Available for contract work, remote.",
+    "Metadata and lineage work. Two merged contributions to datahub-project/datahub, an open helper in google/adk-python written at a maintainer's request, and Ariadne, a lineage-grounded root cause tool built on DataHub. Available for contract work, remote.",
   founder: {
     "@type": "Person",
     name: "Chukwudumaga Nnawuogo",
