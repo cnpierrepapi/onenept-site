@@ -34,6 +34,21 @@ const CASES = [
       ["FOUND", "while building MIGRAGENT"],
     ],
   },
+  {
+    n: "03",
+    slug: "/case/calle",
+    where: "CALL-E",
+    title: "It said done. Nobody answered.",
+    dek: "An AI phone API marked a task completed, with high confidence, on a call that went to voicemail. I placed real calls to a speaking clock until I could say what its fields actually mean. Fourteen issues filed, six fixed inside a week, and the tool that reads a call properly is merged into their repo.",
+    outcome: "MERGED AFTER FOUR ROUNDS OF REVIEW",
+    live: true,
+    when: "31 AUG TO 11 SEP 2026",
+    rows: [
+      ["MERGED", "#337 call state reconciler"],
+      ["FIXED", "6 of 14 issues filed"],
+      ["VALIDATED", "a p1 bug another builder found"],
+    ],
+  },
 ];
 
 const FLAGSHIPS = [
@@ -47,6 +62,18 @@ const FLAGSHIPS = [
       ["TRACE", "column level, prediction to source"],
       ["CATALOG", "DataHub, real lineage graph"],
       ["OUTPUT", "a record a regulator can read"],
+    ],
+  },
+  {
+    name: "ASHEARD",
+    href: "https://asheard.vercel.app",
+    label: "asheard.vercel.app",
+    thesis:
+      "Reads what actually happened on an AI phone call, and which field said so. Place a real call to the speaking clock, then watch the API call a recording a finished job while the other side of the screen says why it is not.",
+    rows: [
+      ["READS", "three CALL-E surfaces, one scale"],
+      ["SHIPS", "npm, and merged upstream"],
+      ["OUTPUT", "what to act on, in plain words"],
     ],
   },
 ];
@@ -119,8 +146,10 @@ export default function Home() {
           <p className="text-base leading-relaxed text-ink/70">
             I find where a codebase and its own documentation disagree, and prove
             it with a script anyone can run. Two of those are merged into
-            DataHub. The third is open in Google&apos;s agent kit because a
-            maintainer asked me to write it. Available for contract work, remote.
+            DataHub. One is merged into CALL-E, after I placed real calls to
+            find out what its API was actually saying. Another is open in
+            Google&apos;s agent kit because a maintainer asked me to write it.
+            Available for contract work, remote.
           </p>
           <div className="flex shrink-0 items-center gap-3 rounded-2xl border border-ink/15 bg-card/70 p-3 shadow-brut-sm">
             <Image
@@ -154,15 +183,15 @@ export default function Home() {
             IN OTHER PEOPLE&apos;S CODEBASES
           </h2>
           <p className="hidden font-mono text-xs text-ink/40 sm:block">
-            TWO CASES. READ EITHER.
+            THREE CASES. READ ANY.
           </p>
         </div>
         <p className="reveal max-w-3xl text-lg leading-relaxed text-ink/70">
           Anyone can get a typo fix merged. This is the other thing: reading
           somebody else&apos;s codebase until you can tell the team something
           about their own project they had not written down yet, and having them
-          write it down. Both of these are written up in full, including the
-          parts where I was the one who was wrong.
+          write it down. Each one is written up in full, including the parts
+          where I was the one who was wrong.
         </p>
 
         <div className="mt-14 space-y-8">
@@ -234,14 +263,14 @@ export default function Home() {
             <span className="font-mono text-sm text-sun sm:text-base">
               02 ::
             </span>{" "}
-            BUILT ON DATAHUB
+            BUILT, RUNNING
           </h2>
           <p className="hidden font-mono text-xs text-ink/40 sm:block">
-            LIVE. OPEN IT.
+            LIVE. OPEN EITHER.
           </p>
         </div>
 
-        <div className="grid gap-6">
+        <div className="grid gap-6 md:grid-cols-2">
           {FLAGSHIPS.map((f) => (
             <a
               key={f.name}
@@ -308,6 +337,8 @@ export default function Home() {
               CASE 01 IS RULE 03. CASE 02 IS RULE 03 AGAIN,
               <br />
               THE DAY AFTER IT CAUGHT ME OUT.
+              <br />
+              CASE 03 IS RULE 04, AIMED AT A PHONE API.
             </p>
           </div>
         </div>

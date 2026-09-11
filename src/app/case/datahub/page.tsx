@@ -30,8 +30,8 @@ const GATES: [string, string, string, string][] = [
   ["2", "Summary aspect", "entity-registry.yml", "MINE"],
   ["3", "GraphQL schema", "incident.graphql", "MINE"],
   ["4", "Resolver wiring", "GmsGraphQLEngine.java", "MINE"],
-  ["5", "Tab badge", "entity page query", "AGREED, NEXT"],
-  ["6", "Incident tab", "web react fragments", "AGREED, NEXT"],
+  ["5", "Tab badge", "entity page query", "BUILT, NOT WANTED YET"],
+  ["6", "Incident tab", "web react fragments", "BUILT, NOT WANTED YET"],
   ["7", "Agent tooling", "mcp_tools/incidents.py", "STILL OPEN"],
 ];
 
@@ -39,8 +39,8 @@ const ALSO = [
   {
     name: "DATAHUB #18685",
     href: "https://github.com/datahub-project/datahub/pull/18685",
-    label: "open, held on purpose",
-    line: "The docs half. It is finished and it is not merging yet, because the list it prints will not be true until one more contributor's work lands. Waiting is the correct move and it is the whole point of the generator.",
+    label: "open, waiting on a review",
+    line: "The docs half. It was held while other work changed the table. That work has landed or been parked, the table it prints is true of master, and it is waiting on a fresh look from a reviewer.",
   },
   {
     name: "DATAHUB #18684",
@@ -175,8 +175,8 @@ export default function DataHubCase() {
               </table>
             </div>
             <p className="mt-3 font-mono text-[11px] leading-5 text-ink/35">
-              GATES 5 AND 6 WERE OUT OF SCOPE WHEN THIS TABLE WAS WRITTEN. SEE
-              BEAT 07.
+              GATES 5 AND 6 WERE BUILT AFTER THIS TABLE WAS WRITTEN. SEE
+              BEAT 07 FOR WHY THEY ARE NOT ON MASTER.
             </p>
           </Beat>
 
@@ -220,6 +220,14 @@ export default function DataHubCase() {
               one and the button would still have disagreed with the mutation
               behind it. Both go through one check now.
             </p>
+            <p className="mt-4 max-w-2xl leading-relaxed text-ink/70">
+              Then I built the tab, got it green, and asked before opening it.
+              The answer was no, for now. An incident on a column but not on
+              its table is a strange thing to show people, and the product
+              team has not decided what it should look like. That is a product
+              call, not a code one. The branch sits on my fork, unopened, and
+              nobody spent review time on a pull request they did not want.
+            </p>
             <Receipt
               chip="ON MASTER"
               headline="fix(incidents): authorize field incidents against the parent entity (#19405)"
@@ -235,7 +243,7 @@ export default function DataHubCase() {
 
         <CaseFoot
           label="THE REST"
-          lead="Two pull requests of mine are on master. The other threads here are still open, and one of them is being held shut on purpose until somebody else's work lands."
+          lead="Two pull requests of mine are on master. A third was built and not opened, because the maintainer said the product was not ready for it. The other threads here are still open."
           tail="I am leaving that here because it was true before either merge and it is the reason they happened. The finding stood on a script anyone could run, months before a busy maintainer got to it."
           nextHref="/case/adk"
           nextLabel="CASE 02 :: GOOGLE ADK"

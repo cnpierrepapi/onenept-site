@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
 
 const TITLE = "Onenept Studios :: read code, prove the gaps";
 const SHORT_DESC =
-  "I find the places where a codebase and its own documentation disagree, and prove it with a script anyone can run. Two pull requests of mine are merged into datahub-project/datahub, and the finding behind them became the tracker the project plans that work from.";
+  "I find the places where a codebase and its own documentation disagree, and prove it with a script anyone can run. Two pull requests of mine are merged into datahub-project/datahub, one into CALL-E's agent repo, and six of the fourteen issues I filed against CALL-E are fixed.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -50,7 +50,7 @@ const jsonLd = {
   url: "https://onenept.com",
   email: "admin@onenept.com",
   description:
-    "Metadata and lineage work. Two merged contributions to datahub-project/datahub, an open helper in google/adk-python written at a maintainer's request, and Ariadne, a lineage-grounded root cause tool built on DataHub. Available for contract work, remote.",
+    "Open source drift audits. Two merged contributions to datahub-project/datahub, one to CALLE-AI/awesome-phone-call-agents, an open helper in google/adk-python written at a maintainer's request, and two live tools: Ariadne, lineage-grounded root cause on DataHub, and Asheard, which reads what actually happened on an AI phone call. Available for contract work, remote.",
   founder: {
     "@type": "Person",
     name: "Chukwudumaga Nnawuogo",

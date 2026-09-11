@@ -161,8 +161,8 @@ export default function AdkCase() {
           label="THE HONEST PART"
           lead="Nothing of mine has merged in a Google repository. The pull request above is open and a maintainer asked for it, which is not the same thing as it landing."
           tail="I have watched a one line fix in the same folder sit for 25 days after the triager had already root caused it, so I am not going to pretend a date. Three of the four threads here are somebody else's, where all I brought was the measurement nobody had run yet. That still counts, it just counts as something other than a merge."
-          nextHref="/case/datahub"
-          nextLabel="CASE 01 :: DATAHUB, TWO MERGED"
+          nextHref="/case/calle"
+          nextLabel="CASE 03 :: CALL-E, MERGED"
         />
 
         <div className="mt-16 grid gap-4 sm:grid-cols-3">
