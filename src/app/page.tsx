@@ -51,32 +51,39 @@ const CASES = [
   },
 ];
 
-const FLAGSHIPS = [
-  {
-    name: "ARIADNE",
-    href: "https://ariadne-five.vercel.app",
-    label: "ariadne-five.vercel.app",
-    thesis:
-      "Lineage-grounded root cause for production ML, built on DataHub. When a model behaves differently, the cause is upstream. Ariadne walks column-level lineage from the prediction back to the table that moved.",
-    rows: [
-      ["TRACE", "column level, prediction to source"],
-      ["CATALOG", "DataHub, real lineage graph"],
-      ["OUTPUT", "a record a regulator can read"],
-    ],
-  },
-  {
-    name: "ASHEARD",
-    href: "https://asheard.vercel.app",
-    label: "asheard.vercel.app",
-    thesis:
-      "Reads what actually happened on an AI phone call, and which field said so. Place a real call to the speaking clock, then watch the API call a recording a finished job while the other side of the screen says why it is not.",
-    rows: [
-      ["READS", "three CALL-E surfaces, one scale"],
-      ["SHIPS", "npm, and merged upstream"],
-      ["OUTPUT", "what to act on, in plain words"],
-    ],
-  },
+/* Every upstream thread, one line each. States checked against GitHub on
+   11 Sep 2026. Re-check before changing a state word. */
+type Entry = {
+  state: string;
+  where: string;
+  line: string;
+  href: string;
+  tone: "sun" | "ink" | "quiet";
+};
+
+const LEDGER: Entry[] = [
+  { state: "MERGED", where: "datahub #19115", line: "incidents on columns, the case 01 finding", href: "https://github.com/datahub-project/datahub/pull/19115", tone: "sun" },
+  { state: "MERGED", where: "datahub #19405", line: "the permission check the column tab needed", href: "https://github.com/datahub-project/datahub/pull/19405", tone: "sun" },
+  { state: "MERGED", where: "call-e #337", line: "the call state reconciler, case 03", href: "https://github.com/CALLE-AI/awesome-phone-call-agents/pull/337", tone: "sun" },
+  { state: "6 FIXED", where: "call-e, 14 issues", line: "docs, SDKs, CLI and plugins. Eight still open", href: "https://github.com/search?q=author%3Acnpierrepapi+org%3ACALLE-AI+is%3Aissue&type=issues", tone: "sun" },
+  { state: "PR OPEN", where: "adk #6935", line: "the config helper a maintainer asked for", href: "https://github.com/google/adk-python/pull/6935", tone: "ink" },
+  { state: "PR OPEN", where: "datahub #18685", line: "the docs half of case 01", href: "https://github.com/datahub-project/datahub/pull/18685", tone: "ink" },
+  { state: "PR OPEN", where: "datahub #18684", line: "two self-hosted failures that print no error", href: "https://github.com/datahub-project/datahub/pull/18684", tone: "ink" },
+  { state: "PR OPEN", where: "datahub-skills #66", line: "what breaks downstream if a column changes", href: "https://github.com/datahub-project/datahub-skills/pull/66", tone: "ink" },
+  { state: "CONFIRMED", where: "adk #6880", line: "the silent 200, confirmed by the models triager", href: "https://github.com/google/adk-python/issues/6880", tone: "ink" },
+  { state: "VALIDATED", where: "call-e #196", line: "a p1 another builder filed, reproduced", href: "https://github.com/CALLE-AI/awesome-phone-call-agents/issues/196", tone: "ink" },
+  { state: "THREAD", where: "adk #2425", line: "a cancel design, worked out with a rival library's author", href: "https://github.com/google/adk-python/issues/2425", tone: "quiet" },
+  { state: "THREAD", where: "adk #2792", line: "a stack trace for stopping an agent on purpose", href: "https://github.com/google/adk-python/issues/2792", tone: "quiet" },
+  { state: "THREAD", where: "python-genai #782", line: "why any output limit under 4k is zero", href: "https://github.com/googleapis/python-genai/issues/782", tone: "quiet" },
+  { state: "FILED", where: "effectstream #895", line: "five reasons a Midnight template will not build", href: "https://github.com/effectstream/effectstream/issues/895", tone: "quiet" },
+  { state: "CLOSED BY ME", where: "call-e #300", line: "my first attempt. It carried real call data", href: "https://github.com/CALLE-AI/awesome-phone-call-agents/pull/300", tone: "quiet" },
 ];
+
+const TONE = {
+  sun: "text-sun",
+  ink: "text-ink/75",
+  quiet: "text-ink/40",
+} as const;
 
 const RULES = [
   [
@@ -253,63 +260,76 @@ export default function Home() {
         </div>
       </section>
 
-      {/* open positions */}
+      {/* the ledger: full-bleed band, breaks the card rhythm on purpose */}
       <section
-        id="positions"
-        className="relative z-10 mx-auto w-full max-w-6xl px-5 pb-24"
+        id="ledger"
+        className="relative z-10 border-y border-ink/10 bg-night/60"
       >
-        <div className="reveal mb-10 flex items-baseline justify-between gap-4">
-          <h2 className="font-display text-2xl font-bold sm:text-4xl">
-            <span className="font-mono text-sm text-sun sm:text-base">
-              02 ::
-            </span>{" "}
-            BUILT, RUNNING
-          </h2>
-          <p className="hidden font-mono text-xs text-ink/40 sm:block">
-            LIVE. OPEN EITHER.
-          </p>
-        </div>
+        <div className="mx-auto w-full max-w-6xl px-5 py-20">
+          <div className="reveal grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] lg:gap-14">
+            <div>
+              <h2 className="font-display text-2xl font-bold sm:text-4xl">
+                <span className="font-mono text-sm text-sun sm:text-base">
+                  02 ::
+                </span>{" "}
+                THE LEDGER
+              </h2>
+              <p className="mt-5 max-w-sm leading-relaxed text-ink/65">
+                Every thread I have opened or argued in, merged or not. The
+                open ones stay on the list. So does the one I closed myself.
+              </p>
+              <p className="mt-6 font-mono text-[11px] leading-5 text-ink/35">
+                STATES CHECKED AGAINST GITHUB, 11 SEP 2026.
+              </p>
+            </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          {FLAGSHIPS.map((f) => (
+            <ol className="min-w-0 font-mono text-xs">
+              {LEDGER.map((e) => (
+                <li key={e.href} className="border-b border-ink/10 last:border-0">
+                  <a
+                    href={e.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group grid grid-cols-[6.5rem_minmax(0,1fr)] gap-x-4 gap-y-1 py-3 sm:grid-cols-[7.5rem_10rem_minmax(0,1fr)]"
+                  >
+                    <span className={`tracking-[0.12em] ${TONE[e.tone]}`}>
+                      {e.state}
+                    </span>
+                    <span className="text-ink/80 group-hover:text-sun">
+                      {e.where}
+                    </span>
+                    <span className="col-start-2 leading-5 text-ink/50 sm:col-start-3">
+                      {e.line}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          <p className="reveal mt-14 max-w-3xl border-t border-ink/10 pt-6 text-sm leading-relaxed text-ink/55">
+            I also ship things, usually because building on a project is how
+            I find what is wrong with it. Two still running:{" "}
             <a
-              key={f.name}
-              href={f.href}
+              href="https://asheard.vercel.app"
               target="_blank"
               rel="noopener noreferrer"
-              className="reveal group relative @container flex min-w-0 flex-col overflow-hidden rounded-3xl border border-ink/15 bg-card p-6 shadow-brut transition-transform hover:-translate-y-1.5 sm:p-8"
+              className="text-ink/80 underline decoration-ink/25 underline-offset-4 hover:text-sun"
             >
-              <div className="flex items-center justify-between">
-                <span className="inline-flex items-center gap-2 rounded-full border border-ink/20 px-3 py-1 font-mono text-[10px] tracking-[0.2em] text-ink/70">
-                  <span className="live-dot h-1.5 w-1.5 rounded-full bg-sun" />
-                  LIVE
-                </span>
-                <ExternalArrow className="h-5 w-5 text-ink/30 transition-colors group-hover:text-sun" />
-              </div>
-              <h3 className="mt-6 font-display text-[min(8cqw,1.75rem)] font-extrabold leading-[1.1] tracking-tight">
-                {f.name}
-              </h3>
-              <p className="mt-4 flex-1 leading-relaxed text-ink/70">
-                {f.thesis}
-              </p>
-              <div className="mt-8 space-y-2 font-mono text-xs">
-                {f.rows.map(([k, v]) => (
-                  <div
-                    key={k}
-                    className="flex min-w-0 justify-between gap-4 border-b border-ink/10 pb-2"
-                  >
-                    <span className="shrink-0 text-ink/40">{k}</span>
-                    <span className="min-w-0 break-words text-right text-ink/80">
-                      {v}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <span className="mt-6 font-mono text-[11px] text-sun/80 group-hover:text-sun">
-                {f.label} ↗
-              </span>
+              asheard
             </a>
-          ))}
+            , the call reader from case 03, and{" "}
+            <a
+              href="https://greenlight.onenept.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-ink/80 underline decoration-ink/25 underline-offset-4 hover:text-sun"
+            >
+              greenlight
+            </a>
+            , which tells a creator what a finished video will get flagged for
+            before it goes up.
+          </p>
         </div>
       </section>
 

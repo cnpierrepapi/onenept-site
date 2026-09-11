@@ -50,7 +50,7 @@ const jsonLd = {
   url: "https://onenept.com",
   email: "admin@onenept.com",
   description:
-    "Open source drift audits. Two merged contributions to datahub-project/datahub, one to CALLE-AI/awesome-phone-call-agents, an open helper in google/adk-python written at a maintainer's request, and two live tools: Ariadne, lineage-grounded root cause on DataHub, and Asheard, which reads what actually happened on an AI phone call. Available for contract work, remote.",
+    "Open source drift audits. Two merged contributions to datahub-project/datahub, one to CALLE-AI/awesome-phone-call-agents, an open helper in google/adk-python written at a maintainer's request, six fixed issues in CALL-E's docs and tooling, and threads in Google's agent and GenAI repos. Available for contract work, remote.",
   founder: {
     "@type": "Person",
     name: "Chukwudumaga Nnawuogo",

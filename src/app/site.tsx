@@ -56,8 +56,8 @@ export function Nav({ chip = "CODE ON MASTER" }: { chip?: string }) {
         <Link href="/#cases" className="hover:text-sun">
           THE CASES
         </Link>
-        <Link href="/#positions" className="hover:text-sun">
-          PRODUCTS
+        <Link href="/#ledger" className="hover:text-sun">
+          THE LEDGER
         </Link>
         <Link href="/#rules" className="hover:text-sun">
           RULES
@@ -88,10 +88,10 @@ export function MobileBar() {
           <span className="text-sun">01</span>THE CASES
         </Link>
         <Link
-          href="/#positions"
+          href="/#ledger"
           className="flex flex-col items-center gap-1 py-3 active:text-sun"
         >
-          <span className="text-sun">02</span>PRODUCTS
+          <span className="text-sun">02</span>LEDGER
         </Link>
         <Link
           href="/#rules"
