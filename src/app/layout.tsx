@@ -1,26 +1,23 @@
-import type { Metadata } from "next";
-import { Syne, Space_Grotesk, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { IBM_Plex_Mono, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 
-const syne = Syne({
-  variable: "--font-syne",
+const serif = Source_Serif_4({
+  variable: "--font-source-serif",
   subsets: ["latin"],
-  weight: ["400", "600", "700", "800"],
+  axes: ["opsz"],
+  style: ["normal", "italic"],
 });
 
-const grotesk = Space_Grotesk({
-  variable: "--font-grotesk",
+const mono = IBM_Plex_Mono({
+  variable: "--font-plex-mono",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const TITLE = "Onenept Studios :: read code, prove the gaps";
+const TITLE = "Onenept Studios :: I read the spec, then I measure";
 const SHORT_DESC =
-  "I find the places where a codebase and its own documentation disagree, and prove it with a script anyone can run. Two pull requests of mine are merged into datahub-project/datahub, one into CALL-E's agent repo, and six of the fourteen issues I filed against CALL-E are fixed.";
+  "I find the places where a codebase and its own documentation disagree, and prove it with something anyone can rerun. Two pull requests of mine are merged into datahub-project/datahub, one into CALL-E's agent repo, and six of the fourteen issues I filed against CALL-E are fixed.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -41,6 +38,11 @@ export const metadata: Metadata = {
     title: TITLE,
     description: SHORT_DESC,
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#f4f1e8",
+  colorScheme: "light",
 };
 
 const jsonLd = {
@@ -69,7 +71,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${syne.variable} ${grotesk.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${serif.variable} ${mono.variable} h-full antialiased`}
     >
       <head>
         <script

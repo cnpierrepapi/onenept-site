@@ -1,16 +1,8 @@
 import Link from "next/link";
 
-export const TICKER = [
-  "AVAILABLE FOR CONTRACT WORK",
-  "TWO MERGED INTO DATAHUB :: AUG 2026",
-  "ONE MERGED INTO CALL-E :: SEP 2026",
-  "6 OF 14 CALL-E ISSUES FIXED",
-  "ADK HELPER PR OPEN AT A MAINTAINER'S ASK",
-  "THE DOCS AND THE CODE DISAGREE",
-  "PROVE IT OR IT DID NOT HAPPEN",
-  "SETTLE EVERYTHING",
-  "ONENEPT STUDIOS INC",
-];
+/* The date every state on the site was last checked against GitHub. Change it
+   only after re-checking, because the stamp and the ledger both print it. */
+export const CALIBRATED = "11 SEP 2026";
 
 export function ExternalArrow({ className }: { className?: string }) {
   return (
@@ -30,47 +22,56 @@ export function ExternalArrow({ className }: { className?: string }) {
   );
 }
 
-export function Ticker() {
-  const tape = [...TICKER, ...TICKER];
+/* Top strip. Static on purpose: a record does not scroll past you. */
+export function CertBar() {
   return (
-    <div className="marquee border-b border-ink/15 bg-night py-2.5 font-mono text-[11px] tracking-[0.18em] text-sun">
-      <div className="marquee-track">
-        {tape.map((t, i) => (
-          <span key={i} className="mx-6">
-            {t} <span className="mx-6 text-ink/30">{"///"}</span>
-          </span>
-        ))}
+    <div className="relative z-10 bg-ink py-2 font-mono text-[10px] tracking-[0.18em] text-paper">
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5">
+        <span className="truncate">
+          ONENEPT STUDIOS INC.
+          <span className="hidden sm:inline"> :: CALIBRATION RECORD</span>
+        </span>
+        <span className="shrink-0">LAST CALIBRATED {CALIBRATED}</span>
       </div>
     </div>
   );
 }
 
-/* chip: the short status word in the top right on mobile */
-export function Nav({ chip = "CODE ON MASTER" }: { chip?: string }) {
+const LINKS: [string, string][] = [
+  ["/#cases", "CASES"],
+  ["/#ledger", "LEDGER"],
+  ["/#errata", "ERRATA"],
+  ["/#rules", "RULES"],
+];
+
+/* chip: the short status in the top right on mobile */
+export function Nav({ chip = "OPEN TO WORK" }: { chip?: string }) {
   return (
     <nav className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-6">
-      <Link href="/" className="font-display text-lg font-bold tracking-tight">
-        one<span className="rounded-md bg-sun px-1.5 py-0.5">nept</span>
+      <Link
+        href="/"
+        className="font-serif text-2xl font-semibold tracking-tight"
+      >
+        onenept
+        <span className="ml-1.5 align-middle font-mono text-[9px] tracking-[0.2em] text-ink/55">
+          STUDIOS
+        </span>
       </Link>
-      <div className="hidden items-center gap-5 font-mono text-xs text-ink/60 sm:flex">
-        <Link href="/#cases" className="hover:text-sun">
-          THE CASES
-        </Link>
-        <Link href="/#ledger" className="hover:text-sun">
-          THE LEDGER
-        </Link>
-        <Link href="/#rules" className="hover:text-sun">
-          RULES
-        </Link>
+      <div className="hidden items-center gap-6 font-mono text-xs text-ink/70 sm:flex">
+        {LINKS.map(([href, label]) => (
+          <Link key={href} href={href} className="hover:text-ink">
+            {label}
+          </Link>
+        ))}
         <a
           href="mailto:admin@onenept.com"
-          className="rounded-full border border-ink/20 px-3 py-1.5 hover:border-sun hover:text-sun"
+          className="border border-ink px-3 py-1.5 text-ink transition-colors hover:bg-ink hover:text-paper"
         >
           CONTACT
         </a>
       </div>
-      <span className="inline-flex items-center gap-2 rounded-full border border-ink/20 px-3 py-1.5 font-mono text-[10px] tracking-[0.2em] text-ink/70 sm:hidden">
-        <span className="live-dot h-1.5 w-1.5 rounded-full bg-sun" />
+      <span className="inline-flex items-center gap-2 border border-ink/40 px-2.5 py-1.5 font-mono text-[10px] tracking-[0.18em] text-ink/80 sm:hidden">
+        <span className="h-1.5 w-1.5 rounded-full bg-ok" />
         {chip}
       </span>
     </nav>
@@ -78,32 +79,29 @@ export function Nav({ chip = "CODE ON MASTER" }: { chip?: string }) {
 }
 
 export function MobileBar() {
+  const items: [string, string, string][] = [
+    ["/#cases", "01", "CASES"],
+    ["/#ledger", "02", "LEDGER"],
+    ["/#errata", "03", "ERRATA"],
+  ];
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-ink/15 bg-night/95 backdrop-blur sm:hidden">
-      <div className="grid grid-cols-4 font-mono text-[10px] tracking-[0.08em] text-ink/70">
-        <Link
-          href="/#cases"
-          className="flex flex-col items-center gap-1 py-3 active:text-sun"
-        >
-          <span className="text-sun">01</span>THE CASES
-        </Link>
-        <Link
-          href="/#ledger"
-          className="flex flex-col items-center gap-1 py-3 active:text-sun"
-        >
-          <span className="text-sun">02</span>LEDGER
-        </Link>
-        <Link
-          href="/#rules"
-          className="flex flex-col items-center gap-1 py-3 active:text-sun"
-        >
-          <span className="text-sun">03</span>RULES
-        </Link>
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-ink/25 bg-paper/95 backdrop-blur sm:hidden">
+      <div className="grid grid-cols-4 font-mono text-[10px] tracking-[0.08em] text-ink/75">
+        {items.map(([href, n, label]) => (
+          <Link
+            key={href}
+            href={href}
+            className="flex flex-col items-center gap-1 py-3 active:text-ink"
+          >
+            <span className="text-ink/45">{n}</span>
+            {label}
+          </Link>
+        ))}
         <a
           href="mailto:admin@onenept.com"
-          className="flex flex-col items-center gap-1 py-3 active:text-sun"
+          className="flex flex-col items-center gap-1 py-3 active:text-ink"
         >
-          <span className="text-sun">@</span>CONTACT
+          <span className="text-ink/45">@</span>CONTACT
         </a>
       </div>
     </nav>
@@ -112,42 +110,49 @@ export function MobileBar() {
 
 export function Footer() {
   return (
-    <footer className="relative z-10 border-t border-ink/10 bg-night">
+    <footer className="relative z-10 border-t-2 border-ink bg-paper-2">
       <div className="mx-auto w-full max-w-6xl px-5 pb-28 pt-14 sm:py-14">
-        <p className="font-display text-[min(8vw,1.75rem)] font-extrabold tracking-tight sm:text-4xl">
-          ONENEPT <span className="text-outline">STUDIOS</span>
-        </p>
-        <div className="mt-8 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
-          <div className="font-mono text-xs leading-6 text-ink/50">
-            ONENEPT STUDIOS INC.
+        <div className="flex flex-col gap-10 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
+              Onenept Studios
+            </p>
+            <p className="mt-3 font-mono text-xs leading-6 text-ink/65">
+              ONENEPT STUDIOS INC.
+              <br />
+              AVAILABLE FOR CONTRACT WORK. REMOTE.
+            </p>
+          </div>
+          <p className="cal-stamp self-start px-4 py-2 font-mono text-[11px] leading-5 text-ink/75 sm:self-auto">
+            CALIBRATED {CALIBRATED}
             <br />
-            AVAILABLE FOR CONTRACT WORK. REMOTE.
-          </div>
-          <div className="flex items-center gap-6 font-mono text-xs text-ink/60">
-            <a href="mailto:admin@onenept.com" className="hover:text-sun">
-              EMAIL
-            </a>
-            <a
-              href="https://github.com/cnpierrepapi"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-sun"
-            >
-              GITHUB
-            </a>
-            <a
-              href="https://www.linkedin.com/in/cenpierrepapi/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-sun"
-            >
-              LINKEDIN
-            </a>
-          </div>
+            AGAINST GITHUB
+          </p>
         </div>
-        <p className="mt-10 font-mono text-[10px] text-ink/30">
-          © {new Date().getFullYear()} ONENEPT STUDIOS INC. /// DARK MODE ONLY.
-          THERE IS NO LIGHT MODE.
+        <div className="mt-10 flex items-center gap-6 font-mono text-xs text-ink/70">
+          <a href="mailto:admin@onenept.com" className="hover:text-ink">
+            EMAIL
+          </a>
+          <a
+            href="https://github.com/cnpierrepapi"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-ink"
+          >
+            GITHUB
+          </a>
+          <a
+            href="https://www.linkedin.com/in/cenpierrepapi/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-ink"
+          >
+            LINKEDIN
+          </a>
+        </div>
+        <p className="mt-10 font-mono text-[10px] leading-5 text-ink/50">
+          © {new Date().getFullYear()} ONENEPT STUDIOS INC. /// EVERY STATE ON
+          THIS SITE LINKS TO THE THING THAT PROVES IT.
         </p>
       </div>
     </footer>

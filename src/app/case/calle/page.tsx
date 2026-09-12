@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
 import Reveal from "../../reveal";
-import { Footer, MobileBar, Nav, Ticker } from "../../site";
-import { Beat, CaseFoot, CaseHeader, Receipt } from "../case-parts";
+import { CertBar, Footer, MobileBar, Nav } from "../../site";
+import {
+  CaseFoot,
+  CaseHeader,
+  Clause,
+  Readings,
+  Receipt,
+  TableBox,
+} from "../case-parts";
 
 const TITLE = "It said done. Nobody answered. :: CALL-E";
 const DESC =
@@ -48,7 +55,7 @@ export default function CalleCase() {
   return (
     <div className="relative min-h-screen overflow-x-clip">
       <Reveal />
-      <Ticker />
+      <CertBar />
       <Nav chip="MERGED 11 SEP" />
       <MobileBar />
 
@@ -57,69 +64,55 @@ export default function CalleCase() {
         kicker="CALL-E, AI PHONE CALLS"
         title={
           <>
-            IT SAID
-            <br />
-            <span className="text-outline">DONE.</span>
-            <br />
-            NOBODY
-            <br />
-            <span className="text-sun">ANSWERED.</span>
+            It said <span className="struck">done.</span> Nobody answered.
           </>
         }
         standfirst="CALL-E lets an agent pick up the phone and make a call for you. I built on it for a hackathon and kept hitting the same question: what actually happened on that call? The API has an answer. Quite often it is the wrong one, and it says it with high confidence."
-        meta="31 AUGUST TO 11 SEPTEMBER 2026 :: REAL CALLS, NO PERSON ON THE OTHER END :: ONE PULL REQUEST MERGED"
+        meta={[
+          ["WHEN", "31 AUGUST TO 11 SEPTEMBER 2026"],
+          ["METHOD", "REAL CALLS, NO PERSON ON THE LINE"],
+          ["STATUS", "ONE PULL REQUEST MERGED"],
+        ]}
       />
 
       <section className="relative z-10 mx-auto w-full max-w-6xl px-5 pb-24">
-        <div className="space-y-16 lg:space-y-24">
-          <Beat
+        <div className="space-y-14 lg:space-y-20">
+          <Clause
             n="01"
-            title="ONE QUESTION, THREE ANSWERS"
+            title="One question, three answers"
             body="There are three ways into CALL-E and each one reports how a call ended in its own words. One can say voicemail and busy. One has no word for either. The third has a failure code with no published list of values, and their own errors guide says not to branch on it. So I wrote a small library that reads all three onto the same scale, and every reading says where it came from: quoted from a field, worked out from other fields, or simply not there."
           >
-            <div className="mt-8 grid gap-px overflow-hidden rounded-2xl border border-ink/15 bg-ink/10 sm:grid-cols-3">
-              {SURFACES.map(([fig, cap]) => (
-                <div key={cap} className="bg-night px-5 py-6">
-                  <p className="font-display text-5xl font-extrabold leading-none text-sun sm:text-6xl">
-                    {fig}
-                  </p>
-                  <p className="mt-3 font-mono text-[11px] leading-5 tracking-[0.1em] text-ink/50">
-                    {cap.toUpperCase()}
-                  </p>
-                </div>
-              ))}
-              <p className="bg-night px-5 pb-6 font-mono text-[11px] leading-5 text-ink/45 sm:col-span-3">
-                &quot;NOT THERE&quot; IS THE IMPORTANT ONE. A MAPPING THAT CANNOT
-                SAY A FACT IS MISSING WILL MAKE ONE UP.
-              </p>
-            </div>
-          </Beat>
+            <Readings
+              items={SURFACES}
+              note="Not there is the important one. A mapping that cannot say a fact is missing will make one up."
+            />
+          </Clause>
 
-          <Beat
+          <Clause
             n="02"
-            title="A VOICEMAIL BOX FINISHED THE JOB"
+            title="A voicemail box finished the job"
             big
             body="Early on I dialled my own phone and it went to voicemail. The agent asked its question into the beep three times and hung up. The API came back completed, task_completed true, confidence high. Sitting in the same object, the result field said the answer was unknown. The payload disagreed with itself and the field everybody branches on picked the wrong side."
             kicker="Nothing in my mapping was wrong. Each field was read faithfully. The missing rule was about the pair: a job marked done on a call where nobody established a person was there."
           />
 
-          <Beat
+          <Clause
             n="03"
-            title="CONFIDENCE CANNOT TELL THEM APART"
+            title="Confidence cannot tell them apart"
             body="So I needed a call with a known right answer and nobody bothered by it. The US speaking clock is a recorded line that exists to be called, and what it says is checkable to the second. The agent heard the time and got it right. That real success and the voicemail box that answered nothing scored two hundredths apart, under the same label. There is no threshold you can set between them. Anyone gating on the score is gating on noise."
             href="https://github.com/CALLE-AI/calle-docs/issues/44"
             link="calle-docs #44, fixed a week later"
           />
 
-          <Beat
+          <Clause
             n="04"
-            title="THE CLOCK THAT MOVES"
+            title="The clock that moves"
             big
             body="Read a finished call straight away and the attempt times are fine: a timezone, fractions of a second. Read the same call a minute later and they have been rewritten. The zone is gone, the time has moved four hours, and the fractions are rounded off. After that it stays wrong. A billing check or a support ticket always reads it later, so it always gets the bad copy."
             href="https://github.com/CALLE-AI/awesome-phone-call-agents/issues/196"
             link="the validation, on their p1 issue that asked for it"
           >
-            <p className="mt-5 max-w-2xl leading-relaxed text-ink/70">
+            <p className="mt-5 max-w-2xl leading-relaxed text-ink/80">
               Another builder had already reported failed calls showing zero
               duration and blamed the failure path. Their issue was tagged as
               needing validation. I posted a reproduction that disagreed with
@@ -129,22 +122,22 @@ export default function CalleCase() {
               the tool treats events as the clock and the attempt fields as a
               rumour.
             </p>
-          </Beat>
+          </Clause>
 
-          <Beat
+          <Clause
             n="05"
-            title="AND I WAS WRONG, MORE THAN ONCE"
+            title="And I was wrong, more than once"
             big
             body="My library read an automated phone menu as a human picking up. The screen said a person answered and it was safe to act on. That one switched off the exact safety rule the whole thing exists for, and a live call caught it, not my hundred tests. The reviewer caught the rest. My demo would let anyone who guessed a call id read that call. I shipped two real phone numbers after ticking the box that said all numbers were fictional. My first pull request carried payloads from real calls, and I closed it myself."
             kicker="Every one of those is fixed and written up in the thread where it happened. The reviewer asked for four rounds of changes and was right every time."
           />
 
-          <Beat
+          <Clause
             n="06"
-            title="FOURTEEN ISSUES, SIX FIXED"
+            title="Fourteen issues, six fixed"
             body="While building I kept a defect log and filed it in the right repos: the docs, the two SDKs, the CLI and plugins. A maintainer fixed five of them in one night and closed each one with a merged change. Two of them he rated top priority."
           >
-            <p className="mt-5 max-w-2xl leading-relaxed text-ink/70">
+            <p className="mt-5 max-w-2xl leading-relaxed text-ink/80">
               The one I am proudest of shows up three times. The TypeScript
               SDK, the Python SDK and the n8n node all stop waiting the moment
               a call&apos;s status says finished, and all three do the opposite
@@ -152,7 +145,7 @@ export default function CalleCase() {
               bug. That is not three careless authors. It is one sentence in
               the docs, and they all believed it.
             </p>
-            <div className="mt-8 overflow-x-auto rounded-2xl border border-ink/15 bg-card/60">
+            <TableBox>
               <table className="w-full min-w-[34rem] table-fixed border-collapse font-mono text-xs">
                 <colgroup>
                   <col className="w-[30%]" />
@@ -160,7 +153,7 @@ export default function CalleCase() {
                   <col className="w-[16%]" />
                 </colgroup>
                 <thead>
-                  <tr className="border-b border-ink/15 text-left text-ink/40">
+                  <tr className="border-b border-ink/30 text-left text-ink/55">
                     <th className="px-4 py-3 font-normal tracking-[0.14em]">
                       WHERE
                     </th>
@@ -176,24 +169,24 @@ export default function CalleCase() {
                   {ISSUES.map(([where, what, href, state]) => (
                     <tr
                       key={href}
-                      className="border-b border-ink/10 last:border-0"
+                      className="border-b border-ink/15 last:border-0"
                     >
                       <td className="px-4 py-3 align-top">
                         <a
                           href={href}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-ink/80 hover:text-sun"
+                          className="underline decoration-ink/25 underline-offset-4 hover:decoration-ink"
                         >
                           {where}
                         </a>
                       </td>
-                      <td className="px-4 py-3 align-top leading-5 text-ink/55">
+                      <td className="px-4 py-3 align-top leading-5 text-ink/70">
                         {what}
                       </td>
                       <td
                         className={`px-4 py-3 text-right align-top ${
-                          state === "FIXED" ? "text-sun" : "text-ink/45"
+                          state === "FIXED" ? "font-medium text-ok" : "text-ink/60"
                         }`}
                       >
                         {state}
@@ -202,12 +195,12 @@ export default function CalleCase() {
                   ))}
                 </tbody>
               </table>
-            </div>
-          </Beat>
+            </TableBox>
+          </Clause>
 
-          <Beat
+          <Clause
             n="07"
-            title="MERGED"
+            title="Merged"
             big
             body="The contribution is a skill that teaches an agent to read what actually happened to a call, plus a small app that shows it. It flags calls that are stuck, calls that are replays, retries that would ring someone twice, and durations that cannot be trusted. Each flag maps to an issue somebody else had already filed and nobody had built against."
           >
@@ -225,11 +218,11 @@ export default function CalleCase() {
               href="https://asheard.vercel.app"
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-6 inline-flex items-center gap-2 font-mono text-[11px] tracking-[0.1em] text-sun/80 hover:text-sun"
+              className="mt-6 inline-flex items-center gap-2 font-mono text-[11px] tracking-[0.08em] text-ink/75 underline decoration-ink/30 underline-offset-4 hover:text-ink"
             >
               the hosted version, asheard.vercel.app &#8599;
             </a>
-          </Beat>
+          </Clause>
         </div>
 
         <CaseFoot
@@ -237,7 +230,7 @@ export default function CalleCase() {
           lead="This repo merges a lot, so a merge here is not rare. The part worth reading is the issue table and the reviews."
           tail="Eight of the fourteen issues are still open and have not been touched since I filed them. The library is on npm as asheard and the hosted app still places real calls to the speaking clock, so you can watch the API say done on a recording yourself."
           nextHref="/case/datahub"
-          nextLabel="CASE 01 :: DATAHUB, TWO MERGED"
+          nextLabel="REPORT 01 :: DATAHUB, TWO MERGED"
         />
       </section>
 
