@@ -1,550 +1,440 @@
 import Image from "next/image";
-import Link from "next/link";
+import Stage from "./gl/stage";
 import Reveal from "./reveal";
-import {
-  CALIBRATED,
-  CertBar,
-  ExternalArrow,
-  Footer,
-  MobileBar,
-  Nav,
-} from "./site";
+import { Arrow, COMPANY, Footer, Nav } from "./site";
 
-type Reading = { k: string; v: string; struck?: boolean; ok?: boolean };
+/* lines lifted from the products themselves, shown in the hero */
+const TRACE: { who: string; line: string; tail: string }[] = [
+  { who: "warmleads", line: "The Brass Fox Bistro, London", tail: "score 89 · serves your skill (demo)" },
+  { who: "syzygy", line: "Bad Bunny × Lamborghini", tail: "taste overlap 0.79 · thesis drafted" },
+  { who: "asheard", line: "task_completed: true", tail: "a recording picked up" },
+];
 
-const CASES: {
-  n: string;
-  slug: string;
-  where: string;
-  when: string;
-  title: string;
-  dek: string;
-  readings: Reading[];
-}[] = [
+const AGENTS: [string, string][] = [
+  ["Scout", "finds two audiences that line up when nobody expects it"],
+  ["Qualifier", "picks the side that would actually buy"],
+  ["Numbers", "builds the evidence from Qloo's data"],
+  ["Contact finder", "looks for the person who signs"],
+  ["Verifier", "checks the inbox is real"],
+  ["Strategist", "picks the angle"],
+  ["Writer", "drafts the message"],
+];
+
+const MERGED: { repo: string; pr: string; href: string; what: string; date: string; sha: string; shaHref: string }[] = [
   {
-    n: "01",
-    slug: "/case/datahub",
-    where: "DATAHUB",
-    when: "28 JUL TO 24 AUG 2026",
-    title: "The page was wrong. So was I.",
-    dek: "DataHub said which kinds of things can have an incident raised against them. The list had drifted from the code and nobody had noticed, because the failure was silent. I stopped reading the files by eye and wrote the script that reads the answer out of the source.",
-    readings: [
-      { k: "THE DOCS SAID", v: "the published list of types", struck: true },
-      { k: "I MEASURED", v: "10 accept an incident, 5 can show it" },
-      { k: "OFF BY", v: "5 types, with no error" },
-      { k: "STATUS", v: "2 MERGED", ok: true },
-    ],
+    repo: "datahub-project/datahub",
+    pr: "#19115",
+    href: "https://github.com/datahub-project/datahub/pull/19115",
+    what: "You can now raise an incident on a single column, not only on a whole dataset. The docs listed types the code didn't support, so we read the answer out of the source instead.",
+    date: "20 Aug 2026",
+    sha: "8c823661e6",
+    shaHref: "https://github.com/datahub-project/datahub/commit/8c823661e6",
   },
   {
-    n: "02",
-    slug: "/case/adk",
-    where: "GOOGLE ADK",
-    when: "22 TO 28 AUG 2026",
-    title: "I said the list would rot. It shipped rotten.",
-    dek: "One config object, 35 fields, three different destinations in the request, and nothing saying which is which. Put the tools in the wrong half and the call returns 200 with no tools in it. A maintainer confirmed it, and my own table went stale inside a day.",
-    readings: [
-      { k: "THE DOCS SAID", v: "nothing. 35 fields, no map" },
-      { k: "I MEASURED", v: "8 top level, 22 nested, 3 dropped" },
-      { k: "OFF BY", v: "your tools vanish on a 200" },
-      { k: "STATUS", v: "PR OPEN, AT THEIR ASK" },
-    ],
+    repo: "datahub-project/datahub",
+    pr: "#19405",
+    href: "https://github.com/datahub-project/datahub/pull/19405",
+    what: "The permission check for those column incidents. It now runs against the parent dataset, which is where the access rules actually live.",
+    date: "24 Aug 2026",
+    sha: "1eeb440e65",
+    shaHref: "https://github.com/datahub-project/datahub/commit/1eeb440e65",
   },
   {
-    n: "03",
-    slug: "/case/calle",
-    where: "CALL-E",
-    when: "31 AUG TO 11 SEP 2026",
-    title: "It said done. Nobody answered.",
-    dek: "An AI phone API marked a task completed, with high confidence, on a call that went to voicemail. I placed real calls to a speaking clock until I could say what its fields actually mean. Fourteen issues filed, six fixed inside a week, and the tool that reads a call properly is merged.",
-    readings: [
-      { k: "THE API SAID", v: "task_completed: true", struck: true },
-      { k: "I MEASURED", v: "a voicemail box. Nobody spoke" },
-      { k: "OFF BY", v: "two hundredths from a real success" },
-      { k: "STATUS", v: "MERGED, 6 ISSUES FIXED", ok: true },
-    ],
+    repo: "CALLE-AI/awesome-phone-call-agents",
+    pr: "#337",
+    href: "https://github.com/CALLE-AI/awesome-phone-call-agents/pull/337",
+    what: "A call state reconciler. It reads what really happened to a phone call, because the status field alone can say done on a voicemail.",
+    date: "11 Sep 2026",
+    sha: "fc43128f2c",
+    shaHref: "https://github.com/CALLE-AI/awesome-phone-call-agents/commit/fc43128f2c",
   },
 ];
 
-/* Every upstream thread, one line each. States checked against GitHub on the
-   CALIBRATED date. Re-check before changing a state word. */
-type Entry = {
-  state: string;
-  where: string;
-  line: string;
-  href: string;
-  tone: "ok" | "ink" | "quiet";
-};
+function Chip({ live, children }: { live?: boolean; children: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-2 rounded-full border border-white/15 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-cream/80">
+      {live ? <span className="live-dot" /> : <span className="h-[7px] w-[7px] rounded-full border border-ice/70" />}
+      {children}
+    </span>
+  );
+}
 
-const LEDGER: Entry[] = [
-  { state: "MERGED", where: "datahub #19115", line: "incidents on columns, the case 01 finding", href: "https://github.com/datahub-project/datahub/pull/19115", tone: "ok" },
-  { state: "MERGED", where: "datahub #19405", line: "the permission check the column tab needed", href: "https://github.com/datahub-project/datahub/pull/19405", tone: "ok" },
-  { state: "MERGED", where: "call-e #337", line: "the call state reconciler, case 03", href: "https://github.com/CALLE-AI/awesome-phone-call-agents/pull/337", tone: "ok" },
-  { state: "6 FIXED", where: "call-e, 14 issues", line: "docs, SDKs, CLI and plugins. Eight still open", href: "https://github.com/search?q=author%3Acnpierrepapi+org%3ACALLE-AI+is%3Aissue&type=issues", tone: "ok" },
-  { state: "PR OPEN", where: "adk #6935", line: "the config helper a maintainer asked for", href: "https://github.com/google/adk-python/pull/6935", tone: "ink" },
-  { state: "PR OPEN", where: "datahub #18685", line: "the docs half of case 01", href: "https://github.com/datahub-project/datahub/pull/18685", tone: "ink" },
-  { state: "PR OPEN", where: "datahub #18684", line: "two self-hosted failures that print no error", href: "https://github.com/datahub-project/datahub/pull/18684", tone: "ink" },
-  { state: "PR OPEN", where: "datahub-skills #66", line: "what breaks downstream if a column changes", href: "https://github.com/datahub-project/datahub-skills/pull/66", tone: "ink" },
-  { state: "CONFIRMED", where: "adk #6880", line: "the silent 200, confirmed by the models triager", href: "https://github.com/google/adk-python/issues/6880", tone: "ink" },
-  { state: "VALIDATED", where: "call-e #196", line: "a p1 another builder filed, reproduced", href: "https://github.com/CALLE-AI/awesome-phone-call-agents/issues/196", tone: "ink" },
-  { state: "THREAD", where: "adk #2425", line: "a cancel design, worked out with a rival library's author", href: "https://github.com/google/adk-python/issues/2425", tone: "quiet" },
-  { state: "THREAD", where: "adk #2792", line: "a stack trace for stopping an agent on purpose", href: "https://github.com/google/adk-python/issues/2792", tone: "quiet" },
-  { state: "THREAD", where: "python-genai #782", line: "why any output limit under 4k is zero", href: "https://github.com/googleapis/python-genai/issues/782", tone: "quiet" },
-  { state: "FILED", where: "effectstream #895", line: "five reasons a Midnight template will not build", href: "https://github.com/effectstream/effectstream/issues/895", tone: "quiet" },
-  { state: "CLOSED BY ME", where: "call-e #300", line: "my first attempt. It carried real call data", href: "https://github.com/CALLE-AI/awesome-phone-call-agents/pull/300", tone: "quiet" },
-];
-
-const TONE = {
-  ok: "text-ok",
-  ink: "text-ink",
-  quiet: "text-ink/55",
-} as const;
-
-/* Things I said in public that were wrong, and what was actually true. */
-const ERRATA: {
-  where: string;
-  claimed: string;
-  actual: string;
-  href: string;
-  label: string;
-}[] = [
-  {
-    where: "DATAHUB #18685",
-    claimed: "One file is the gate that blocks the write, and machine learning models get rejected.",
-    actual: "Neither is true. The maintainer asked for changes and he was right to. I posted the correction myself, twice.",
-    href: "https://github.com/datahub-project/datahub/pull/18685#issuecomment-5306551155",
-    label: "the correction",
-  },
-  {
-    where: "ADK #6880",
-    claimed: "Six fields go to the top level of the request.",
-    actual: "Eight. I missed modelArmorConfig and serviceTier, less than a day after publishing the table.",
-    href: "https://github.com/google/adk-python/issues/6880#issuecomment-5413241023",
-    label: "the correction",
-  },
-  {
-    where: "ADK #2425",
-    claimed: "An orphaned tool call leaves a session in a shape nothing in the codebase is written to handle.",
-    actual: "So I ran it. The session resumes fine on Gemini. Retracted in the thread, with the probe.",
-    href: "https://github.com/google/adk-python/issues/2425",
-    label: "the thread",
-  },
-  {
-    where: "CALL-E #300",
-    claimed: "Nothing from the earlier commits survives the force-push.",
-    actual: "It did. A force-push moves a branch, it does not delete the objects. I said so in the thread and closed the pull request myself.",
-    href: "https://github.com/CALLE-AI/awesome-phone-call-agents/pull/300",
-    label: "the thread",
-  },
-  {
-    where: "MY OWN LIBRARY",
-    claimed: "A person picked up. Safe to act on.",
-    actual: "It was a phone menu. A live call caught it, not my hundred tests.",
-    href: "/case/calle",
-    label: "report 03",
-  },
-];
-
-const RULES = [
-  [
-    "01",
-    "Live data or nothing.",
-    "If it does not run against real data arriving in real time, it is a slide, not a product.",
-  ],
-  [
-    "02",
-    "Every output carries its record.",
-    "Where it came from travels inside the thing itself, not in a spreadsheet somebody has to be trusted to keep.",
-  ],
-  [
-    "03",
-    "Derive it, do not maintain it.",
-    "A hand-written list of what a system supports is wrong the week after it is written. If it can be read from the source, read it from the source.",
-  ],
-  [
-    "04",
-    "Settle everything.",
-    "A claim that cannot be traced back to a record is marketing. That includes my own claims, including the ones I got wrong first.",
-  ],
-];
+function Visit({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group inline-flex items-center gap-2 border-b border-cream/30 pb-1 font-mono text-xs tracking-[0.08em] text-cream transition-colors hover:border-signal hover:text-signal"
+    >
+      {children}
+      <Arrow className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+    </a>
+  );
+}
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen overflow-x-clip">
+    <div className="relative overflow-x-clip">
       <Reveal />
-      <CertBar />
       <Nav />
-      <MobileBar />
 
-      {/* hero: the claim left, a real specimen right */}
-      <header className="relative z-10 mx-auto grid w-full max-w-6xl gap-12 px-5 pb-24 pt-10 sm:pt-16 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:gap-16">
-        <div className="min-w-0">
-          <p className="reveal font-mono text-xs tracking-[0.28em] text-ink/60">
-            CALIBRATION RECORD FOR
-          </p>
-          <div className="reveal mt-5 flex items-center gap-4">
-            <Image
-              src="/founder.jpg"
-              alt="Chukwudumaga Nnawuogo"
-              width={56}
-              height={56}
-              className="h-14 w-14 border border-ink/30 object-cover object-top grayscale"
-            />
-            <div>
-              <p className="font-serif text-xl font-semibold leading-tight sm:text-2xl">
-                Chukwudumaga Nnawuogo
-              </p>
-              <p className="mt-1 font-mono text-[10px] tracking-[0.12em] text-ink/60">
-                BENG, ELECTRICAL AND ELECTRONICS ENGINEERING
-              </p>
+      {/* hero: the field fills the screen, words sit low and left */}
+      <section className="relative isolate flex min-h-[100svh] flex-col justify-end overflow-hidden">
+        <Stage scene="field" className="absolute inset-0 -z-10" />
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_75%_10%,rgb(59_91_255/0.28),transparent_70%)]" />
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-night/25 lg:bg-transparent lg:bg-gradient-to-r lg:from-night/85 lg:via-night/30 lg:to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-night to-transparent" />
+
+        <div className="mx-auto grid w-full max-w-[1400px] gap-10 px-5 pb-14 pt-32 sm:px-8 lg:grid-cols-12 lg:items-end lg:pb-20">
+          <div className="min-w-0 lg:col-span-8">
+            <p className="reveal font-mono text-[11px] uppercase tracking-[0.28em] text-ice/80">
+              Onenept Studios · applied AI
+            </p>
+            <h1 className="reveal mt-6 font-display text-[12.5vw] font-extrabold leading-[0.88] tracking-[-0.045em] sm:text-[9vw] lg:text-[7.2vw] 2xl:text-[104px]">
+              We build agents
+              <br />
+              that find the work.
+              <br />
+              <span className="text-glow">Then they show</span>
+              <br />
+              <span className="text-glow">the receipts.</span>
+            </h1>
+            <p className="reveal mt-8 max-w-xl text-lg leading-relaxed text-cream/75 sm:text-xl">
+              Our agents go through public data the way a good researcher would. They find the business sitting in it and go after it. Every step leaves a record you can click.
+            </p>
+            <div className="reveal mt-9 flex flex-wrap items-center gap-4">
+              <a
+                href={`mailto:${COMPANY.email}`}
+                className="inline-flex items-center gap-2 rounded-full bg-signal px-6 py-3 text-sm font-semibold text-night transition-colors hover:bg-cream"
+              >
+                Talk to us <Arrow />
+              </a>
+              <a
+                href="#work"
+                className="inline-flex items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-sm text-cream transition-colors hover:border-cream"
+              >
+                See what&apos;s running
+              </a>
             </div>
           </div>
-          <h1 className="reveal mt-10 font-serif text-[12vw] font-semibold leading-[0.98] tracking-tight sm:text-7xl lg:text-8xl">
-            I read the spec.
-            <br />
-            <span className="italic text-ink/70">Then I measure</span>
-            <br />
-            the thing.
-          </h1>
-          <p className="reveal mt-10 max-w-xl text-lg leading-relaxed text-ink/80">
-            {
-              "On a bench you trust the meter, not the drawing. I do the same with other people's code. I find where a project's docs and what it actually does disagree, and I prove it with something anyone can rerun. Two of those are merged into DataHub and one into CALL-E. Another is open in Google's agent kit because a maintainer asked me to write it."
-            }
-          </p>
-          <div className="reveal mt-8 flex flex-wrap items-center gap-5">
-            <a
-              href="mailto:admin@onenept.com"
-              className="inline-flex items-center gap-2 border-2 border-ink bg-ink px-5 py-2.5 font-mono text-xs tracking-[0.14em] text-paper transition-colors hover:bg-paper hover:text-ink"
-            >
-              START A CONVERSATION
-              <ExternalArrow className="h-3.5 w-3.5" />
-            </a>
-            <span className="font-mono text-xs text-ink/60">
-              CONTRACT WORK, REMOTE
-            </span>
-          </div>
-        </div>
 
-        {/* the specimen: one real finding, as a test sheet */}
-        <Link
-          href="/case/calle"
-          className="reveal group relative self-end border-2 border-ink bg-paper p-6 transition-colors hover:bg-paper-2 sm:p-7"
-        >
-          <p className="font-mono text-[10px] tracking-[0.2em] text-ink/60">
-            SPECIMEN :: REPORT 03 :: CALL-E
-          </p>
-          <dl className="mt-6 space-y-5">
-            <div>
-              <dt className="font-mono text-[10px] tracking-[0.18em] text-ink/55">
-                THE API SAID
-              </dt>
-              <dd className="struck mt-1 font-mono text-lg">
-                task_completed: true
-              </dd>
-            </div>
-            <div>
-              <dt className="font-mono text-[10px] tracking-[0.18em] text-ink/55">
-                I MEASURED
-              </dt>
-              <dd className="mt-1 font-serif text-2xl leading-snug">
-                A voicemail box. Nobody answered.
-              </dd>
-            </div>
-            <div className="border-t border-ink/20 pt-4">
-              <dt className="font-mono text-[10px] tracking-[0.18em] text-ink/55">
-                THEIR DOCS
-              </dt>
-              <dd className="mt-1 font-mono text-sm text-ok">
-                REDEFINED THE FIELD, 7 SEP
-              </dd>
-            </div>
-          </dl>
-          <span className="cal-stamp absolute -right-2 -top-4 bg-paper px-3 py-1 font-mono text-[10px] text-ok sm:-right-4">
-            SETTLED
-          </span>
-          <span className="mt-6 inline-block font-mono text-[11px] tracking-[0.1em] text-ink/70 group-hover:text-ink">
-            READ THE REPORT &#8594;
-          </span>
-        </Link>
-      </header>
-
-      {/* the cases: report rows, not cards */}
-      <section
-        id="cases"
-        className="relative z-10 mx-auto w-full max-w-6xl px-5 pb-24"
-      >
-        <div className="reveal flex items-baseline justify-between gap-4 border-b-2 border-ink pb-4">
-          <h2 className="font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
-            <span className="mr-3 font-mono text-sm font-normal text-ink/55">
-              01
-            </span>
-            In other people&apos;s codebases
-          </h2>
-          <p className="hidden font-mono text-xs text-ink/55 sm:block">
-            THREE REPORTS
-          </p>
-        </div>
-        <p className="reveal mt-6 max-w-3xl text-lg leading-relaxed text-ink/75">
-          {
-            "Anyone can get a typo fix merged. This is the other thing: reading somebody else's codebase until you can tell the team something about their own project they had not written down yet, and having them write it down. Each one is written up in full, including the parts where I was the one who was wrong."
-          }
-        </p>
-
-        <div className="mt-6">
-          {CASES.map((c) => (
-            <Link
-              key={c.slug}
-              href={c.slug}
-              className="reveal group grid gap-6 border-b border-ink/25 py-12 lg:grid-cols-[minmax(0,10rem)_minmax(0,1fr)] lg:gap-10"
-            >
-              <div>
-                <p className="num font-mono text-5xl font-medium leading-none text-ink/25 group-hover:text-ink">
-                  {c.n}
-                </p>
-                <p className="mt-3 font-mono text-[11px] tracking-[0.16em]">
-                  {c.where}
-                </p>
-                <p className="mt-1 font-mono text-[10px] tracking-[0.1em] text-ink/55">
-                  {c.when}
-                </p>
-              </div>
-              <div className="min-w-0">
-                <h3 className="font-serif text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-                  {c.title}
-                </h3>
-                <p className="mt-4 max-w-2xl leading-relaxed text-ink/75">
-                  {c.dek}
-                </p>
-                <dl className="mt-7 grid grid-cols-2 border-t border-ink/30 sm:grid-cols-4">
-                  {c.readings.map((r) => (
-                    <div
-                      key={r.k}
-                      className="border-b border-ink/15 py-3 pr-4 sm:border-b-0"
-                    >
-                      <dt className="font-mono text-[10px] tracking-[0.16em] text-ink/55">
-                        {r.k}
-                      </dt>
-                      <dd
-                        className={`mt-1 font-mono text-xs leading-5 ${
-                          r.struck ? "struck" : r.ok ? "text-ok" : ""
-                        }`}
-                      >
-                        {r.v}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-                <span className="mt-6 inline-block font-mono text-[11px] tracking-[0.12em] text-ink/70 underline decoration-ink/30 underline-offset-4 group-hover:text-ink">
-                  READ REPORT {c.n} &#8594;
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* the ledger: full-bleed band, breaks the page rhythm on purpose */}
-      <section
-        id="ledger"
-        className="relative z-10 border-y-2 border-ink bg-paper-2"
-      >
-        <div className="mx-auto w-full max-w-6xl px-5 py-20">
-          <div className="reveal grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.7fr)] lg:gap-14">
-            <div>
-              <h2 className="font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
-                <span className="mr-3 font-mono text-sm font-normal text-ink/55">
-                  02
-                </span>
-                The ledger
-              </h2>
-              <p className="mt-5 max-w-sm leading-relaxed text-ink/75">
-                Every thread I have opened or argued in, merged or not. The
-                open ones stay on the list. So does the one I closed myself.
-              </p>
-              <p className="mt-6 font-mono text-[11px] leading-5 text-ink/55">
-                STATES CHECKED AGAINST GITHUB, {CALIBRATED}.
-              </p>
-            </div>
-
-            <ol className="min-w-0 border-t border-ink/30 font-mono text-xs">
-              {LEDGER.map((e) => (
-                <li key={e.href} className="border-b border-ink/15">
-                  <a
-                    href={e.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group grid grid-cols-[6.5rem_minmax(0,1fr)] gap-x-4 gap-y-1 py-3 sm:grid-cols-[7.5rem_10rem_minmax(0,1fr)]"
-                  >
-                    <span className={`tracking-[0.1em] ${TONE[e.tone]}`}>
-                      {e.state}
-                    </span>
-                    <span className="group-hover:underline">{e.where}</span>
-                    <span className="col-start-2 leading-5 text-ink/65 sm:col-start-3">
-                      {e.line}
-                    </span>
-                  </a>
+          <aside className="reveal min-w-0 lg:col-span-4">
+            <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-mute">Straight from the products</p>
+            <ol className="mt-4 space-y-3">
+              {TRACE.map((r) => (
+                <li key={r.who} className="glass rounded-xl px-4 py-3">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-signal">{r.who}</p>
+                  <p className={`mt-1 font-mono text-sm text-cream ${r.who === "asheard" ? "struck" : ""}`}>{r.line}</p>
+                  <p className="mt-0.5 font-mono text-[11px] text-mute">{r.tail}</p>
                 </li>
               ))}
             </ol>
-          </div>
-
-          <p className="reveal mt-14 max-w-3xl border-t border-ink/20 pt-6 leading-relaxed text-ink/70">
-            I also ship things, usually because building on a project is how
-            I find what is wrong with it. Two still running:{" "}
-            <a
-              href="https://asheard.vercel.app"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-ink underline decoration-ink/30 underline-offset-4"
-            >
-              asheard
-            </a>
-            , the call reader from report 03, and{" "}
-            <a
-              href="https://greenlight.onenept.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-ink underline decoration-ink/30 underline-offset-4"
-            >
-              greenlight
-            </a>
-            , which tells a creator what a finished video will get flagged for
-            before it goes up.
-          </p>
+          </aside>
         </div>
       </section>
 
-      {/* errata: offset right, the one section that is all about me being wrong */}
-      <section
-        id="errata"
-        className="relative z-10 mx-auto w-full max-w-6xl px-5 py-24"
-      >
-        <div className="lg:pl-[16%]">
-          <h2 className="reveal font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
-            <span className="mr-3 font-mono text-sm font-normal text-ink/55">
-              03
-            </span>
-            Errata
-          </h2>
-          <p className="reveal mt-5 max-w-2xl text-lg leading-relaxed text-ink/75">
-            Things I said in public that turned out to be wrong. Each one got
-            corrected where I said it, before anyone had to ask twice.
-          </p>
+      {/* what we do: two halves on purpose, one much bigger than the other */}
+      <section className="relative z-10 mx-auto max-w-[1400px] px-5 py-28 sm:px-8 sm:py-40">
+        <div className="grid gap-16 lg:grid-cols-12">
+          <div className="lg:col-span-7">
+            <p className="reveal font-mono text-[11px] uppercase tracking-[0.28em] text-mute">What we do</p>
+            <h2 className="reveal mt-6 font-display text-4xl font-bold leading-[1.02] tracking-[-0.03em] sm:text-6xl lg:text-7xl">
+              Most of the business you want is already public. It&apos;s just scattered.
+            </h2>
+            <p className="reveal mt-8 max-w-2xl text-lg leading-relaxed text-cream/70">
+              A restaurant in London whose website is broken. Two brands whose fans love the same films. It&apos;s all sitting in maps listings and taste data and job posts. Nobody has the hours to read it. So we built agents that do, and then act on what they find.
+            </p>
+          </div>
+          <div className="lg:col-span-4 lg:col-start-9 lg:pt-56">
+            <div className="reveal border-l-2 border-signal pl-6">
+              <h3 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+                And they don&apos;t get to say &ldquo;done&rdquo; on trust.
+              </h3>
+              <p className="mt-4 leading-relaxed text-cream/65">
+                When an agent marks a job complete, that&apos;s a claim. We check it. That habit is where asheard came from, and it&apos;s why we&apos;ve had fixes merged into DataHub and CALL-E.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
-          <ol className="mt-10 border-t-2 border-ink">
-            {ERRATA.map((e) => {
-              const internal = e.href.startsWith("/");
-              return (
-                <li
-                  key={e.where}
-                  className="reveal grid gap-3 border-b border-ink/20 py-7 sm:grid-cols-[minmax(0,10rem)_minmax(0,1fr)] sm:gap-8"
-                >
-                  <p className="font-mono text-[11px] tracking-[0.14em] text-ink/60">
-                    {e.where}
-                  </p>
-                  <div className="min-w-0">
-                    <p className="struck font-serif text-xl leading-snug">
-                      {e.claimed}
-                    </p>
-                    <p className="mt-3 max-w-2xl leading-relaxed">{e.actual}</p>
-                    {internal ? (
-                      <Link
-                        href={e.href}
-                        className="mt-3 inline-block font-mono text-[11px] tracking-[0.08em] text-ink/70 underline decoration-ink/30 underline-offset-4 hover:text-ink"
-                      >
-                        {e.label} &#8594;
-                      </Link>
-                    ) : (
-                      <a
-                        href={e.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-3 inline-block font-mono text-[11px] tracking-[0.08em] text-ink/70 underline decoration-ink/30 underline-offset-4 hover:text-ink"
-                      >
-                        {e.label} &#8599;
-                      </a>
-                    )}
+      {/* work */}
+      <section id="work" className="relative z-10 scroll-mt-20">
+        <div className="mx-auto flex max-w-[1400px] items-end justify-between gap-6 px-5 sm:px-8">
+          <h2 className="reveal font-display text-[15vw] font-extrabold leading-[0.8] tracking-[-0.05em] text-cream/95 sm:text-[11vw] lg:text-[150px]">
+            Running
+          </h2>
+          <p className="reveal hidden pb-3 text-right font-mono text-[11px] uppercase leading-6 tracking-[0.2em] text-mute sm:block">
+            3 products
+            <br />2 live · 1 building
+          </p>
+        </div>
+        <div className="hairline mx-auto mt-10 max-w-[1400px]" />
+
+        {/* 01 warmleads: wide, the globe bleeds off the right edge */}
+        <article className="relative isolate overflow-hidden">
+          <div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(50%_60%_at_80%_50%,rgb(59_91_255/0.22),transparent_70%)]" />
+          <div className="mx-auto grid max-w-[1400px] items-center gap-6 px-5 py-20 sm:px-8 lg:min-h-[88vh] lg:grid-cols-12 lg:py-10">
+            <div className="relative z-10 lg:col-span-5">
+              <div className="reveal flex flex-wrap items-center gap-3">
+                <span className="font-mono text-xs text-mute">01</span>
+                <Chip live>Live</Chip>
+              </div>
+              <h3 className="reveal mt-6 font-display text-[16vw] font-extrabold tracking-[-0.04em] sm:text-8xl">Warmleads</h3>
+              <p className="reveal mt-4 font-display text-2xl font-medium leading-snug text-ice sm:text-3xl">
+                Leads for freelancers, already qualified.
+              </p>
+              <p className="reveal mt-6 max-w-md leading-relaxed text-cream/70">
+                Pick a business type and a city. Warmleads hands back the ones that actually need your skill. Each comes with a score, a verified contact and the one thing that business needs most. You don&apos;t need a thousand leads. You need the right fifty.
+              </p>
+              <dl className="reveal mt-8 grid max-w-md grid-cols-3 gap-4 border-t border-white/10 pt-6">
+                {[
+                  ["any", "business type"],
+                  ["any", "city"],
+                  ["50+", "skills"],
+                ].map(([v, k]) => (
+                  <div key={k}>
+                    <dt className="font-display text-2xl font-bold sm:text-3xl">{v}</dt>
+                    <dd className="mt-1 font-mono text-[10px] uppercase tracking-[0.16em] text-mute">{k}</dd>
                   </div>
-                </li>
-              );
-            })}
+                ))}
+              </dl>
+              <div className="reveal mt-9">
+                <Visit href="https://warmleads.app">warmleads.app</Visit>
+              </div>
+            </div>
+            <div className="relative h-[78vh] min-h-[520px] lg:col-span-7 lg:h-[88vh] lg:min-h-0">
+              <Stage scene="globe" className="absolute -left-[10%] -right-[25%] bottom-[22%] top-0 sm:inset-y-0 lg:-right-[35%]" />
+              <div className="reveal glass absolute bottom-0 left-0 w-[min(320px,92%)] rounded-2xl p-5 sm:bottom-14 sm:left-6">
+                <div className="flex items-center justify-between">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-mute">From the warmleads demo</p>
+                  <p className="font-display text-2xl font-bold text-signal">89</p>
+                </div>
+                <p className="mt-2 font-display text-lg font-semibold">The Brass Fox Bistro</p>
+                <p className="font-mono text-[11px] text-cream/60">Restaurant · London · 4.6★ (320)</p>
+                <div className="mt-4 flex flex-wrap gap-2 font-mono text-[10px] uppercase tracking-[0.12em]">
+                  <span className="rounded-full bg-signal/15 px-2.5 py-1 text-signal">serves your skill</span>
+                  <span className="rounded-full bg-white/5 px-2.5 py-1 text-cream/70">WhatsApp</span>
+                </div>
+                <p className="mt-4 rounded-lg border border-dashed border-white/15 px-3 py-2 font-mono text-[11px] text-cream/50">
+                  hold to reveal the contact + top need
+                </p>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        {/* 02 syzygy: reversed, tall stage on the left, the agent chain on the right */}
+        <article className="relative isolate overflow-hidden border-y border-white/10 bg-deep">
+          <div className="mx-auto grid max-w-[1400px] items-center gap-6 px-5 py-20 sm:px-8 lg:grid-cols-12 lg:py-0">
+            <div className="relative order-2 h-[58vh] min-h-[360px] lg:order-1 lg:col-span-7 lg:h-[96vh]">
+              <Stage scene="orbits" className="absolute inset-0 lg:-left-[18%]" />
+              <p className="pointer-events-none absolute bottom-4 left-0 max-w-[16rem] font-mono text-[10px] uppercase leading-5 tracking-[0.16em] text-mute lg:bottom-12">
+                syzygy (n.) when three bodies line up in a straight line
+              </p>
+            </div>
+            <div className="order-1 lg:order-2 lg:col-span-5 lg:py-24">
+              <div className="reveal flex flex-wrap items-center gap-3">
+                <span className="font-mono text-xs text-mute">02</span>
+                <Chip>Building · Qloo hackathon, closes 30 Oct</Chip>
+              </div>
+              <h3 className="reveal mt-6 font-display text-[16vw] font-extrabold tracking-[-0.04em] sm:text-8xl">SYZYGY</h3>
+              <p className="reveal mt-4 font-display text-2xl font-medium leading-snug text-violet sm:text-3xl">
+                A sales floor with no people on it.
+              </p>
+              <p className="reveal mt-6 leading-relaxed text-cream/70">
+                SYZYGY reads Qloo&apos;s taste data and looks for audiences that overlap when they really shouldn&apos;t. Bad Bunny fans and Lamborghini, say. Then a chain of agents takes it from there. Click any line on the floor and you get the evidence behind it.
+              </p>
+              <ol className="reveal relative mt-8 space-y-0 border-l border-white/15 pl-6">
+                {AGENTS.map(([name, job], k) => (
+                  <li key={name} className="relative py-2">
+                    <span
+                      className={`absolute -left-[29px] top-[14px] h-2.5 w-2.5 rounded-full ${
+                        k === AGENTS.length - 1 ? "bg-signal" : "border border-ice/60 bg-deep"
+                      }`}
+                    />
+                    <p className="text-sm">
+                      <span className="font-mono text-ice">{name}</span>
+                      <span className="text-cream/55"> {job}</span>
+                    </p>
+                  </li>
+                ))}
+              </ol>
+              <p className="reveal mt-6 font-mono text-[11px] leading-5 text-mute">
+                Messages are drafted, not sent, until the mailbox goes live.
+              </p>
+              <div className="reveal mt-8">
+                <Visit href="https://syzygybot.vercel.app">see the floor</Visit>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        {/* 03 asheard: a full-bleed band, the waveform behind the words */}
+        <article className="relative isolate overflow-hidden">
+          <Stage scene="wave" className="absolute inset-0 -z-10 opacity-90" />
+          <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-night via-night/80 to-night/10" />
+          <div className="mx-auto grid max-w-[1400px] gap-12 px-5 py-28 sm:px-8 lg:min-h-[86vh] lg:grid-cols-12 lg:items-center">
+            <div className="lg:col-span-6">
+              <div className="reveal flex flex-wrap items-center gap-3">
+                <span className="font-mono text-xs text-mute">03</span>
+                <Chip live>Live · on npm</Chip>
+              </div>
+              <h3 className="reveal mt-6 font-display text-[16vw] font-extrabold tracking-[-0.04em] sm:text-8xl">asheard</h3>
+              <p className="reveal mt-4 font-display text-2xl font-medium leading-snug text-signal sm:text-3xl">
+                Did that call actually happen?
+              </p>
+              <p className="reveal mt-6 max-w-lg leading-relaxed text-cream/70">
+                AI phone APIs can come back with the call finished, the job done and a confidence of 0.9, when an answering machine picked up. asheard reads the same payload and tells you what really happened. And it points at the exact field it read.
+              </p>
+              <div className="reveal mt-9">
+                <Visit href="https://asheard.vercel.app">asheard.vercel.app</Visit>
+              </div>
+            </div>
+            <div className="reveal lg:col-span-5 lg:col-start-8">
+              <div className="glass grid grid-cols-2 overflow-hidden rounded-2xl font-mono text-xs">
+                <div className="border-r border-white/10 p-5">
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-mute">The API said</p>
+                  <ul className="mt-4 space-y-2 text-cream/80">
+                    <li>status: completed</li>
+                    <li className="struck">task_completed: true</li>
+                    <li>confidence: 0.9</li>
+                  </ul>
+                </div>
+                <div className="p-5">
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-signal">What happened</p>
+                  <p className="mt-4 font-display text-xl font-semibold leading-snug text-cream">
+                    A recording picked up. Nobody spoke.
+                  </p>
+                </div>
+              </div>
+              <p className="mt-4 font-mono text-[11px] text-mute">Built on CALL-E. The flat orange line, with the beep, is the voicemail.</p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      {/* open source: merged only */}
+      <section id="open-source" className="relative isolate z-10 scroll-mt-20 overflow-hidden border-t border-white/10">
+        <div className="relative h-[42vh] min-h-[280px]">
+          <Stage scene="merge" className="absolute inset-0" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-night to-transparent" />
+        </div>
+        <div className="mx-auto max-w-[1400px] px-5 pb-28 sm:px-8">
+          <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
+            <h2 className="reveal font-display text-5xl font-extrabold leading-[0.95] tracking-[-0.04em] sm:text-7xl lg:col-span-7">
+              Merged upstream.
+            </h2>
+            <p className="reveal max-w-md leading-relaxed text-cream/65 lg:col-span-5">
+              Some of the checking happens in other people&apos;s code. These three are in, reviewed and merged by the teams who own the projects.
+            </p>
+          </div>
+          <ol className="mt-14 border-t border-white/15">
+            {MERGED.map((m) => (
+              <li key={m.pr + m.repo} className="reveal grid gap-4 border-b border-white/10 py-8 lg:grid-cols-12 lg:gap-8">
+                <div className="lg:col-span-3">
+                  <a href={m.href} target="_blank" rel="noopener noreferrer" className="group">
+                    <p className="font-mono text-[11px] text-mute">{m.repo}</p>
+                    <p className="mt-1 font-display text-3xl font-bold group-hover:text-signal">{m.pr}</p>
+                  </a>
+                </div>
+                <p className="max-w-2xl leading-relaxed text-cream/75 lg:col-span-6">{m.what}</p>
+                <div className="font-mono text-[11px] leading-6 lg:col-span-3 lg:text-right">
+                  <p className="text-signal">MERGED {m.date.toUpperCase()}</p>
+                  <a href={m.shaHref} target="_blank" rel="noopener noreferrer" className="text-mute underline decoration-white/20 underline-offset-4 hover:text-cream">
+                    commit {m.sha}
+                  </a>
+                </div>
+              </li>
+            ))}
           </ol>
         </div>
       </section>
 
-      {/* where the habit came from: one big paragraph, no furniture */}
-      <section className="relative z-10 bg-ink text-paper">
-        <div className="mx-auto w-full max-w-6xl px-5 py-20 sm:py-28">
-          <p className="reveal font-mono text-[11px] tracking-[0.2em] text-paper/60">
-            WHERE THE HABIT CAME FROM
-          </p>
-          <p className="reveal mt-6 max-w-4xl font-serif text-2xl leading-snug sm:text-4xl sm:leading-tight">
-            {
-              "I trained as an electrical engineer, where you check the meter before you believe the drawing. In 2016 I co-founded Afrosets, a dataset of Black faces, because the models of the day had barely seen any. My master's dissertation is about drift: what a stock keeps doing after the company publishes its numbers."
-            }
-          </p>
-          <p className="reveal mt-8 font-serif text-2xl italic text-paper/70 sm:text-3xl">
-            Same question every time. What did the record leave out?
-          </p>
-        </div>
-      </section>
-
-      {/* standing rules */}
-      <section
-        id="rules"
-        className="relative z-10 mx-auto w-full max-w-6xl px-5 py-24"
-      >
-        <h2 className="reveal mb-12 border-b-2 border-ink pb-4 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
-          <span className="mr-3 font-mono text-sm font-normal text-ink/55">
-            04
-          </span>
-          Standing rules
-        </h2>
-        <div className="grid gap-x-12 gap-y-10 sm:grid-cols-2">
-          {RULES.map(([n, title, body]) => (
-            <div key={n} className="reveal grid grid-cols-[3rem_minmax(0,1fr)]">
-              <p className="font-mono text-sm text-ink/55">§{n}</p>
+      {/* company: the one light section, breaks the night */}
+      <section id="company" className="relative z-10 scroll-mt-16 bg-cream text-night">
+        <div className="mx-auto grid max-w-[1400px] gap-14 px-5 py-24 sm:px-8 sm:py-32 lg:grid-cols-12">
+          <div className="lg:col-span-6">
+            <p className="reveal font-mono text-[11px] uppercase tracking-[0.28em] text-night/55">The company</p>
+            <h2 className="reveal mt-6 font-display text-5xl font-extrabold leading-[0.92] tracking-[-0.045em] sm:text-7xl">
+              Onenept
+              <br />
+              Studios Inc.
+            </h2>
+            <p className="reveal mt-8 max-w-md text-lg leading-relaxed text-night/70">
+              An applied AI company. If it can&apos;t run on live data, we don&apos;t ship it. If an agent says it did something, there&apos;s a record of it.
+            </p>
+          </div>
+          <div className="lg:col-span-5 lg:col-start-8 lg:pt-16">
+            <dl className="reveal divide-y divide-night/15 border-y border-night/15 font-mono text-sm">
+              <div className="grid grid-cols-[7rem_1fr] gap-4 py-4">
+                <dt className="text-[10px] uppercase tracking-[0.18em] text-night/50">Entity</dt>
+                <dd>
+                  {COMPANY.legal}
+                  <br />
+                  <span className="text-night/60">{COMPANY.kind}</span>
+                </dd>
+              </div>
+              <div className="grid grid-cols-[7rem_1fr] gap-4 py-4">
+                <dt className="text-[10px] uppercase tracking-[0.18em] text-night/50">Address</dt>
+                <dd>
+                  {COMPANY.street}
+                  <br />
+                  {COMPANY.city}
+                  <br />
+                  {COMPANY.country}
+                </dd>
+              </div>
+              <div className="grid grid-cols-[7rem_1fr] gap-4 py-4">
+                <dt className="text-[10px] uppercase tracking-[0.18em] text-night/50">Email</dt>
+                <dd>
+                  <a href={`mailto:${COMPANY.email}`} className="underline decoration-night/30 underline-offset-4 hover:decoration-signal">
+                    {COMPANY.email}
+                  </a>
+                </dd>
+              </div>
+            </dl>
+            <div className="reveal mt-10 flex items-center gap-4">
+              <Image
+                src="/founder.jpg"
+                alt={COMPANY.founder}
+                width={56}
+                height={56}
+                className="h-14 w-14 rounded-full object-cover object-top grayscale"
+              />
               <div>
-                <h3 className="font-serif text-2xl font-semibold">{title}</h3>
-                <p className="mt-2 leading-relaxed text-ink/75">{body}</p>
+                <p className="font-display text-lg font-bold">{COMPANY.founder}</p>
+                <p className="text-sm text-night/60">
+                  Founder. Electrical engineer by training.{" "}
+                  <a href={COMPANY.linkedin} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">
+                    LinkedIn
+                  </a>{" "}
+                  ·{" "}
+                  <a href={COMPANY.github} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">
+                    GitHub
+                  </a>
+                </p>
               </div>
             </div>
-          ))}
+          </div>
         </div>
-        <p className="reveal mt-14 font-mono text-xs leading-6 text-ink/55">
-          THE RULES ARE NOT ASPIRATIONAL. REPORT 01 IS §03. REPORT 02 IS §03
-          AGAIN, THE DAY AFTER IT CAUGHT ME OUT. REPORT 03 IS §04, AIMED AT A
-          PHONE API. THE ERRATA ARE §04 AIMED AT ME.
-        </p>
       </section>
 
-      {/* why this domain */}
-      <section className="relative z-10 border-t border-ink/25">
-        <div className="mx-auto w-full max-w-6xl px-5 py-20">
-          <div className="reveal grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
-            <h2 className="font-serif text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-              Why onenept.com
-              <br />
-              <span className="italic text-ink/60">and not my name</span>
-            </h2>
-            <div className="max-w-2xl space-y-4 text-lg leading-relaxed text-ink/80">
-              <p>
-                Onenept Studios is a real company. It is how the work ships and
-                how it gets invoiced, so a first contract needs no paperwork set
-                up from scratch.
-              </p>
-              <p className="text-ink">
-                If you are hiring, you are hiring me, and I am on this page. If
-                you are contracting, the entity is already here.
-              </p>
-              <a
-                href="mailto:admin@onenept.com"
-                className="inline-flex items-center gap-2 border-2 border-ink px-5 py-2.5 font-mono text-xs tracking-[0.14em] transition-colors hover:bg-ink hover:text-paper"
-              >
-                START A CONVERSATION
-                <ExternalArrow className="h-3.5 w-3.5" />
-              </a>
-            </div>
-          </div>
+      {/* contact */}
+      <section className="relative isolate z-10 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(45%_70%_at_15%_100%,rgb(255_107_44/0.25),transparent_70%),radial-gradient(50%_60%_at_90%_0%,rgb(59_91_255/0.25),transparent_70%)]" />
+        <div className="mx-auto max-w-[1400px] px-5 py-28 sm:px-8 sm:py-40">
+          <p className="reveal max-w-xl font-display text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
+            Got public data you think has business hiding in it?
+          </p>
+          <a
+            href={`mailto:${COMPANY.email}`}
+            className="reveal group mt-10 inline-flex max-w-full items-center gap-4 font-display text-[9.4vw] font-extrabold leading-none tracking-[-0.045em] text-cream transition-colors hover:text-signal sm:text-[7vw] lg:text-[96px]"
+          >
+            <span className="min-w-0 break-all sm:break-normal">{COMPANY.email}</span>
+            <Arrow className="h-[0.6em] w-[0.6em] shrink-0 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" />
+          </a>
         </div>
       </section>
 

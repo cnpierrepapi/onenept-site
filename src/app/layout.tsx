@@ -1,66 +1,70 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Mono, Source_Serif_4 } from "next/font/google";
+import { Bricolage_Grotesque, Instrument_Sans, JetBrains_Mono } from "next/font/google";
+import { COMPANY } from "./site";
 import "./globals.css";
 
-const serif = Source_Serif_4({
-  variable: "--font-source-serif",
+const display = Bricolage_Grotesque({
+  variable: "--font-bricolage",
   subsets: ["latin"],
-  axes: ["opsz"],
-  style: ["normal", "italic"],
 });
 
-const mono = IBM_Plex_Mono({
-  variable: "--font-plex-mono",
+const sans = Instrument_Sans({
+  variable: "--font-instrument",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
 });
 
-const TITLE = "Onenept Studios :: I read the spec, then I measure";
-const SHORT_DESC =
-  "I find the places where a codebase and its own documentation disagree, and prove it with something anyone can rerun. Two pull requests of mine are merged into datahub-project/datahub, one into CALL-E's agent repo, and six of the fourteen issues I filed against CALL-E are fixed.";
+const mono = JetBrains_Mono({
+  variable: "--font-jetbrains",
+  subsets: ["latin"],
+  weight: ["400", "500"],
+});
+
+const TITLE = "Onenept Studios: AI agents that find the work and show their receipts";
+const DESC =
+  "Onenept Studios is an applied AI company. Our agents read public data, find the business in it and act on it, and every step leaves a record you can check. Warmleads, SYZYGY and asheard, plus merged work in DataHub and CALL-E.";
 
 export const metadata: Metadata = {
-  title: TITLE,
-  description: `${SHORT_DESC} Available for contract work, remote.`,
+  title: { default: TITLE, template: "%s :: Onenept Studios" },
+  description: DESC,
   metadataBase: new URL("https://onenept.com"),
-  alternates: {
-    canonical: "/",
-  },
+  alternates: { canonical: "/" },
   openGraph: {
     title: TITLE,
-    description: SHORT_DESC,
+    description: DESC,
     url: "https://onenept.com",
     siteName: "Onenept Studios",
     type: "website",
   },
-  twitter: {
-    card: "summary_large_image",
-    title: TITLE,
-    description: SHORT_DESC,
-  },
+  twitter: { card: "summary_large_image", title: TITLE, description: DESC },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f4f1e8",
-  colorScheme: "light",
+  themeColor: "#05060c",
+  colorScheme: "dark",
 };
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "Onenept Studios Inc.",
+  name: COMPANY.legal,
+  alternateName: "Onenept Studios",
   url: "https://onenept.com",
-  email: "admin@onenept.com",
-  description:
-    "Open source drift audits. Two merged contributions to datahub-project/datahub, one to CALLE-AI/awesome-phone-call-agents, an open helper in google/adk-python written at a maintainer's request, six fixed issues in CALL-E's docs and tooling, and threads in Google's agent and GenAI repos. Available for contract work, remote.",
+  email: COMPANY.email,
+  description: DESC,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: COMPANY.street,
+    addressLocality: "Dover",
+    addressRegion: "DE",
+    postalCode: "19901",
+    addressCountry: "US",
+  },
   founder: {
     "@type": "Person",
-    name: "Chukwudumaga Nnawuogo",
-    sameAs: [
-      "https://www.linkedin.com/in/cenpierrepapi/",
-      "https://github.com/cnpierrepapi",
-    ],
+    name: COMPANY.founder,
+    sameAs: [COMPANY.linkedin, COMPANY.github],
   },
+  sameAs: [COMPANY.github],
 };
 
 export default function RootLayout({
@@ -71,9 +75,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${serif.variable} ${mono.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className={`${display.variable} ${sans.variable} ${mono.variable} h-full antialiased`}
     >
       <head>
+        <script
+          dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
