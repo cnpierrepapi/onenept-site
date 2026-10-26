@@ -6,18 +6,21 @@ import { Arrow, COMPANY, Footer, Nav } from "./site";
 /* lines lifted from the products themselves, shown in the hero */
 const TRACE: { who: string; line: string; tail: string }[] = [
   { who: "warmleads", line: "The Brass Fox Bistro, London", tail: "score 89 · serves your skill (demo)" },
-  { who: "syzygy", line: "Bad Bunny × Lamborghini", tail: "taste overlap 0.79 · thesis drafted" },
+  { who: "syzygy", line: "Bad Bunny × Natti Natasha", tail: "Qloo 0.95 both ways · pitch drafted" },
   { who: "asheard", line: "task_completed: true", tail: "a recording picked up" },
 ];
 
 const AGENTS: [string, string][] = [
-  ["Scout", "finds two audiences that line up when nobody expects it"],
-  ["Qualifier", "picks the side that would actually buy"],
-  ["Numbers", "builds the evidence from Qloo's data"],
+  ["Scout", "pulls who the audience leans toward out of Qloo"],
+  ["Numbers", "measures it both ways and keeps the weaker number"],
+  ["Deal check", "drops brands the talent already works with"],
+  ["Rival check", "drops their competitors too"],
   ["Contact finder", "looks for the person who signs"],
-  ["Verifier", "checks the inbox is real"],
-  ["Strategist", "picks the angle"],
-  ["Writer", "drafts the message"],
+  ["Verifier", "only keeps what it read on a real page"],
+  ["Writer", "drafts the email or letter"],
+  ["Clearance", "holds anything that breaks a rule"],
+  ["Sequencer", "sends once a person says yes"],
+  ["Inbox", "sorts the replies"],
 ];
 
 const MERGED: { repo: string; pr: string; href: string; what: string; date: string; sha: string; shaHref: string }[] = [
@@ -241,10 +244,10 @@ export default function Home() {
               </div>
               <h3 className="reveal mt-6 font-display text-[16vw] font-extrabold tracking-[-0.04em] sm:text-8xl">SYZYGY</h3>
               <p className="reveal mt-4 font-display text-2xl font-medium leading-snug text-violet sm:text-3xl">
-                A sales floor with no people on it.
+                Taste data that books the deal.
               </p>
               <p className="reveal mt-6 leading-relaxed text-cream/70">
-                SYZYGY reads Qloo&apos;s taste data and looks for audiences that overlap when they really shouldn&apos;t. Bad Bunny fans and Lamborghini, say. Then a chain of agents takes it from there. Click any line on the floor and you get the evidence behind it.
+                Open a desk for a tour, a venue, a podcast or a brand. Ten agents read Qloo&apos;s taste data, find who that audience leans toward and the person who decides there, and write the pitch. Not in Qloo? Give it a website and it reads you through things Qloo does know. Every step leaves a record you can click.
               </p>
               <ol className="reveal relative mt-8 space-y-0 border-l border-white/15 pl-6">
                 {AGENTS.map(([name, job], k) => (
@@ -262,10 +265,10 @@ export default function Home() {
                 ))}
               </ol>
               <p className="reveal mt-6 font-mono text-[11px] leading-5 text-mute">
-                Messages are drafted, not sent, until the mailbox goes live.
+                Nothing goes out until a person approves it. Real sends only from a desk its owner has verified.
               </p>
               <div className="reveal mt-8">
-                <Visit href="https://syzygybot.vercel.app">see the floor</Visit>
+                <Visit href="https://syzygybot.com/desk">open a desk</Visit>
               </div>
             </div>
           </div>
