@@ -170,7 +170,7 @@ export default function Home() {
           </h2>
           <p className="reveal hidden pb-3 text-right font-mono text-[11px] uppercase leading-6 tracking-[0.2em] text-mute sm:block">
             3 products
-            <br />2 live · 1 building
+            <br />3 live
           </p>
         </div>
         <div className="hairline mx-auto mt-10 max-w-[1400px]" />
@@ -240,7 +240,7 @@ export default function Home() {
             <div className="order-1 lg:order-2 lg:col-span-5 lg:py-24">
               <div className="reveal flex flex-wrap items-center gap-3">
                 <span className="font-mono text-xs text-mute">02</span>
-                <Chip>Building · Qloo hackathon, closes 30 Oct</Chip>
+                <Chip live>Live · syzygybot.com</Chip>
               </div>
               <h3 className="reveal mt-6 font-display text-[16vw] font-extrabold tracking-[-0.04em] sm:text-8xl">SYZYGY</h3>
               <p className="reveal mt-4 font-display text-2xl font-medium leading-snug text-violet sm:text-3xl">
