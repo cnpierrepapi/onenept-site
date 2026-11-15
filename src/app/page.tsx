@@ -1,29 +1,35 @@
 import Image from "next/image";
+import Link from "next/link";
 import Stage from "./gl/stage";
 import Reveal from "./reveal";
 import { Arrow, COMPANY, Footer, Nav } from "./site";
 
 /* lines lifted from the products themselves, shown in the hero */
 const TRACE: { who: string; line: string; tail: string }[] = [
-  { who: "warmleads", line: "The Brass Fox Bistro, London", tail: "score 89 · serves your skill (demo)" },
-  { who: "syzygy", line: "Bad Bunny × Natti Natasha", tail: "Qloo 0.95 both ways · pitch drafted" },
-  { who: "asheard", line: "task_completed: true", tail: "a recording picked up" },
+  { who: "ad fontes", line: "Play with email", tail: "a funded account, no wallet popup" },
+  { who: "melax", line: "#2580#", tail: "1 Balance · 2 Send · 3 Receive" },
+  { who: "fugitiva", line: "File 01 · Europol, 2019", tail: "18 women, sources linked" },
 ];
 
-const AGENTS: [string, string][] = [
-  ["Scout", "pulls who the audience leans toward out of Qloo"],
-  ["Numbers", "measures it both ways and keeps the weaker number"],
-  ["Deal check", "drops brands the talent already works with"],
-  ["Rival check", "drops their competitors too"],
-  ["Contact finder", "looks for the person who signs"],
-  ["Verifier", "only keeps what it read on a real page"],
-  ["Writer", "drafts the email or letter"],
-  ["Clearance", "holds anything that breaks a rule"],
-  ["Sequencer", "sends once a person says yes"],
-  ["Inbox", "sorts the replies"],
+/* what every FUGITIVA case file is made of, in order */
+const FILE: [string, string][] = [
+  ["The facts", "flat, each one with its source"],
+  ["Open eyes", "did she go in knowing what she was doing"],
+  ["The read", "an opinion, argued from the record"],
+  ["Where it stands", "caught, sentenced or still out there"],
+  ["Sources", "linked, so you can check us"],
 ];
 
 const MERGED: { repo: string; pr: string; href: string; what: string; date: string; sha: string; shaHref: string }[] = [
+  {
+    repo: "google/adk-python",
+    pr: "#6935",
+    href: "https://github.com/google/adk-python/pull/6935",
+    what: "A custom model in Google's Agent Development Kit got one config object holding fields for three different places, and putting the tools in the wrong one quietly dropped them. The fix hands the job to the converter Google's own client uses. Their team took it in with our founder as co-author.",
+    date: "7 Nov 2026",
+    sha: "9be86308a1",
+    shaHref: "https://github.com/google/adk-python/commit/9be86308a1a1af769541165c9ff57d0ec095c68c",
+  },
   {
     repo: "datahub-project/datahub",
     pr: "#19115",
@@ -95,16 +101,16 @@ export default function Home() {
               Onenept Studios · applied AI
             </p>
             <h1 className="reveal mt-6 font-display text-[12.5vw] font-extrabold leading-[0.88] tracking-[-0.045em] sm:text-[9vw] lg:text-[7.2vw] 2xl:text-[104px]">
-              We build agents
+              AI products
               <br />
-              that find the work.
+              for people
               <br />
-              <span className="text-glow">Then they show</span>
+              <span className="text-glow">who never asked</span>
               <br />
-              <span className="text-glow">the receipts.</span>
+              <span className="text-glow">for AI.</span>
             </h1>
             <p className="reveal mt-8 max-w-xl text-lg leading-relaxed text-cream/75 sm:text-xl">
-              Our agents go through public data the way a good researcher would. They find the business sitting in it and go after it. Every step leaves a record you can click.
+              We hide the plumbing. Models, wallets, tokens and APIs stay under the floor. What&apos;s left on the screen is something you can use in the first thirty seconds.
             </p>
             <div className="reveal mt-9 flex flex-wrap items-center gap-4">
               <a
@@ -117,7 +123,7 @@ export default function Home() {
                 href="#work"
                 className="inline-flex items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-sm text-cream transition-colors hover:border-cream"
               >
-                See what&apos;s running
+                See what we&apos;ve built
               </a>
             </div>
           </div>
@@ -128,7 +134,7 @@ export default function Home() {
               {TRACE.map((r) => (
                 <li key={r.who} className="glass rounded-xl px-4 py-3">
                   <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-signal">{r.who}</p>
-                  <p className={`mt-1 font-mono text-sm text-cream ${r.who === "asheard" ? "struck" : ""}`}>{r.line}</p>
+                  <p className="mt-1 font-mono text-sm text-cream">{r.line}</p>
                   <p className="mt-0.5 font-mono text-[11px] text-mute">{r.tail}</p>
                 </li>
               ))}
@@ -143,19 +149,19 @@ export default function Home() {
           <div className="lg:col-span-7">
             <p className="reveal font-mono text-[11px] uppercase tracking-[0.28em] text-mute">What we do</p>
             <h2 className="reveal mt-6 font-display text-4xl font-bold leading-[1.02] tracking-[-0.03em] sm:text-6xl lg:text-7xl">
-              Most of the business you want is already public. It&apos;s just scattered.
+              Most AI products work. Most people still can&apos;t use them.
             </h2>
             <p className="reveal mt-8 max-w-2xl text-lg leading-relaxed text-cream/70">
-              A restaurant in London whose website is broken. Two brands whose fans love the same films. It&apos;s all sitting in maps listings and taste data and job posts. Nobody has the hours to read it. So we built agents that do, and then act on what they find.
+              A blockchain game asks for a wallet before you&apos;ve seen anything. A bitcoin wallet assumes a smartphone and data. Every time, the clever part is done and the person in front of it gets stuck at the door. We build the door.
             </p>
           </div>
           <div className="lg:col-span-4 lg:col-start-9 lg:pt-56">
             <div className="reveal border-l-2 border-signal pl-6">
               <h3 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-                And they don&apos;t get to say &ldquo;done&rdquo; on trust.
+                And we say what&apos;s real.
               </h3>
               <p className="mt-4 leading-relaxed text-cream/65">
-                When an agent marks a job complete, that&apos;s a claim. We check it. That habit is where asheard came from, and it&apos;s why we&apos;ve had fixes merged into DataHub and CALL-E.
+                Every product says what works and what doesn&apos;t yet. When a platform we build on turns out to be wrong, we send the fix back. Four of those are merged.
               </p>
             </div>
           </div>
@@ -166,36 +172,36 @@ export default function Home() {
       <section id="work" className="relative z-10 scroll-mt-20">
         <div className="mx-auto flex max-w-[1400px] items-end justify-between gap-6 px-5 sm:px-8">
           <h2 className="reveal font-display text-[15vw] font-extrabold leading-[0.8] tracking-[-0.05em] text-cream/95 sm:text-[11vw] lg:text-[150px]">
-            Running
+            Built
           </h2>
           <p className="reveal hidden pb-3 text-right font-mono text-[11px] uppercase leading-6 tracking-[0.2em] text-mute sm:block">
             3 products
-            <br />3 live
+            <br />2 live
           </p>
         </div>
         <div className="hairline mx-auto mt-10 max-w-[1400px]" />
 
-        {/* 01 warmleads: wide, the globe bleeds off the right edge */}
+        {/* 01 ad fontes: wide, the globe bleeds off the right edge */}
         <article className="relative isolate overflow-hidden">
           <div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(50%_60%_at_80%_50%,rgb(59_91_255/0.22),transparent_70%)]" />
           <div className="mx-auto grid max-w-[1400px] items-center gap-6 px-5 py-20 sm:px-8 lg:min-h-[88vh] lg:grid-cols-12 lg:py-10">
             <div className="relative z-10 lg:col-span-5">
               <div className="reveal flex flex-wrap items-center gap-3">
                 <span className="font-mono text-xs text-mute">01</span>
-                <Chip live>Live</Chip>
+                <Chip live>Live · NEAR testnet</Chip>
               </div>
-              <h3 className="reveal mt-6 font-display text-[16vw] font-extrabold tracking-[-0.04em] sm:text-8xl">Warmleads</h3>
+              <h3 className="reveal mt-6 font-display text-[16vw] font-extrabold tracking-[-0.04em] sm:text-8xl">AD FONTES</h3>
               <p className="reveal mt-4 font-display text-2xl font-medium leading-snug text-ice sm:text-3xl">
-                Leads for freelancers, already qualified.
+                A blockchain game where you never see the blockchain.
               </p>
               <p className="reveal mt-6 max-w-md leading-relaxed text-cream/70">
-                Pick a business type and a city. Warmleads hands back the ones that actually need your skill. Each comes with a score, a verified contact and the one thing that business needs most. You don&apos;t need a thousand leads. You need the right fifty.
+                A world of small nations run by AI. Their citizens read real research papers, trade what they learn and sometimes go to war. You fund one and become its god. Underneath there are DAOs, agent wallets and a contract that seals every turn. On screen you sign up with an email and give grace. That&apos;s it.
               </p>
               <dl className="reveal mt-8 grid max-w-md grid-cols-3 gap-4 border-t border-white/10 pt-6">
                 {[
-                  ["any", "business type"],
-                  ["any", "city"],
-                  ["50+", "skills"],
+                  ["email", "to start"],
+                  ["0", "wallet popups"],
+                  ["3D", "world map"],
                 ].map(([v, k]) => (
                   <div key={k}>
                     <dt className="font-display text-2xl font-bold sm:text-3xl">{v}</dt>
@@ -204,57 +210,47 @@ export default function Home() {
                 ))}
               </dl>
               <div className="reveal mt-9">
-                <Visit href="https://warmleads.app">warmleads.app</Visit>
+                <Visit href="https://adfontes.fun">adfontes.fun</Visit>
               </div>
             </div>
             <div className="relative h-[78vh] min-h-[520px] lg:col-span-7 lg:h-[88vh] lg:min-h-0">
               <Stage scene="globe" className="absolute -left-[10%] -right-[25%] bottom-[22%] top-0 sm:inset-y-0 lg:-right-[35%]" />
               <div className="reveal glass absolute bottom-0 left-0 w-[min(320px,92%)] rounded-2xl p-5 sm:bottom-14 sm:left-6">
-                <div className="flex items-center justify-between">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-mute">From the warmleads demo</p>
-                  <p className="font-display text-2xl font-bold text-signal">89</p>
-                </div>
-                <p className="mt-2 font-display text-lg font-semibold">The Brass Fox Bistro</p>
-                <p className="font-mono text-[11px] text-cream/60">Restaurant · London · 4.6★ (320)</p>
-                <div className="mt-4 flex flex-wrap gap-2 font-mono text-[10px] uppercase tracking-[0.12em]">
-                  <span className="rounded-full bg-signal/15 px-2.5 py-1 text-signal">serves your skill</span>
-                  <span className="rounded-full bg-white/5 px-2.5 py-1 text-cream/70">WhatsApp</span>
-                </div>
-                <p className="mt-4 rounded-lg border border-dashed border-white/15 px-3 py-2 font-mono text-[11px] text-cream/50">
-                  hold to reveal the contact + top need
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-mute">How you start</p>
+                <p className="mt-3 rounded-lg border border-white/15 px-3 py-2 font-mono text-[12px] text-cream/50">you@email.com</p>
+                <p className="mt-3 rounded-full bg-signal px-4 py-2 text-center text-sm font-semibold text-night">Play with email</p>
+                <p className="mt-4 font-mono text-[11px] leading-5 text-cream/55">
+                  A funded account gets made for you. No wallet, no seed phrase, no popups.
                 </p>
               </div>
             </div>
           </div>
         </article>
 
-        {/* 02 syzygy: reversed, tall stage on the left, the agent chain on the right */}
+        {/* 02 fugitiva: reversed, tall stage on the left, the case file on the right */}
         <article className="relative isolate overflow-hidden border-y border-white/10 bg-deep">
           <div className="mx-auto grid max-w-[1400px] items-center gap-6 px-5 py-20 sm:px-8 lg:grid-cols-12 lg:py-0">
             <div className="relative order-2 h-[58vh] min-h-[360px] lg:order-1 lg:col-span-7 lg:h-[96vh]">
               <Stage scene="orbits" className="absolute inset-0 lg:-left-[18%]" />
-              <p className="pointer-events-none absolute bottom-4 left-0 max-w-[16rem] font-mono text-[10px] uppercase leading-5 tracking-[0.16em] text-mute lg:bottom-12">
-                syzygy (n.) when three bodies line up in a straight line
-              </p>
             </div>
             <div className="order-1 lg:order-2 lg:col-span-5 lg:py-24">
               <div className="reveal flex flex-wrap items-center gap-3">
                 <span className="font-mono text-xs text-mute">02</span>
-                <Chip live>Live · syzygybot.com</Chip>
+                <Chip live>Live · fugitiva.onenept.com</Chip>
               </div>
-              <h3 className="reveal mt-6 font-display text-[16vw] font-extrabold tracking-[-0.04em] sm:text-8xl">SYZYGY</h3>
+              <h3 className="reveal mt-6 font-display text-[16vw] font-extrabold tracking-[-0.04em] sm:text-8xl">FUGITIVA</h3>
               <p className="reveal mt-4 font-display text-2xl font-medium leading-snug text-violet sm:text-3xl">
-                Taste data that books the deal.
+                The crimes nobody expects from a woman.
               </p>
               <p className="reveal mt-6 leading-relaxed text-cream/70">
-                Open a desk for a tour, a venue, a podcast or a brand. Ten agents read Qloo&apos;s taste data, find who that audience leans toward and the person who decides there, and write the pitch. Not in Qloo? Give it a website and it reads you through things Qloo does know. Every step leaves a record you can click.
+                A journal of case files on women behind the crimes people assume men commit. File 01 is the 18 women on Europol&apos;s 2019 most wanted list: what each one did, and where she is now.
               </p>
               <ol className="reveal relative mt-8 space-y-0 border-l border-white/15 pl-6">
-                {AGENTS.map(([name, job], k) => (
+                {FILE.map(([name, job], k) => (
                   <li key={name} className="relative py-2">
                     <span
                       className={`absolute -left-[29px] top-[14px] h-2.5 w-2.5 rounded-full ${
-                        k === AGENTS.length - 1 ? "bg-signal" : "border border-ice/60 bg-deep"
+                        k === FILE.length - 1 ? "bg-signal" : "border border-ice/60 bg-deep"
                       }`}
                     />
                     <p className="text-sm">
@@ -265,16 +261,16 @@ export default function Home() {
                 ))}
               </ol>
               <p className="reveal mt-6 font-mono text-[11px] leading-5 text-mute">
-                Nothing goes out until a person approves it. Real sends only from a desk its owner has verified.
+                No glamour. Every case file runs in that order.
               </p>
               <div className="reveal mt-8">
-                <Visit href="https://syzygybot.com/desk">open a desk</Visit>
+                <Visit href="https://fugitiva.onenept.com">read file 01</Visit>
               </div>
             </div>
           </div>
         </article>
 
-        {/* 03 asheard: a full-bleed band, the waveform behind the words */}
+        {/* 03 melax: a full-bleed band, the signal behind the words */}
         <article className="relative isolate overflow-hidden">
           <Stage scene="wave" className="absolute inset-0 -z-10 opacity-90" />
           <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-night via-night/80 to-night/10" />
@@ -282,37 +278,40 @@ export default function Home() {
             <div className="lg:col-span-6">
               <div className="reveal flex flex-wrap items-center gap-3">
                 <span className="font-mono text-xs text-mute">03</span>
-                <Chip live>Live · on npm</Chip>
+                <Chip>Learning project · not deployed</Chip>
               </div>
-              <h3 className="reveal mt-6 font-display text-[16vw] font-extrabold tracking-[-0.04em] sm:text-8xl">asheard</h3>
+              <h3 className="reveal mt-6 font-display text-[16vw] font-extrabold tracking-[-0.04em] sm:text-8xl">Melax</h3>
               <p className="reveal mt-4 font-display text-2xl font-medium leading-snug text-signal sm:text-3xl">
-                Did that call actually happen?
+                Bitcoin for the phone you already have.
               </p>
               <p className="reveal mt-6 max-w-lg leading-relaxed text-cream/70">
-                AI phone APIs can come back with the call finished, the job done and a confidence of 0.9, when an answering machine picked up. asheard reads the same payload and tells you what really happened. And it points at the exact field it read.
+                Dial a short code and a menu opens, in Wolof, French or English. No app, no internet. Under the menu it&apos;s Lightning and Cashu, and a local agent swaps francs for sats with you. It runs on a test network on one machine, and the repo says so up front.
               </p>
               <div className="reveal mt-9">
-                <Visit href="https://asheard.vercel.app">asheard.vercel.app</Visit>
+                <Visit href="https://github.com/cnpierrepapi/melax">the code on GitHub</Visit>
               </div>
             </div>
             <div className="reveal lg:col-span-5 lg:col-start-8">
               <div className="glass grid grid-cols-2 overflow-hidden rounded-2xl font-mono text-xs">
                 <div className="border-r border-white/10 p-5">
-                  <p className="text-[10px] uppercase tracking-[0.18em] text-mute">The API said</p>
-                  <ul className="mt-4 space-y-2 text-cream/80">
-                    <li>status: completed</li>
-                    <li className="struck">task_completed: true</li>
-                    <li>confidence: 0.9</li>
-                  </ul>
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-mute">You dial</p>
+                  <p className="mt-4 font-display text-3xl font-semibold text-cream">#2580#</p>
+                  <p className="mt-3 text-cream/55">on any phone with buttons</p>
                 </div>
                 <div className="p-5">
-                  <p className="text-[10px] uppercase tracking-[0.18em] text-signal">What happened</p>
-                  <p className="mt-4 font-display text-xl font-semibold leading-snug text-cream">
-                    A recording picked up. Nobody spoke.
-                  </p>
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-signal">What opens</p>
+                  <ul className="mt-4 space-y-1.5 text-cream/85">
+                    <li>Melax</li>
+                    <li>1 Balance</li>
+                    <li>2 Send</li>
+                    <li>3 Receive</li>
+                    <li>4 Pay a shop</li>
+                    <li>5 Cash in</li>
+                    <li>6 Cash out</li>
+                  </ul>
                 </div>
               </div>
-              <p className="mt-4 font-mono text-[11px] text-mute">Built on CALL-E. The flat orange line, with the beep, is the voicemail.</p>
+              <p className="mt-4 font-mono text-[11px] text-mute">The English menu. In Wolof, 1 is Sa xaalis.</p>
             </div>
           </div>
         </article>
@@ -330,7 +329,7 @@ export default function Home() {
               Merged upstream.
             </h2>
             <p className="reveal max-w-md leading-relaxed text-cream/65 lg:col-span-5">
-              Some of the checking happens in other people&apos;s code. These three are in, reviewed and merged by the teams who own the projects.
+              Some of the work happens in other people&apos;s code. These four are in, reviewed and merged by the teams who own the projects.
             </p>
           </div>
           <ol className="mt-14 border-t border-white/15">
@@ -366,7 +365,7 @@ export default function Home() {
               Studios Inc.
             </h2>
             <p className="reveal mt-8 max-w-md text-lg leading-relaxed text-night/70">
-              An applied AI company. If it can&apos;t run on live data, we don&apos;t ship it. If an agent says it did something, there&apos;s a record of it.
+              An applied AI company. We build for the person who has never heard of the tech underneath, and we test on the live thing, on a phone.
             </p>
           </div>
           <div className="lg:col-span-5 lg:col-start-8 lg:pt-16">
@@ -409,7 +408,11 @@ export default function Home() {
               <div>
                 <p className="font-display text-lg font-bold">{COMPANY.founder}</p>
                 <p className="text-sm text-night/60">
-                  Founder. Electrical engineer by training.{" "}
+                  Founder and design engineer.{" "}
+                  <Link href="/emmanuel" className="underline underline-offset-4">
+                    About him
+                  </Link>{" "}
+                  ·{" "}
                   <a href={COMPANY.linkedin} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">
                     LinkedIn
                   </a>{" "}
@@ -429,7 +432,7 @@ export default function Home() {
         <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(45%_70%_at_15%_100%,rgb(255_107_44/0.25),transparent_70%),radial-gradient(50%_60%_at_90%_0%,rgb(59_91_255/0.25),transparent_70%)]" />
         <div className="mx-auto max-w-[1400px] px-5 py-28 sm:px-8 sm:py-40">
           <p className="reveal max-w-xl font-display text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
-            Got public data you think has business hiding in it?
+            Got an AI product people keep bouncing off?
           </p>
           <a
             href={`mailto:${COMPANY.email}`}

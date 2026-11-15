@@ -35,7 +35,7 @@ export default function Privacy() {
           <section>
             <h2 className="font-display text-2xl font-bold text-cream">Our products</h2>
             <p className="mt-3">
-              Warmleads, SYZYGY and asheard run on their own sites and each has its own terms. This page only covers onenept.com.
+              AD FONTES and FUGITIVA run on their own sites and each has its own terms. This page only covers onenept.com.
             </p>
           </section>
           <section>

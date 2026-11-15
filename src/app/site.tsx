@@ -7,7 +7,7 @@ export const COMPANY = {
   city: "Dover, DE 19901",
   country: "United States",
   email: "admin@onenept.com",
-  founder: "Chukwudumaga Nnawuogo",
+  founder: "Emmanuel Nnawuogo",
   linkedin: "https://www.linkedin.com/in/cenpierrepapi/",
   github: "https://github.com/cnpierrepapi",
 };
@@ -34,6 +34,7 @@ const LINKS: [string, string][] = [
   ["/#work", "Work"],
   ["/#open-source", "Open source"],
   ["/#company", "Company"],
+  ["/emmanuel", "Founder"],
 ];
 
 export function Nav() {

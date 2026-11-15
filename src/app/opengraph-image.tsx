@@ -46,8 +46,8 @@ export default function OG() {
           onenept studios
         </div>
         <div style={{ display: "flex", flexDirection: "column", marginTop: 54, fontSize: 62, fontWeight: 800, lineHeight: 1, letterSpacing: -3 }}>
-          <span>We build agents that find the work.</span>
-          <span style={{ color: "#ff6b2c", marginTop: 12 }}>Then they show the receipts.</span>
+          <span>AI products for people</span>
+          <span style={{ color: "#ff6b2c", marginTop: 12 }}>who never asked for AI.</span>
         </div>
       </div>
     ),

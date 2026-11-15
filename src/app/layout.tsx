@@ -19,9 +19,9 @@ const mono = JetBrains_Mono({
   weight: ["400", "500"],
 });
 
-const TITLE = "Onenept Studios: AI agents that find the work and show their receipts";
+const TITLE = "Onenept Studios: AI products for people who never asked for AI";
 const DESC =
-  "Onenept Studios is an applied AI company. Our agents read public data, find the business in it and act on it, and every step leaves a record you can check. Warmleads, SYZYGY and asheard, plus merged work in DataHub and CALL-E.";
+  "Onenept Studios is an applied AI company. We hide the plumbing so anyone can use what we build: AD FONTES, a blockchain game you start with an email, FUGITIVA, a journal of case files, and Melax, bitcoin on a phone with buttons. Plus merged work in Google's ADK, DataHub and CALL-E.";
 
 export const metadata: Metadata = {
   title: { default: TITLE, template: "%s :: Onenept Studios" },
