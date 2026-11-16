@@ -164,7 +164,8 @@ class Stage {
         const slotAspect = b.width / b.height, imgAspect = this.portrait.aspect;
         const fit = 0.92;
         u.uAspect.value = slotAspect > imgAspect ? [(imgAspect / slotAspect) * fit, fit] : [fit, (slotAspect / imgAspect) * fit];
-        this.portrait.gather += (Math.min(1, this.intro * 0.6 + p * 1.6) - this.portrait.gather) * 0.08;
+        // the face forms as the page opens (16 Nov: half-gathered dots crowded the name until you scrolled)
+        this.portrait.gather += (Math.min(1, this.intro + p) - this.portrait.gather) * 0.06;
         u.uGather.value = this.portrait.gather;
         u.uT.value = time;
         u.uSize.value = Math.max(2, ((b.height * D) / 132) * 1.05);
