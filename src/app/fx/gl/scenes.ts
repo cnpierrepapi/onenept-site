@@ -5,7 +5,7 @@ import { Geometry, Transform, type Mesh, type OGLRenderingContext } from "ogl";
 import { meshSDF, sd } from "@/lib/mesh";
 import { C, Kit, ease, mix, setColour, smooth, stretch, type ClayMesh, type Colour } from "./clay";
 
-export type ClayKey = "hero" | "adfontes" | "fugitiva" | "melax" | "merge";
+export type ClayKey = "hero" | "adfontes" | "hopium" | "melax" | "merge";
 
 export interface Cam { pos: [number, number, number]; target: [number, number, number]; back?: number }
 /** which kinetic-type frame is on screen; index === count means the rest frame. rest: 0..1 through it */
@@ -159,48 +159,79 @@ function adfontes(kit: Kit): ClayScene {
   };
 }
 
-/* FUGITIVA. A woman's face built from Bauhaus shapes flies together from scattered shards, then a red
-   redaction bar slams across the eyes. */
-function fugitiva(kit: Kit): ClayScene {
+/* HOPIUM HIGHWAY (in the works). A kart race on a road built from a coin's trades. One piece of road
+   appears per cut: flat start, a buy uphill, another buy, a sell downhill, a silence pothole, a big-buy
+   boost pad, then an item box. The kart drives the road as it gets built and hops the pothole. */
+type Piece = { kind: "flat" | "up" | "down" | "gap" | "boost" | "box"; h0: number; h1: number; colour: Colour };
+const ROAD: Piece[] = [
+  { kind: "flat", h0: 0, h1: 0, colour: C.cream },
+  { kind: "up", h0: 0, h1: 0.4, colour: C.cobalt },
+  { kind: "up", h0: 0.4, h1: 0.8, colour: C.cobalt },
+  { kind: "down", h0: 0.8, h1: 0.35, colour: C.orange },
+  { kind: "gap", h0: 0.35, h1: 0.35, colour: C.cream },
+  { kind: "boost", h0: 0.35, h1: 0.35, colour: C.lemon },
+  { kind: "box", h0: 0.35, h1: 0.35, colour: C.cream },
+];
+const ROAD_X0 = -3.5;
+function roadHeight(x: number) {
+  const i = Math.min(ROAD.length - 1, Math.max(0, Math.floor(x - ROAD_X0)));
+  const p = ROAD[i], f = x - ROAD_X0 - i;
+  return mix(p.h0, p.h1, Math.min(1, Math.max(0, f)));
+}
+function hopium(kit: Kit): ClayScene {
   const { root, solids, shadows, add, shade } = base(kit);
-  const face = new Transform(); face.setParent(root);
   const gl = kit.gl;
-  type Piece = { m: ClayMesh; c: [number, number, number] };
-  const piece = (g: Geometry, colour: Colour, c: [number, number, number]): Piece => ({ m: add(kit.wrap(g, colour, face)), c });
-  const B = (r: number, zh: number): [[number, number, number], [number, number, number]] => [[-r - 0.05, -r - 0.05, -zh - 0.05], [r + 0.05, r + 0.05, zh + 0.05]];
-  const pieces: Piece[] = [
-    piece(geo(gl, (x, y, z) => sd.slab(sd.halfDisc(x, y, 1.08, 1), z, 0.07), ...B(1.08, 0.07), 0.02), C.ink, [0, 0.18, -0.14]),
-    piece(geo(gl, (x, y, z) => sd.slab(Math.hypot(x, y) - 0.9, z, 0.08), ...B(0.9, 0.08), 0.018), C.cobalt, [0, 0.05, 0]),
-    piece(geo(gl, (x, y, z) => sd.slab(sd.halfDisc(x, y, 0.17, -1), z, 0.05), ...B(0.17, 0.05), 0.008), C.ink, [-0.33, 0.2, 0.11]),
-    piece(geo(gl, (x, y, z) => sd.slab(Math.hypot(x, y) - 0.15, z, 0.05), ...B(0.15, 0.05), 0.008), C.lemon, [0.33, 0.22, 0.11]),
-    piece(geo(gl, (x, y, z) => sd.slab(sd.tri(x, y, 0.15), z, 0.05), ...B(0.2, 0.05), 0.008), C.orange, [0, -0.06, 0.11]),
-    piece(geo(gl, (x, y, z) => sd.roundBox(x, y, z, 0.3, 0.06, 0.05, 0.03), [-0.35, -0.1, -0.1], [0.35, 0.1, 0.1], 0.01), C.cream, [0, -0.44, 0.11]),
-    piece(geo(gl, (x, y, z) => sd.slab(sd.halfDisc(x, y, 1.05, 1), z, 0.09), ...B(1.05, 0.09), 0.02), C.orange, [0, -1.42, -0.06]),
-  ];
-  const ear = add(kit.sphere(C.lemon, face));
-  pieces.push({ m: ear, c: [0.93, -0.28, 0.06] });
-  const bar = add(kit.wrap(geo(gl, (x, y, z) => sd.roundBox(x, y, z, 1.45, 0.14, 0.05, 0.025), [-1.5, -0.2, -0.1], [1.5, 0.2, 0.1], 0.015), C.red, face));
-  const sh = shade(root);
-  sh.position.set(0, -1.415, 0);
+  const world = new Transform(); world.setParent(root);
+  const slab = geo(gl, (x, y, z) => sd.roundBox(x, y, z, 0.5, 0.09, 0.5, 0.04), [-0.55, -0.12, -0.55], [0.55, 0.12, 0.55], 0.02);
+  const stripe = geo(gl, (x, y, z) => sd.roundBox(x, y, z, 0.07, 0.02, 0.32, 0.015), [-0.1, -0.04, -0.36], [0.1, 0.04, 0.36], 0.012);
+  const cube = geo(gl, (x, y, z) => sd.roundBox(x, y, z, 0.17, 0.17, 0.17, 0.05), [-0.2, -0.2, -0.2], [0.2, 0.2, 0.2], 0.012);
+  const pieces = ROAD.map((p, i) => {
+    const g = new Transform(); g.setParent(world);
+    const len = Math.hypot(1, p.h1 - p.h0);
+    const m = p.kind === "gap" ? null : add(kit.wrap(slab, p.colour, g));
+    if (m) { m.scale.set(len, 1, 1); m.rotation.z = Math.atan2(p.h1 - p.h0, 1); }
+    const extras: ClayMesh[] = [];
+    if (p.kind === "boost") for (const dx of [-0.25, 0, 0.25]) { const s = add(kit.wrap(stripe, C.orange, g)); s.position.set(dx, 0.1, 0); extras.push(s); }
+    if (p.kind === "box") { const b = add(kit.wrap(cube, C.lemon, g)); b.position.set(0, 0.55, 0); extras.push(b); }
+    return { g, p, i, extras };
+  });
+  // the kart: a body, a seat back, a helmet and four wheels
+  const kart = new Transform(); kart.setParent(world);
+  add(kit.wrap(geo(gl, (x, y, z) => sd.roundBox(x, y, z, 0.32, 0.09, 0.2, 0.06), [-0.36, -0.12, -0.24], [0.36, 0.12, 0.24], 0.014), C.orange, kart)).position.set(0, 0.14, 0);
+  add(kit.wrap(geo(gl, (x, y, z) => sd.roundBox(x, y, z, 0.05, 0.12, 0.14, 0.04), [-0.08, -0.15, -0.17], [0.08, 0.15, 0.17], 0.012), C.ink, kart)).position.set(-0.14, 0.3, 0);
+  const helmet = add(kit.sphere(C.cobalt, kart)); helmet.position.set(-0.04, 0.4, 0); helmet.scale.set(0.11, 0.11, 0.11);
+  for (const [x, z] of [[-0.2, 0.22], [-0.2, -0.22], [0.2, 0.22], [0.2, -0.22]]) {
+    const w = add(kit.rod(C.ink, kart));
+    w.rotation.x = Math.PI / 2; w.position.set(x, 0.08, z); w.scale.set(0.08, 0.07, 0.08);
+  }
+  const sh = shade(world);
 
   return {
     root, solids, shadows, clipY: -100,
-    cam: (_a, icon) => (icon ? { pos: [0, 0.25, 5.4], target: [0, -0.1, 0] } : { pos: [0, 0.4, 7.0], target: [0, -0.2, 0] }),
+    cam: (_a, icon) => (icon ? { pos: [0.4, 2.4, 6.4], target: [0, 0.3, 0] } : { pos: [0.6, 1.8, 7.2], target: [0.1, 0.35, 0] }),
     update(p, t, _intro, icon) {
-      const P = icon ? 1 : p;
-      face.rotation.y = 0.18 * Math.sin(t * 0.4);
-      pieces.forEach(({ m, c }, fi) => {
-        const a = ease(smooth(0.05 + fi * 0.045, 0.34 + fi * 0.045, P));
-        m.position.set(c[0] + Math.sin(fi * 3.7) * 3.6 * (1 - a), c[1] + Math.cos(fi * 2.3) * 2.6 * (1 - a), c[2] + Math.sin(fi * 1.9) * 2.4 * (1 - a));
-        m.rotation.z = -(1 - a) * (fi * 1.4 + 0.8);
+      const P = icon ? 0.62 : p;
+      world.rotation.y = -0.25 + 0.06 * Math.sin(t * 0.4) + (icon ? 0.15 * Math.sin(t * 0.6) : 0);
+      // one piece per step of the story; each rises into place
+      const built = Math.min(ROAD.length, (P / 0.62) * ROAD.length);
+      pieces.forEach(({ g, p: pc, i, extras }) => {
+        const a = ease(Math.min(1, Math.max(0, built - i)));
+        const x = ROAD_X0 + i + 0.5;
+        g.position.set(x, (pc.h0 + pc.h1) / 2 - 0.09 - (1 - a) * 1.1, 0);
+        g.visible = a > 0.001;
+        if (pc.kind === "box") extras.forEach((e) => { e.rotation.y = t * 1.4; e.position.y = 0.55 + 0.05 * Math.sin(t * 2); });
       });
-      ear.scale.set(0.09, 0.09, 0.09);
-      const slam = ease(smooth(0.7, 0.8, P));
-      bar.position.set(mix(-16, 0, slam), 0.22, 0.24);
-      bar.rotation.z = 0.06;
-      const settle = ease(smooth(0.3, 0.5, P));
-      sh.scale.set(2.8, 1.2, 1);
-      sh.program.uniforms.uOpacity.value = 0.3 * settle;
+      // the kart drives the built road, hopping the pothole
+      const front = ROAD_X0 + Math.max(0.5, built) - 0.45;
+      const x = Math.min(ROAD_X0 + ROAD.length - 0.4, front);
+      const f = x - ROAD_X0;
+      const hop = f > 4 && f < 5 ? Math.sin((f - 4) * Math.PI) * 0.45 : 0;
+      kart.position.set(x, roadHeight(x) + hop + 0.02 * Math.sin(t * 9), 0.02);
+      const slope = Math.atan2(roadHeight(x + 0.05) - roadHeight(x - 0.05), 0.1);
+      kart.rotation.z = hop > 0 ? 0.25 * Math.cos((f - 4) * Math.PI) : slope;
+      sh.position.set(0, -0.75, 0);
+      sh.scale.set(8, 1.8, 1);
+      sh.program.uniforms.uOpacity.value = 0.22 * Math.min(1, built / 3);
     },
   };
 }
@@ -310,5 +341,5 @@ function merge(kit: Kit): ClayScene {
   };
 }
 
-export const BUILDERS: Record<ClayKey, (kit: Kit) => ClayScene> = { hero, adfontes, fugitiva, melax, merge };
+export const BUILDERS: Record<ClayKey, (kit: Kit) => ClayScene> = { hero, adfontes, hopium, melax, merge };
 export type { Mesh };

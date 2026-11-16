@@ -22,7 +22,7 @@ const mono = JetBrains_Mono({
 
 const TITLE = "Onenept Studios: AI products for people who never asked for AI";
 const DESC =
-  "Onenept Studios is an applied AI company. We hide the plumbing so anyone can use what we build: AD FONTES, a blockchain game you start with an email, FUGITIVA, a journal of case files, and Melax, bitcoin on a phone with buttons. Plus merged work in Google's ADK, DataHub and CALL-E.";
+  "Onenept Studios is an applied AI company. We hide the plumbing so anyone can use what we build: AD FONTES, a blockchain game you start with an email, and Melax, bitcoin on a phone with buttons. Next: Hopium Highway, a kart race on a road built from a coin's trades. Plus merged work in Google's ADK, DataHub and CALL-E.";
 
 export const metadata: Metadata = {
   title: { default: TITLE, template: "%s :: Onenept Studios" },

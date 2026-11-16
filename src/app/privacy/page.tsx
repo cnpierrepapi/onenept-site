@@ -38,7 +38,7 @@ export default function Privacy() {
           <section>
             <h2 className="font-display text-2xl font-bold text-ink">Our products</h2>
             <p className="mt-3">
-              AD FONTES and FUGITIVA run on their own sites and each has its own terms. This page only covers onenept.com.
+              AD FONTES runs on its own site and has its own terms. This page only covers onenept.com.
             </p>
           </section>
           <section>

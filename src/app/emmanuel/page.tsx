@@ -21,12 +21,6 @@ const SHIPPED: { name: string; href: string; what: string; state: string }[] = [
     state: "Live on NEAR testnet",
   },
   {
-    name: "FUGITIVA",
-    href: "https://fugitiva.onenept.com",
-    what: "A journal of case files on women behind the crimes people assume men commit. Bauhaus layout, masks drawn in code, every source linked.",
-    state: "Live",
-  },
-  {
     name: "Melax",
     href: "https://github.com/cnpierrepapi/melax",
     what: "A bitcoin wallet in Wolof, French and English for phones with buttons. Its setup guide only ticks a step when the server proves it happened.",

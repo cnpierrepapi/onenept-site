@@ -30,7 +30,7 @@ function Visit({ href, children, internal = false, light = false }: { href: stri
 /** The name across the full width of the screen, under the nav. */
 function Mast({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <h2 className={`pointer-events-none absolute inset-x-0 top-[72px] whitespace-nowrap px-[3.5vmin] text-center font-display text-[min(16vw,19svh)] font-extrabold leading-[0.8] tracking-[-0.06em] md:top-[78px] ${className}`}>
+    <h2 className={`pointer-events-none absolute inset-x-0 top-[72px] whitespace-nowrap px-[3.5vmin] text-center font-display font-extrabold leading-[0.8] tracking-[-0.06em] md:top-[78px] ${className.includes("text-[") ? "" : "text-[min(16vw,19svh)]"} ${className}`}>
       {children}
     </h2>
   );
@@ -52,12 +52,14 @@ const ADF_FRAMES: Frame[] = [
   { top: "JUST AN", bottom: "EMAIL.", bg: "paper", fg: "ink" },
 ];
 
-const FUG_FRAMES: Frame[] = [
-  { top: "SHE", bottom: "DID IT.", bg: "lemon", fg: "ink" },
-  { top: "TRAFFICKING.", bottom: "MURDER.", bg: "paper", fg: "red" },
-  { top: "CULTS.", bottom: "TERROR.", bg: "lemon", fg: "red" },
-  { top: "18", bottom: "WOMEN", bg: "paper", fg: "ink" },
-  { top: "EUROPOL'S", bottom: "MOST WANTED", bg: "lemon", fg: "ink" },
+/* one piece of road per cut, the way the game builds it from a coin's trades */
+const HWAY_FRAMES: Frame[] = [
+  { top: "EVERY TRADE", bottom: "BUILDS ROAD.", bg: "lemon", fg: "ink" },
+  { top: "BUY:", bottom: "UPHILL.", bg: "cobalt", fg: "lemon" },
+  { top: "SELL:", bottom: "DOWNHILL.", bg: "orange", fg: "ink" },
+  { top: "SILENCE:", bottom: "POTHOLE.", bg: "ink", fg: "lemon" },
+  { top: "BIG BUY:", bottom: "BOOST PAD.", bg: "paper", fg: "orange" },
+  { top: "RUG PULL.", bottom: "JEET BOMB.", bg: "cobalt", fg: "paper" },
 ];
 
 /* one frame per key press: the phone dials as the glyphs cut */
@@ -77,18 +79,10 @@ const NAME_FRAMES: Frame[] = [
   { top: "WE RISE BY", bottom: "LIFTING OTHERS.", bg: "lemon", fg: "ink" },
 ];
 
-const PRODUCTS: { scene: "adfontes" | "fugitiva" | "melax"; name: string; line: string; href: string }[] = [
+const PRODUCTS: { scene: "adfontes" | "hopium" | "melax"; name: string; line: string; href: string }[] = [
   { scene: "adfontes", name: "AD FONTES", line: "a blockchain game you start with an email", href: "#work" },
-  { scene: "fugitiva", name: "FUGITIVA", line: "case files on the crimes nobody expects from a woman", href: "#fugitiva" },
+  { scene: "hopium", name: "HOPIUM HIGHWAY", line: "a kart race on a road built from a coin's trades (in the works)", href: "#hopium-highway" },
   { scene: "melax", name: "Melax", line: "bitcoin on a phone with buttons", href: "#melax" },
-];
-
-const FILE: [string, string][] = [
-  ["The facts", "flat, each one with its source"],
-  ["Open eyes", "did she go in knowing"],
-  ["The read", "an opinion, argued from the record"],
-  ["Where it stands", "caught, sentenced or still out there"],
-  ["Sources", "linked, so you can check us"],
 ];
 
 const MERGED: { repo: string; pr: string; href: string; what: string; date: string }[] = [
@@ -121,23 +115,19 @@ function AdfDetails() {
   );
 }
 
-function FugDetails() {
+function HwayDetails() {
   return (
     <>
       <div>
-        <span className="chip"><span className="live-dot" />Live · fugitiva.onenept.com</span>
-        <p className="mt-3 font-display text-[min(2.2vw,4svh)] font-bold leading-[1.05] text-red max-md:text-2xl">The crimes nobody expects from a woman.</p>
+        <span className="chip">In the works · Solana</span>
+        <p className="mt-3 font-display text-[min(2.2vw,4svh)] font-bold leading-[1.05] text-cobalt max-md:text-2xl">A kart race on a road built from a coin&apos;s trades.</p>
       </div>
       <p className="text-[15px] leading-relaxed">
-        A journal of case files on women behind the crimes people assume men commit. File 01 is the 18 women on Europol&apos;s 2019 most wanted list: what each one did, and where she is now. No glamour.
+        Pick a Solana coin and race its road. Every real trade lays the next piece: a buy goes uphill with the buyer&apos;s wallet painted on it, a sell goes downhill, a quiet spell leaves a pothole to hop, a big buy drops a boost pad. Everyone on that coin races the same road. Two-minute races, steering by thumb on a phone.
       </p>
-      <div className="flex flex-col items-start gap-4">
-        <ol className="space-y-0.5 font-mono text-[11px] leading-5">
-          {FILE.map(([n, j]) => (
-            <li key={n}><span className="font-medium">{n}</span> <span className="text-mute">{j}</span></li>
-          ))}
-        </ol>
-        <Visit href="https://fugitiva.onenept.com">read file 01</Visit>
+      <div className="flex flex-col items-start gap-3">
+        <p className="font-mono text-[11px] leading-5">Item boxes come from new holders: Rug Pull · Jeet Bomb · Bot Swarm · FUD Cloud · Liquidation · Diamond Hands · Pump · Airdrop</p>
+        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-mute">Not built yet. Coming soon.</p>
       </div>
     </>
   );
@@ -164,7 +154,7 @@ function MelaxDetails() {
 /** One product: a burst of frames, then the rest frame with the name across the top and the details
  *  in three columns across the bottom. On phones the details follow the scene as a normal stack. */
 function Chapter({ id, scene, frames, restFrom, fit, name, nameClass, details }: {
-  id: string; scene: "adfontes" | "fugitiva" | "melax"; frames: Frame[]; restFrom: number; fit: number;
+  id: string; scene: "adfontes" | "hopium" | "melax"; frames: Frame[]; restFrom: number; fit: number;
   name: string; nameClass: string; details: React.ReactNode;
 }) {
   return (
@@ -261,7 +251,7 @@ export default function Home() {
         {/* 3. the work: three products, each a burst of frames and one rest frame */}
         <div id="work" className="scroll-mt-0">
           <Chapter id="adfontes" scene="adfontes" frames={ADF_FRAMES} restFrom={0.5} fit={1.7} name="AD FONTES" nameClass="text-ink" details={<AdfDetails />} />
-          <Chapter id="fugitiva" scene="fugitiva" frames={FUG_FRAMES} restFrom={0.55} fit={1.9} name="FUGITIVA" nameClass="text-red" details={<FugDetails />} />
+          <Chapter id="hopium-highway" scene="hopium" frames={HWAY_FRAMES} restFrom={0.55} fit={1.5} name="HOPIUM HIGHWAY" nameClass="text-cobalt text-[min(10vw,17svh)]" details={<HwayDetails />} />
           <Chapter id="melax" scene="melax" frames={MELAX_FRAMES} restFrom={0.62} fit={1.9} name="MELAX" nameClass="text-orange" details={<MelaxDetails />} />
         </div>
 
