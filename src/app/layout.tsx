@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import { COMPANY } from "./site";
 import "./globals.css";
+import Experience from "./fx/Experience";
 
 const display = Bricolage_Grotesque({
   variable: "--font-bricolage",
@@ -39,8 +40,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#05060c",
-  colorScheme: "dark",
+  themeColor: "#FFF8EE",
+  colorScheme: "light",
 };
 
 const jsonLd = {
@@ -87,7 +88,13 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">
+        <noscript>
+          <style>{".loader{display:none!important}"}</style>
+        </noscript>
+        {children}
+        <Experience />
+      </body>
     </html>
   );
 }
