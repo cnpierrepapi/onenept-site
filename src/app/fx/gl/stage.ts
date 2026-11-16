@@ -9,10 +9,22 @@ import { Renderer, Program, Mesh, Geometry, Camera } from "ogl";
 import { Kit } from "./clay";
 import { BUILDERS, type ClayKey, type ClayScene } from "./scenes";
 import { PORTRAIT_FRAG, PORTRAIT_VERT, samplePortrait } from "./portrait";
+import { TypeLayer, type Frame } from "./type";
 
 export type SceneKey = ClayKey | "portrait";
+export type { Frame };
 
-type Slot = { el: HTMLElement; key: SceneKey; icon: boolean; shift: number; shiftNarrow: number };
+type Slot = {
+  el: HTMLElement; key: SceneKey; icon: boolean; shift: number; shiftNarrow: number;
+  /** kinetic-type sequence: frames cut on the scroll beat, then a rest frame from restFrom on */
+  frames?: Frame[]; restFrom: number; type?: TypeLayer;
+  /** the [data-at] block it lives in, if any: not drawn until that block is in */
+  gate: HTMLElement | null;
+};
+
+/** one cut per 340 ms at most: three a second, the WCAG flash line */
+export const CUT_MS = 340;
+const REST: Frame = { word: "", bg: "paper", fg: "ink" };
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 
@@ -113,8 +125,8 @@ class Stage {
     this.portrait = { mesh: new Mesh(gl, { geometry, program, mode: gl.POINTS }), aspect: d.aspect, gather: 0 };
   }
 
-  add(el: HTMLElement, key: SceneKey, opts: { icon?: boolean; shift?: number; shiftNarrow?: number } = {}) {
-    const s: Slot = { el, key, icon: !!opts.icon, shift: opts.shift ?? 0, shiftNarrow: opts.shiftNarrow ?? 0 };
+  add(el: HTMLElement, key: SceneKey, opts: { icon?: boolean; shift?: number; shiftNarrow?: number; frames?: Frame[]; restFrom?: number } = {}) {
+    const s: Slot = { el, key, icon: !!opts.icon, shift: opts.shift ?? 0, shiftNarrow: opts.shiftNarrow ?? 0, frames: opts.frames, restFrom: opts.restFrom ?? 1, gate: el.closest<HTMLElement>("[data-at]") };
     this.slots.add(s);
     return () => { this.slots.delete(s); };
   }
@@ -150,14 +162,36 @@ class Stage {
     for (const s of this.slots) {
       const b = s.el.getBoundingClientRect();
       if (b.bottom <= 0 || b.top >= H || b.width < 2 || b.height < 2) continue;
+      if (s.gate && !s.gate.classList.contains("in")) continue;
       const x = b.left * D, y = (H - b.bottom) * D, w = b.width * D, h = b.height * D;
       const cx = Math.max(0, b.left) * D, cy = Math.max(0, H - b.bottom) * D;
       const cw = (Math.min(W, b.right) - Math.max(0, b.left)) * D, ch = (Math.min(H, b.bottom) - Math.max(0, b.top)) * D;
       gl.viewport(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
       gl.scissor(Math.round(cx), Math.round(cy), Math.ceil(cw), Math.ceil(ch));
-      gl.clearColor(1, 0.973, 0.933, 1);
-      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       const p = s.icon ? 1 : trackProgress(s.el);
+      // kinetic type: the frame behind the scene, cut on the beat
+      let frame: { index: number; count: number; bg: string; rest: number } | undefined;
+      if (s.frames && s.frames.length) {
+        const N = s.frames.length;
+        const target = p >= s.restFrom ? N : Math.min(N - 1, Math.floor((p / s.restFrom) * N));
+        const now = performance.now();
+        if (!s.type) s.type = new TypeLayer(gl);
+        const t = s.type, key = `${Math.round(w)}x${Math.round(h)}`;
+        const at = (i: number) => (i >= N ? REST : s.frames![i]);
+        if (t.key !== key) { t.key = key; t.cut(at(Math.max(0, t.shown < 0 ? target : t.shown)), t.shown < 0 ? target : t.shown, w, h, now - 1e4); }
+        else if (target !== t.shown && now - t.lastCut >= CUT_MS) {
+          const next = t.shown + Math.sign(target - t.shown);
+          t.cut(at(next), next, w, h, now);
+        }
+        const calm = document.documentElement.dataset.motion === "calm";
+        t.mesh.program.uniforms.uMix.value = calm ? Math.min(1, (now - t.fadeFrom) / 300) : 1;
+        gl.clear(gl.DEPTH_BUFFER_BIT);
+        t.mesh.draw();
+        frame = { index: t.shown, count: N, bg: at(t.shown).bg, rest: Math.min(1, Math.max(0, (p - s.restFrom) / (1 - s.restFrom || 1))) };
+      } else {
+        gl.clearColor(1, 0.973, 0.933, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      }
       if (s.key === "portrait") {
         if (!this.portrait) { void this.loadPortrait("/founder.jpg"); continue; }
         const u = this.portrait.mesh.program.uniforms;
@@ -174,7 +208,7 @@ class Stage {
       }
       const sc = this.scene(s.key);
       if (!sc) continue;
-      sc.update(p, time, this.intro, s.icon);
+      sc.update(p, time, this.intro, s.icon, frame);
       const aspect = b.width / b.height;
       const c = sc.cam(aspect, s.icon);
       const back = c.back ?? 1;

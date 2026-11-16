@@ -8,13 +8,15 @@ import { C, Kit, ease, mix, setColour, smooth, stretch, type ClayMesh, type Colo
 export type ClayKey = "hero" | "adfontes" | "fugitiva" | "melax" | "merge";
 
 export interface Cam { pos: [number, number, number]; target: [number, number, number]; back?: number }
+/** which kinetic-type frame is on screen; index === count means the rest frame. rest: 0..1 through it */
+export interface FrameInfo { index: number; count: number; bg: string; rest: number }
 export interface ClayScene {
   root: Transform;
   solids: ClayMesh[];
   shadows: ClayMesh[];
   clipY: number;
   cam(aspect: number, icon: boolean): Cam;
-  update(p: number, t: number, intro: number, icon: boolean): void;
+  update(p: number, t: number, intro: number, icon: boolean, frame?: FrameInfo): void;
 }
 
 /** Where each branch finishes merging. The PR cards appear at these points. */
@@ -37,6 +39,15 @@ function base(kit: Kit) {
 
 /* Hero. A knot of pipes and cables hangs over the paper. Scroll pulls it down through the floor until
    it is gone, and the orange door rises in its place. */
+/* knot colours that stand out from each field */
+const KNOT: Record<string, Colour[]> = {
+  paper: [C.cobalt, C.lemon, C.ink, C.cream],
+  cobalt: [C.lemon, C.cream, C.ink, C.orange],
+  lemon: [C.cobalt, C.ink, C.cream, C.orange],
+  orange: [C.ink, C.cobalt, C.cream, C.lemon],
+  ink: [C.lemon, C.cream, C.orange, C.cobalt],
+};
+
 function hero(kit: Kit): ClayScene {
   const { root, solids, shadows, add, shade } = base(kit);
   const knot = new Transform(); knot.setParent(root);
@@ -62,12 +73,21 @@ function hero(kit: Kit): ClayScene {
   return {
     root, solids, shadows, clipY: -1,
     cam: () => ({ pos: [0, 1, 6.4], target: [0, -0.05, 0] }),
-    update(p, t, intro) {
-      const sink = ease(smooth(0.04, 0.6, p));
-      knot.position.y = 0.45 - 3.6 * sink + (1 - ease(intro)) * 4;
-      knot.rotation.y = -t * 0.12;
-      tori.forEach((m, i) => { m.rotation.x = i * 1.13 + t * 0.18; });
-      const rise = ease(smooth(0.45, 0.85, p));
+    update(p, t, intro, _icon, frame) {
+      // with frames: one more loop of cable on every cut, re-posed and recoloured against the field
+      const k = frame ? Math.min(frame.index, frame.count) : 6;
+      const restP = frame ? frame.rest : p;
+      const shown = frame ? Math.min(7, k + 2) : 7;
+      const pal = KNOT[frame?.bg ?? "paper"] ?? KNOT.paper;
+      tori.forEach((m, i) => {
+        m.visible = i < shown;
+        m.rotation.x = i * 1.13 + t * 0.18 + k * 0.9;
+        setColour(m, pal[i % pal.length]);
+      });
+      const sink = ease(smooth(0.0, 0.35, restP));
+      knot.position.y = 0.12 - 3.6 * sink + (1 - ease(intro)) * 4;
+      knot.rotation.y = -t * 0.12 - k * 0.6;
+      const rise = ease(smooth(0.2, 0.55, restP));
       door.position.y = mix(-2.3, -0.18, rise);
       door.rotation.y = -(0.35 * (1 - rise) + 0.12 * Math.sin(t * 0.5));
       knotShadow.scale.set(3.4, 2.2, 1);

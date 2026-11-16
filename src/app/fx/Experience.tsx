@@ -19,11 +19,13 @@ type Phase = "boot" | "gate" | "load" | "done";
    Experience is mounted once, and this state never needs to re-render anything. */
 let litEls: { el: HTMLElement; words: HTMLElement[] }[] = [];
 let atEls: HTMLElement[] = [];
+let untilEls: HTMLElement[] = [];
 let flashAtEls: { el: HTMLElement; past: boolean }[] = [];
 
 function scan() {
   litEls = Array.from(document.querySelectorAll<HTMLElement>("[data-lit]")).map((el) => ({ el, words: Array.from(el.querySelectorAll<HTMLElement>(".lit-word")) }));
   atEls = Array.from(document.querySelectorAll<HTMLElement>("[data-at]"));
+  untilEls = Array.from(document.querySelectorAll<HTMLElement>("[data-until]"));
   flashAtEls = Array.from(document.querySelectorAll<HTMLElement>("[data-flash-at]")).map((el) => ({ el, past: trackProgress(el) >= Number(el.dataset.flashAt) }));
 }
 
@@ -34,6 +36,7 @@ function drive() {
     words.forEach((w, i) => w.classList.toggle("on", p * 1.25 > (i + 1) / n));
   }
   for (const el of atEls) el.classList.toggle("in", trackProgress(el) >= Number(el.dataset.at));
+  for (const el of untilEls) el.style.opacity = trackProgress(el) >= Number(el.dataset.until) ? "0" : "";
   for (const f of flashAtEls) {
     const past = trackProgress(f.el) >= Number(f.el.dataset.flashAt);
     if (past && !f.past) flash((f.el.dataset.flash || "cobalt").split(","), (f.el.dataset.kind as FlashKind) || "flash");

@@ -2,25 +2,11 @@ import { Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import GLSlot from "./fx/GLSlot";
+import type { Frame } from "./fx/gl/type";
 import { MERGE_AT } from "./fx/gl/scenes";
 import { Arrow, COMPANY, Footer, Nav } from "./site";
 
 /* ---------- small pieces ---------- */
-
-/** Headline words that fly up once the loader opens. Real text, so readers and crawlers get it. */
-function Split({ text, from = 0, className = "" }: { text: string; from?: number; className?: string }) {
-  return (
-    <>
-      {text.split(" ").map((w, i) => (
-        <Fragment key={i}>
-          <span className={`split-word intro-hide ${className}`}>
-            <span style={{ "--i": from + i } as React.CSSProperties}>{w}</span>
-          </span>{" "}
-        </Fragment>
-      ))}
-    </>
-  );
-}
 
 /** Words that light up one by one as the track scrolls. */
 function Lit({ text }: { text: string }) {
@@ -51,6 +37,15 @@ function Visit({ href, children, internal = false }: { href: string; children: R
 }
 
 /* ---------- content ---------- */
+
+const HERO_FRAMES: Frame[] = [
+  { word: "AI", bg: "cobalt", fg: "paper" },
+  { word: "PRODUCTS", bg: "lemon", fg: "ink" },
+  { word: "FOR PEOPLE", bg: "orange", fg: "ink" },
+  { word: "WHO NEVER", bg: "ink", fg: "lemon" },
+  { word: "ASKED", bg: "cobalt", fg: "lemon" },
+  { word: "FOR AI.", bg: "lemon", fg: "ink" },
+];
 
 const PRODUCTS: { scene: "adfontes" | "fugitiva" | "melax"; name: string; line: string; href: string }[] = [
   { scene: "adfontes", name: "AD FONTES", line: "a blockchain game you start with an email", href: "#adfontes" },
@@ -116,25 +111,25 @@ export default function Home() {
       <Nav />
 
       <main className="relative z-10">
-        {/* 1. hero: the plumbing sinks through the paper, the door rises */}
-        <section data-track className="relative h-[170vh]" aria-labelledby="hero-title">
+        {/* 1. hero: kinetic type. One word a frame, cut on the scroll beat; the knot tangles on every cut.
+            Then the rest frame: paper, the knot sinks through the floor, the door rises. */}
+        <section data-track className="relative h-[360vh]" aria-labelledby="hero-title">
           <div className="sticky top-0 h-[100svh] overflow-hidden">
-            <GLSlot scene="hero" shift={0.46} shiftNarrow={0} className="absolute inset-x-0 top-[7svh] h-[34svh] md:top-0 md:h-full" />
-            <div className="relative mx-auto flex h-full max-w-[1500px] flex-col justify-end px-5 pb-6 sm:px-8 md:justify-center md:pb-0 md:pt-16">
-              <div className="md:max-w-[58%]">
-              <p className="font-mono text-[11px] uppercase tracking-[0.26em] text-mute">Onenept Studios · applied AI</p>
-              <h1 id="hero-title" className="mt-3 max-w-[11ch] font-display text-[min(14vw,8.2svh)] font-extrabold leading-[0.86] tracking-[-0.055em] md:text-[min(7.4vw,12.5svh)]">
-                <Split text="AI products for people" />
-                <span className="text-orange">
-                  <Split text="who never asked for AI." from={4} />
-                </span>
-              </h1>
-              <p className="intro-fade mt-5 max-w-md text-base leading-relaxed [@media(min-height:720px)]:text-lg" style={{ "--fly-delay": "0.7s" } as React.CSSProperties}>
+            <GLSlot scene="hero" frames={HERO_FRAMES} restFrom={0.5} className="absolute inset-0" />
+            <h1 id="hero-title" className="sr-only">AI products for people who never asked for AI.</h1>
+            <p className="pointer-events-none absolute inset-x-0 bottom-6 text-center font-mono text-[10px] uppercase tracking-[0.3em] text-ink/70 transition-opacity" data-until="0.06" aria-hidden="true">
+              scroll
+            </p>
+            <p className="pointer-events-none absolute inset-x-0 top-[13svh] px-5 text-center font-display text-[min(11vw,10svh)] font-extrabold leading-[0.9] tracking-[-0.05em]" data-at="0.66">
+              We build the door.
+            </p>
+            <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-4 px-5 pb-6 text-center md:pb-8" data-at="0.76">
+              <p className="max-w-xl text-base leading-relaxed [@media(min-height:720px)]:text-lg">
                 We hide the plumbing. Models, wallets, tokens and APIs stay under the floor. What&apos;s left on the screen is something you can use in the first thirty seconds.
               </p>
-              <ul className="mt-5 flex flex-wrap gap-2" aria-label="What we've built">
-                {PRODUCTS.map((p, i) => (
-                  <li key={p.scene} className="intro-fade" style={{ "--fly-delay": `${0.9 + i * 0.1}s` } as React.CSSProperties}>
+              <ul className="flex flex-wrap justify-center gap-2" aria-label="What we've built">
+                {PRODUCTS.map((p) => (
+                  <li key={p.scene}>
                     <a href={p.href} title={p.line} className="group flex items-center gap-2 rounded-full border-2 border-ink py-1 pl-1 pr-4 transition-transform hover:-translate-y-0.5">
                       <GLSlot scene={p.scene} icon className="h-11 w-11 shrink-0 rounded-full" />
                       <span className="font-display text-sm font-extrabold tracking-[-0.02em]">{p.name}</span>
@@ -142,14 +137,7 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-              </div>
             </div>
-            <p className="absolute right-6 top-24 hidden max-w-[12rem] text-right font-mono text-[11px] uppercase leading-5 tracking-[0.2em] md:block" data-at="0.7">
-              The plumbing&apos;s gone. What&apos;s left is a door.
-            </p>
-            <p className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 font-mono text-[10px] uppercase tracking-[0.3em] text-mute md:block" aria-hidden="true">
-              scroll
-            </p>
           </div>
         </section>
 
@@ -169,7 +157,7 @@ export default function Home() {
 
         {/* 3. the work */}
         <section id="work" className="relative scroll-mt-0">
-          <div className="mx-auto flex max-w-[1500px] items-end justify-between gap-6 px-5 pt-10 sm:px-8" data-flash="cobalt,lemon">
+          <div className="mx-auto flex max-w-[1500px] items-end justify-between gap-6 px-5 pt-10 sm:px-8">
             <h2 className="font-display text-[26vw] font-extrabold leading-[0.78] tracking-[-0.07em] md:text-[19vw]" data-fly>
               Built<span className="text-orange">.</span>
             </h2>
@@ -181,7 +169,6 @@ export default function Home() {
 
           {/* 01 AD FONTES */}
           <article id="adfontes" data-track className="relative h-[230vh] scroll-mt-0">
-            <span data-flash="lemon" data-flash-at="0.015" />
             <div className="sticky top-0 h-[100svh] overflow-hidden">
               <GLSlot scene="adfontes" shift={0.3} shiftNarrow={0} className="absolute inset-x-0 top-0 h-[50svh] md:inset-y-0 md:left-[34%] md:right-0 md:h-full" />
               <div className="relative mx-auto flex h-full max-w-[1500px] flex-col justify-end px-5 pb-8 sm:px-8 md:justify-center md:pb-0">
@@ -221,7 +208,6 @@ export default function Home() {
 
           {/* 02 FUGITIVA */}
           <article id="fugitiva" data-track className="relative h-[230vh] scroll-mt-0">
-            <span data-flash="red" data-kind="tear" data-flash-at="0.015" />
             <div className="sticky top-0 h-[100svh] overflow-hidden">
               <GLSlot scene="fugitiva" shift={-0.24} shiftNarrow={0} className="absolute inset-x-0 top-0 h-[48svh] md:inset-y-0 md:left-0 md:right-[38%] md:h-full" />
               <div className="relative mx-auto flex h-full max-w-[1500px] flex-col justify-end px-5 pb-8 sm:px-8 md:items-end md:justify-center md:pb-0">
@@ -257,8 +243,6 @@ export default function Home() {
 
           {/* 03 Melax */}
           <article id="melax" data-track className="relative h-[250vh] scroll-mt-0">
-            <span data-flash="orange" data-flash-at="0.015" />
-            <span data-flash="lemon,cobalt" data-flash-at="0.86" />
             <div className="sticky top-0 h-[100svh] overflow-hidden">
               <GLSlot scene="melax" shift={0.4} shiftNarrow={0} className="absolute inset-x-0 top-0 h-[50svh] md:inset-y-0 md:left-[30%] md:right-0 md:h-full" />
               <div className="relative mx-auto flex h-full max-w-[1500px] flex-col justify-end px-5 pb-8 sm:px-8 md:justify-center md:pb-0">
@@ -301,7 +285,6 @@ export default function Home() {
 
         {/* 4. merged upstream: branches merge into the trunk, each PR lands as its branch does */}
         <section id="open-source" data-track className="relative h-[220vh] scroll-mt-0">
-          <span data-flash="cobalt" data-kind="tear" data-flash-at="0.015" />
           <div className="sticky top-0 flex h-[100svh] flex-col pt-20">
             <h2 className="mx-auto w-full max-w-[1500px] px-5 font-display text-5xl font-extrabold leading-[0.9] tracking-[-0.05em] sm:px-8 md:text-7xl" data-at="0.01">
               Merged upstream.
@@ -337,7 +320,6 @@ export default function Home() {
 
         {/* 5. the company: the one solid cobalt block */}
         <section id="company" className="relative scroll-mt-0 bg-cobalt text-paper">
-          <span className="absolute inset-x-0 top-0 h-px" data-flash="cobalt" />
           <div className="mx-auto grid max-w-[1500px] gap-14 px-5 py-24 sm:px-8 sm:py-32 lg:grid-cols-12">
             <div className="lg:col-span-7">
               <p className="font-mono text-[11px] uppercase tracking-[0.26em] text-lemon" data-fly>Why onenept</p>
