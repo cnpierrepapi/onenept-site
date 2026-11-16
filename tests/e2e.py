@@ -17,6 +17,7 @@ def check(ok, name, detail=""):
 # Records the moment either flash layer turns fully on.
 WATCH = """() => {
   window.__onsets = [];
+  window.__cuts = [];
   for (const sel of ['[data-fx=flash]', '[data-fx=tear]']) {
     const el = document.querySelector(sel);
     new MutationObserver(() => { if (el.style.opacity === '1') window.__onsets.push(performance.now()); })
@@ -33,8 +34,8 @@ async def storm(pg):
     for k in range(40, -1, -2):
         await pg.evaluate(f"window.scrollTo(0, {int(H * k / 40)})")
         await pg.wait_for_timeout(40)
-    await pg.wait_for_timeout(3500)  # let queued flashes play out
-    return await pg.evaluate("window.__onsets")
+    await pg.wait_for_timeout(3500)  # let queued cuts play out
+    return await pg.evaluate("[...window.__onsets, ...(window.__cuts || [])].sort((a, b) => a - b)")
 
 async def main():
     async with async_playwright() as p:
@@ -54,7 +55,8 @@ async def main():
         # 2. calm mode never flashes
         await pg.evaluate(WATCH)
         onsets = await storm(pg)
-        check(len(onsets) == 0, "calm mode: no flash frames during a full scroll", f"{len(onsets)} frames")
+        gaps = [b - a for a, b in zip(onsets, onsets[1:])]
+        check(not gaps or min(gaps) >= 880, "calm mode: changes fade, never faster than one every 0.9 s", f"min gap {min(gaps) if gaps else 0:.0f} ms")
         await pg.reload(wait_until="networkidle")
         check(not await pg.get_by_role("dialog").is_visible(), "second visit skips the warning")
         await ctx.close()
@@ -115,7 +117,7 @@ async def main():
         await pg.goto(BASE + "/", wait_until="networkidle")
         await pg.wait_for_selector(".loader", state="detached", timeout=30000)
         check(await pg.evaluate("document.documentElement.classList.contains('gl-off')"), "no WebGL is detected")
-        imgs = await pg.evaluate("[...document.querySelectorAll('.gl-slot')].map(s => getComputedStyle(s).backgroundImage)")
+        imgs = await pg.evaluate("[...document.querySelectorAll('.gl-slot[data-still]')].map(s => getComputedStyle(s).backgroundImage)")
         check(imgs and all(i.startswith("url(") for i in imgs), "no WebGL: every slot shows a still", str(imgs[:3]))
         missing = []
         for u in set(i[5:-2] for i in imgs if i.startswith("url(")):

@@ -11,20 +11,27 @@ import { BUILDERS, type ClayKey, type ClayScene } from "./scenes";
 import { PORTRAIT_FRAG, PORTRAIT_VERT, samplePortrait } from "./portrait";
 import { TypeLayer, type Frame } from "./type";
 
-export type SceneKey = ClayKey | "portrait";
+/** "type" is a kinetic-type sequence with no 3D object */
+export type SceneKey = ClayKey | "portrait" | "type";
 export type { Frame };
 
 type Slot = {
   el: HTMLElement; key: SceneKey; icon: boolean; shift: number; shiftNarrow: number;
   /** kinetic-type sequence: frames cut on the scroll beat, then a rest frame from restFrom on */
-  frames?: Frame[]; restFrom: number; type?: TypeLayer;
+  frames?: Frame[]; restFrom: number; type?: TypeLayer; restBg: string;
+  /** how far the camera steps back so the object fits the open band between the lines */
+  fit: number;
+  /** the scene's story position, eased toward where the frames say it should be */
+  story: number;
   /** the [data-at] block it lives in, if any: not drawn until that block is in */
   gate: HTMLElement | null;
 };
 
 /** one cut per 340 ms at most: three a second, the WCAG flash line */
 export const CUT_MS = 340;
-const REST: Frame = { word: "", bg: "paper", fg: "ink" };
+/** calm mode: a slow cross-fade, never more than about one a second, so nothing strobes */
+export const CALM_CUT_MS = 900;
+
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 
@@ -56,6 +63,8 @@ class Stage {
   private portraitLoading = false;
   intro = 0;
   quality = 1;
+  /** the last cut anywhere on the page: the three-a-second limit is page-wide, not per section */
+  private lastCut = -1e9;
   /** false behind the gate and loader: nothing is drawn until the iris opens */
   active = false;
   frameMs = 16;
@@ -125,8 +134,11 @@ class Stage {
     this.portrait = { mesh: new Mesh(gl, { geometry, program, mode: gl.POINTS }), aspect: d.aspect, gather: 0 };
   }
 
-  add(el: HTMLElement, key: SceneKey, opts: { icon?: boolean; shift?: number; shiftNarrow?: number; frames?: Frame[]; restFrom?: number } = {}) {
-    const s: Slot = { el, key, icon: !!opts.icon, shift: opts.shift ?? 0, shiftNarrow: opts.shiftNarrow ?? 0, frames: opts.frames, restFrom: opts.restFrom ?? 1, gate: el.closest<HTMLElement>("[data-at]") };
+  add(el: HTMLElement, key: SceneKey, opts: { icon?: boolean; shift?: number; shiftNarrow?: number; frames?: Frame[]; restFrom?: number; restBg?: string; fit?: number } = {}) {
+    const s: Slot = {
+      el, key, icon: !!opts.icon, shift: opts.shift ?? 0, shiftNarrow: opts.shiftNarrow ?? 0, frames: opts.frames,
+      restFrom: opts.restFrom ?? 1, restBg: opts.restBg ?? "paper", fit: opts.fit ?? 1, gate: el.closest<HTMLElement>("[data-at]"), story: 0,
+    };
     this.slots.add(s);
     return () => { this.slots.delete(s); };
   }
@@ -177,14 +189,16 @@ class Stage {
         const now = performance.now();
         if (!s.type) s.type = new TypeLayer(gl);
         const t = s.type, key = `${Math.round(w)}x${Math.round(h)}`;
-        const at = (i: number) => (i >= N ? REST : s.frames![i]);
-        if (t.key !== key) { t.key = key; t.cut(at(Math.max(0, t.shown < 0 ? target : t.shown)), t.shown < 0 ? target : t.shown, w, h, now - 1e4); }
-        else if (target !== t.shown && now - t.lastCut >= CUT_MS) {
-          const next = t.shown + Math.sign(target - t.shown);
-          t.cut(at(next), next, w, h, now);
-        }
+        const at = (i: number): Frame => (i >= N ? { bg: s.restBg, fg: "ink" } : s.frames![i]);
+        const navPx = 76 * D;
         const calm = document.documentElement.dataset.motion === "calm";
-        t.mesh.program.uniforms.uMix.value = calm ? Math.min(1, (now - t.fadeFrom) / 300) : 1;
+        if (t.key !== key) { t.key = key; const i0 = t.shown < 0 ? target : t.shown; t.cut(at(i0), i0, w, h, now - 1e4, navPx, false); }
+        else if (target !== t.shown && now - this.lastCut >= (calm ? CALM_CUT_MS : CUT_MS)) {
+          const next = t.shown + Math.sign(target - t.shown);
+          t.cut(at(next), next, w, h, now, navPx);
+          this.lastCut = now;
+        }
+        t.mesh.program.uniforms.uMix.value = calm ? Math.min(1, (now - t.fadeFrom) / 600) : 1;
         gl.clear(gl.DEPTH_BUFFER_BIT);
         t.mesh.draw();
         frame = { index: t.shown, count: N, bg: at(t.shown).bg, rest: Math.min(1, Math.max(0, (p - s.restFrom) / (1 - s.restFrom || 1))) };
@@ -206,12 +220,23 @@ class Stage {
         this.portrait.mesh.draw();
         continue;
       }
+      if (s.key === "type") continue;
       const sc = this.scene(s.key);
       if (!sc) continue;
-      sc.update(p, time, this.intro, s.icon, frame);
+      // with frames, the story moves one cut at a time and eases to each new state (0..0.7 over the
+      // frames, 0.7..1 through the rest frame); without, it follows the scroll directly
+      let story = p;
+      if (frame) {
+        const goal = frame.index < frame.count ? ((frame.index + 1) / frame.count) * 0.7 : 0.7 + 0.3 * frame.rest;
+        s.story += (goal - s.story) * Math.min(1, dt / 140);
+        story = s.story;
+      }
+      sc.update(story, time, this.intro, s.icon, frame);
       const aspect = b.width / b.height;
       const c = sc.cam(aspect, s.icon);
-      const back = c.back ?? 1;
+      // in a sequence the object steps back to fit the open band; tall phone frames have more room
+      // between the lines, so it comes closer there
+      const back = (c.back ?? 1) * (s.frames ? s.fit * (aspect < 1 ? 0.6 : 1) : 1);
       cam.perspective({ fov: fovFor(aspect), aspect, near: 0.1, far: 80 });
       cam.position.set(
         c.target[0] + (c.pos[0] - c.target[0]) * back,

@@ -1,44 +1,73 @@
-// Full-frame kinetic type. A sequence is a run of frames: one colour field, one or two giant words.
-// Each frame is drawn once into a 2D canvas and used as a texture behind the clay scene, so the 3D object
-// passes in front of the letters. The cut between frames is the flash; the stage allows one cut per
-// 340 ms at most (three a second, WCAG 2.3.1), so a fast scroll plays the cuts out on the beat instead.
+// Full-frame kinetic type. A sequence is a run of frames: one colour field and either two lines of giant
+// type (one along the top edge, one along the bottom, on opposite sides) or one glyph filling the screen.
+// The clay object lives in the open band between the lines, so it never covers the words.
+// Each frame is painted once into a 2D canvas and used as a texture behind the scene. The cut between
+// frames is the flash; the stage allows one cut per 340 ms (three a second, WCAG 2.3.1).
 import { Mesh, Program, Texture, Triangle, type OGLRenderingContext } from "ogl";
 
-export type Frame = { word: string; bg: string; fg: string };
+export type Frame = { top?: string; bottom?: string; glyph?: string; bg: string; fg: string };
 
 export const FIELD: Record<string, string> = {
   paper: "#FFF8EE", ink: "#15120F", orange: "#FF6B2C", cobalt: "#2F5BFF", lemon: "#FFE14D", red: "#E8402B",
 };
+
+/** The open band in the middle of a two-line frame, as fractions of the slot height (top, bottom). */
+export const BAND = { wide: [0.33, 0.67], tall: [0.3, 0.7] } as const;
 
 function displayFont() {
   const v = getComputedStyle(document.documentElement).getPropertyValue("--font-bricolage").trim();
   return v || "'Bricolage Grotesque', sans-serif";
 }
 
-/** Paint one frame: the field, then the word as large as it fits (one line, or stacked on narrow screens). */
-export function paintFrame(c: HTMLCanvasElement, f: Frame, w: number, h: number) {
+type Ctx = CanvasRenderingContext2D & { letterSpacing?: string };
+
+/** Largest size at which `text` fits in w x h (cap height measured, not the em box). */
+function fit(x: Ctx, font: string, text: string, w: number, h: number) {
+  x.font = `800 100px ${font}`;
+  x.letterSpacing = "-5px";
+  const m = x.measureText(text);
+  const cap = (m.actualBoundingBoxAscent + m.actualBoundingBoxDescent) || 72;
+  return Math.min((w / m.width) * 100, (h / cap) * 100);
+}
+
+function line(x: Ctx, font: string, text: string, size: number, ax: "left" | "right" | "center", px: number, cy: number) {
+  x.font = `800 ${size}px ${font}`;
+  x.letterSpacing = `${-0.05 * size}px`;
+  x.textAlign = ax;
+  x.textBaseline = "alphabetic";
+  const m = x.measureText(text);
+  const asc = m.actualBoundingBoxAscent, desc = m.actualBoundingBoxDescent;
+  x.fillText(text, px, cy + (asc - desc) / 2);
+}
+
+/** Paint one frame at w x h device pixels. navPx keeps the top line clear of the nav. */
+export function paintFrame(c: HTMLCanvasElement, f: Frame, w: number, h: number, navPx = 72) {
   c.width = Math.max(2, Math.round(w));
   c.height = Math.max(2, Math.round(h));
-  const x = c.getContext("2d")!;
+  const x = c.getContext("2d") as Ctx;
   x.fillStyle = FIELD[f.bg] ?? f.bg;
   x.fillRect(0, 0, c.width, c.height);
-  if (!f.word) return;
-  const font = displayFont();
-  const words = f.word.split(" ");
-  const lines = c.width / c.height < 1.1 && words.length > 1 ? words : [f.word];
-  x.font = `800 100px ${font}`;
-  const widest = Math.max(...lines.map((l) => x.measureText(l).width));
-  const lineH = 0.86;
-  let size = (c.width * 0.9) / widest * 100;
-  size = Math.min(size, (c.height * 0.72) / (lines.length * lineH));
-  x.font = `800 ${size}px ${font}`;
   x.fillStyle = FIELD[f.fg] ?? f.fg;
-  x.textAlign = "center";
-  x.textBaseline = "middle";
-  // tight tracking, like the display type on the rest of the site
-  try { (x as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = `${-0.05 * size}px`; } catch {}
-  const total = lines.length * size * lineH;
-  lines.forEach((l, i) => x.fillText(l, c.width / 2, c.height / 2 - total / 2 + size * lineH * (i + 0.5)));
+  const font = displayFont();
+  const W = c.width, H = c.height;
+  const pad = Math.round(Math.min(W, H) * 0.035);
+  if (f.glyph) {
+    const s = fit(x, font, f.glyph, W * 0.92, H * 0.78);
+    line(x, font, f.glyph, s, "center", W / 2, H / 2);
+    return;
+  }
+  const wide = W / H >= 1;
+  const [b0, b1] = wide ? BAND.wide : BAND.tall;
+  const topBox = [Math.max(navPx, pad), H * b0 - pad];
+  const botBox = [H * b1 + pad, H - pad];
+  if (f.top) {
+    const s = fit(x, font, f.top, W - 2 * pad, topBox[1] - topBox[0]);
+    line(x, font, f.top, s, wide ? "left" : "center", wide ? pad : W / 2, (topBox[0] + topBox[1]) / 2);
+  }
+  if (f.bottom) {
+    const s = fit(x, font, f.bottom, W - 2 * pad, botBox[1] - botBox[0]);
+    line(x, font, f.bottom, s, wide ? "right" : "center", wide ? W - pad : W / 2, (botBox[0] + botBox[1]) / 2);
+  }
 }
 
 const VERT = /* glsl */ `
@@ -75,11 +104,13 @@ export class TypeLayer {
     this.mesh = new Mesh(gl, { geometry: new Triangle(gl), program });
   }
   /** Cut to frame f (index i). The old frame stays in texture A for a fade. */
-  cut(f: Frame, i: number, w: number, h: number, now: number) {
+  cut(f: Frame, i: number, w: number, h: number, now: number, navPx: number, counted = true) {
+    // every real cut is a flash: recorded so the browser tests can hold it to three a second
+    if (counted) ((window as unknown as { __cuts?: number[] }).__cuts ??= []).push(now);
     [this.ca, this.cb] = [this.cb, this.ca];
     this.a.image = this.ca;
     this.a.needsUpdate = true;
-    paintFrame(this.cb, f, w, h);
+    paintFrame(this.cb, f, w, h, navPx);
     this.b.image = this.cb;
     this.b.needsUpdate = true;
     this.shown = i;

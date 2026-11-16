@@ -12,6 +12,8 @@ export default function GLSlot({
   shiftNarrow = 0,
   frames,
   restFrom,
+  restBg,
+  fit,
   className = "",
 }: {
   scene: SceneKey;
@@ -20,13 +22,16 @@ export default function GLSlot({
   shiftNarrow?: number;
   frames?: Frame[];
   restFrom?: number;
+  restBg?: string;
+  fit?: number;
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!ref.current) return;
-    return stage.add(ref.current, scene, { icon, shift, shiftNarrow, frames, restFrom });
-  }, [scene, icon, shift, shiftNarrow, frames, restFrom]);
-  const still = `url(/stills/${scene}${icon ? "-icon" : ""}.jpg)`;
-  return <div ref={ref} aria-hidden="true" data-still data-scene={scene + (icon ? "-icon" : "")} className={`gl-slot ${className}`} style={{ "--still": still } as React.CSSProperties} />;
+    return stage.add(ref.current, scene, { icon, shift, shiftNarrow, frames, restFrom, restBg, fit });
+  }, [scene, icon, shift, shiftNarrow, frames, restFrom, restBg, fit]);
+  // a type-only sequence has no object, so no still: without WebGL its section's own text carries it
+  const still = scene === "type" ? undefined : `url(/stills/${scene}${icon ? "-icon" : ""}.jpg)`;
+  return <div ref={ref} aria-hidden="true" data-still={still ? "" : undefined} data-scene={scene + (icon ? "-icon" : "")} className={`gl-slot ${className}`} style={still ? ({ "--still": still } as React.CSSProperties) : undefined} />;
 }

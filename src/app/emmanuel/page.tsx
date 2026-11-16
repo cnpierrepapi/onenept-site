@@ -55,65 +55,64 @@ export default function Founder() {
     <div className="relative">
       <Nav />
       <main className="relative z-10">
-        {/* hero: the portrait gathers out of scattered clay dots */}
+        {/* hero: the name along the top and bottom edges, the face gathering out of clay dots between them */}
         <section data-track className="relative h-[170vh]">
           <div className="sticky top-0 h-[100svh] overflow-hidden">
-            <GLSlot scene="portrait" className="absolute inset-x-0 top-[9svh] h-[50svh] md:inset-y-0 md:left-[48%] md:right-0 md:h-full" />
-            <div className="relative mx-auto flex h-full max-w-[1500px] flex-col justify-end px-5 pb-10 sm:px-8 md:justify-center md:pb-0">
-              <p className="intro-fade font-mono text-[11px] uppercase tracking-[0.26em] text-mute" style={{ "--fly-delay": "0.4s" } as React.CSSProperties}>
-                Founder · Onenept Studios
-              </p>
-              <h1 className="mt-4 font-display text-[17vw] font-extrabold leading-[0.82] tracking-[-0.06em] md:text-[10vw] 2xl:text-[150px]">
-                <Split text="Emmanuel" />
-                <br />
-                <span className="text-orange">
-                  <Split text="Nnawuogo" from={1} />
-                </span>
-              </h1>
-              <p className="intro-fade mt-6 max-w-md text-base leading-relaxed sm:text-lg" style={{ "--fly-delay": "0.8s" } as React.CSSProperties}>
-                I&apos;m a design engineer. I build the part of an AI product people actually touch, and I keep at it until someone who has never seen it can use it without asking me anything.
-              </p>
-            </div>
+            <GLSlot scene="portrait" className="absolute inset-x-0 bottom-[22svh] top-[24svh] md:bottom-[20svh] md:top-[22svh]" />
+            <h1 className="pointer-events-none absolute inset-0 font-display font-extrabold leading-[0.8] tracking-[-0.06em]">
+              <span className="absolute inset-x-0 top-[72px] whitespace-nowrap px-[3.5vmin] text-center text-[min(17vw,19svh)] md:top-[78px] md:text-left">
+                <Split text="EMMANUEL" />
+              </span>
+              <span className="absolute inset-x-0 bottom-6 whitespace-nowrap px-[3.5vmin] text-center text-[min(17vw,19svh)] text-orange md:text-right">
+                <Split text="NNAWUOGO" from={1} />
+              </span>
+            </h1>
+            <p className="intro-fade absolute right-[3.5vmin] top-[80px] hidden w-[min(28vw,24rem)] text-[15px] leading-relaxed md:block" style={{ "--fly-delay": "0.8s" } as React.CSSProperties}>
+              Founder of Onenept Studios. I&apos;m a design engineer: I build the part of an AI product people actually touch, and I keep at it until someone who has never seen it can use it without asking me anything.
+            </p>
           </div>
         </section>
+        <p className="px-5 pb-12 text-base leading-relaxed md:hidden">
+          Founder of Onenept Studios. I&apos;m a design engineer: I build the part of an AI product people actually touch, and I keep at it until someone who has never seen it can use it without asking me anything.
+        </p>
 
-        {/* how */}
-        <section className="mx-auto max-w-[1500px] px-5 py-28 sm:px-8 sm:py-36">
-          <div className="grid gap-16 lg:grid-cols-12">
-            <div className="lg:col-span-7">
-              <h2 className="font-display text-5xl font-extrabold leading-[0.95] tracking-[-0.045em] sm:text-7xl" data-fly>
-                The model is the engine. My job is the dashboard.
-              </h2>
-              <p className="mt-8 max-w-2xl text-lg leading-relaxed" data-fly style={{ "--fly-delay": "0.1s" } as React.CSSProperties}>
-                My training is in design thinking and human-computer interaction, not computer science. I write code with AI and always have. What I bring is the judgement about what goes on the screen, what stays off it, and how plain the words can get before they stop being true.
+        {/* the line: slides across the whole width, then cuts to ink */}
+        <section data-track className="relative h-[280vh]" aria-label="How I work">
+          <div className="sticky top-0 flex h-[100svh] items-center overflow-hidden">
+            <p className="whitespace-nowrap pl-[3.5vmin] font-display text-[min(28vw,36svh)] font-extrabold leading-none tracking-[-0.06em] will-change-transform max-md:text-[22svh]" data-slide="0,0.46">
+              The model is the engine.
+            </p>
+            <div className="absolute inset-0 flex items-center bg-ink text-lemon" data-at="0.48" data-cut>
+              <p className="whitespace-nowrap pl-[3.5vmin] font-display text-[min(28vw,36svh)] font-extrabold leading-none tracking-[-0.06em] will-change-transform max-md:text-[22svh]" data-slide="0.48,0.86">
+                My job is the dashboard.
               </p>
-            </div>
-            <div className="lg:col-span-4 lg:col-start-9 lg:pt-40">
-              <div className="rotate-[2deg] rounded-3xl border-2 border-ink bg-orange p-6 shadow-[8px_8px_0_#15120F]" data-fly style={{ "--fly-rot": "8deg" } as React.CSSProperties}>
-                <h3 className="font-display text-3xl font-extrabold tracking-[-0.03em]">Where I&apos;m not your guy.</h3>
-                <p className="mt-3 leading-relaxed">
-                  A backend with no screen, or deep infrastructure work. If it&apos;s an AI product real people have to understand, I am.
+              <div className="absolute inset-x-0 bottom-0 grid gap-6 px-[3.5vmin] pb-7 text-paper md:grid-cols-2 md:gap-[4vw]" data-at="0.82">
+                <p className="text-base leading-relaxed md:text-lg">
+                  My training is in design thinking and human-computer interaction, not computer science. I write code with AI and always have. What I bring is the judgement about what goes on the screen, what stays off it, and how plain the words can get before they stop being true.
+                </p>
+                <p className="text-base leading-relaxed md:text-lg">
+                  <span className="font-display font-extrabold text-orange">Where I&apos;m not your guy:</span> a backend with no screen, or deep infrastructure work. If it&apos;s an AI product real people have to understand, I am.
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* shipped */}
-        <section className="border-t-2 border-ink" data-flash="lemon">
-          <div className="mx-auto max-w-[1500px] px-5 py-24 sm:px-8">
-            <h2 className="font-display text-[20vw] font-extrabold leading-[0.8] tracking-[-0.07em] md:text-[12vw]" data-fly>Shipped</h2>
+        {/* shipped: a ledger across the whole width */}
+        <section className="border-t-2 border-ink">
+          <div className="px-[3.5vmin] py-20">
+            <h2 className="whitespace-nowrap text-center font-display text-[21vw] font-extrabold leading-[0.78] tracking-[-0.07em]" data-fly>Shipped</h2>
             <ol className="mt-12 border-t-2 border-ink">
               {SHIPPED.map((s, i) => (
-                <li key={s.name} className="grid gap-3 border-b-2 border-ink py-8 lg:grid-cols-12 lg:gap-8" data-fly style={{ "--fly-delay": `${i * 0.08}s` } as React.CSSProperties}>
-                  <a href={s.href} target="_blank" rel="noopener noreferrer" className="group lg:col-span-4">
-                    <p className="flex items-center gap-3 font-display text-4xl font-extrabold tracking-[-0.03em] group-hover:text-orange">
+                <li key={s.name} className="grid gap-3 border-b-2 border-ink py-7 md:grid-cols-12 md:items-baseline md:gap-8" data-fly style={{ "--fly-delay": `${i * 0.08}s` } as React.CSSProperties}>
+                  <a href={s.href} target="_blank" rel="noopener noreferrer" className="group md:col-span-5">
+                    <p className="flex items-center gap-3 font-display text-[min(7vw,11svh)] font-extrabold leading-none tracking-[-0.05em] group-hover:text-orange max-md:text-5xl">
                       {s.name}
-                      <Arrow className="h-6 w-6 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                      <Arrow className="h-[0.4em] w-[0.4em] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                     </p>
                   </a>
-                  <p className="max-w-2xl leading-relaxed lg:col-span-6">{s.what}</p>
-                  <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-mute lg:col-span-2 lg:text-right">{s.state}</p>
+                  <p className="leading-relaxed md:col-span-5">{s.what}</p>
+                  <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-mute md:col-span-2 md:text-right">{s.state}</p>
                 </li>
               ))}
             </ol>
@@ -126,42 +125,36 @@ export default function Founder() {
           </div>
         </section>
 
-        {/* hire: the lemon band */}
+        {/* hire: the roles set across the whole width, one per line, alternating sides */}
         <section className="bg-lemon">
-          <span className="block h-px" data-flash="lemon" />
-          <div className="mx-auto grid max-w-[1500px] gap-14 px-5 py-24 sm:px-8 sm:py-32 lg:grid-cols-12">
-            <div className="lg:col-span-7">
-              <p className="font-mono text-[11px] uppercase tracking-[0.26em]" data-fly>Open to remote and contract work</p>
-              <ul className="mt-6 space-y-1 font-display text-5xl font-extrabold leading-[0.95] tracking-[-0.045em] sm:text-7xl">
-                {ROLES.map((r, i) => (
-                  <li key={r} data-fly style={{ "--fly-delay": `${i * 0.08}s` } as React.CSSProperties}>{r}</li>
-                ))}
-              </ul>
-              <a href={`mailto:${EMAIL}`} data-magnetic className="group mt-12 inline-flex max-w-full items-center gap-3 font-display text-2xl font-extrabold tracking-[-0.03em] hover:text-orange sm:text-4xl">
-                <span className="min-w-0 break-all sm:break-normal">{EMAIL}</span>
-                <Arrow className="h-[0.7em] w-[0.7em] shrink-0" />
-              </a>
-            </div>
-            <div className="lg:col-span-4 lg:col-start-9 lg:pt-10">
-              <dl className="divide-y-2 divide-ink border-y-2 border-ink text-sm" data-fly>
-                <div className="py-4">
-                  <dt className="font-mono text-[10px] uppercase tracking-[0.18em]">Studying</dt>
-                  <dd className="mt-1">MSc IT Management with Data Analytics, GBS Malta</dd>
-                </div>
-                <div className="py-4">
-                  <dt className="font-mono text-[10px] uppercase tracking-[0.18em]">Studied</dt>
-                  <dd className="mt-1">MSc Innovation, Strategy &amp; Entrepreneurship, Grenoble École de Management, with Distinction</dd>
-                </div>
-                <div className="py-4">
-                  <dt className="font-mono text-[10px] uppercase tracking-[0.18em]">Elsewhere</dt>
-                  <dd className="mt-1 font-mono text-xs">
-                    <a href={COMPANY.github} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-orange">GitHub</a>
-                    {"  ·  "}
-                    <a href={COMPANY.linkedin} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-orange">LinkedIn</a>
-                  </dd>
-                </div>
-              </dl>
-            </div>
+          <div className="px-[3.5vmin] py-20 md:py-28">
+            <p className="font-mono text-[11px] uppercase tracking-[0.26em]" data-fly>Open to remote and contract work</p>
+            <ul className="mt-6 font-display text-[min(10.5vw,16svh)] font-extrabold leading-[0.88] tracking-[-0.06em] max-md:text-[8.4vw]">
+              {ROLES.map((r, i) => (
+                <li key={r} className={`whitespace-nowrap ${i % 2 ? "md:text-right" : ""}`} data-fly style={{ "--fly-delay": `${i * 0.08}s` } as React.CSSProperties}>{r}</li>
+              ))}
+            </ul>
+            <a href={`mailto:${EMAIL}`} data-magnetic className="mt-12 block whitespace-nowrap font-display text-[7.6vw] font-extrabold leading-none tracking-[-0.06em] hover:text-orange">
+              {EMAIL}
+            </a>
+            <dl className="mt-12 grid gap-6 border-t-2 border-ink pt-6 text-sm md:grid-cols-3">
+              <div>
+                <dt className="font-mono text-[10px] uppercase tracking-[0.18em]">Studying</dt>
+                <dd className="mt-1">MSc IT Management with Data Analytics, GBS Malta</dd>
+              </div>
+              <div>
+                <dt className="font-mono text-[10px] uppercase tracking-[0.18em]">Studied</dt>
+                <dd className="mt-1">MSc Innovation, Strategy &amp; Entrepreneurship, Grenoble École de Management, with Distinction</dd>
+              </div>
+              <div>
+                <dt className="font-mono text-[10px] uppercase tracking-[0.18em]">Elsewhere</dt>
+                <dd className="mt-1 font-mono text-xs">
+                  <a href={COMPANY.github} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-orange">GitHub</a>
+                  {"  ·  "}
+                  <a href={COMPANY.linkedin} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-orange">LinkedIn</a>
+                </dd>
+              </div>
+            </dl>
           </div>
         </section>
       </main>

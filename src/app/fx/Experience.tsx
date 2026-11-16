@@ -20,12 +20,14 @@ type Phase = "boot" | "gate" | "load" | "done";
 let litEls: { el: HTMLElement; words: HTMLElement[] }[] = [];
 let atEls: HTMLElement[] = [];
 let untilEls: HTMLElement[] = [];
+let slideEls: HTMLElement[] = [];
 let flashAtEls: { el: HTMLElement; past: boolean }[] = [];
 
 function scan() {
   litEls = Array.from(document.querySelectorAll<HTMLElement>("[data-lit]")).map((el) => ({ el, words: Array.from(el.querySelectorAll<HTMLElement>(".lit-word")) }));
   atEls = Array.from(document.querySelectorAll<HTMLElement>("[data-at]"));
   untilEls = Array.from(document.querySelectorAll<HTMLElement>("[data-until]"));
+  slideEls = Array.from(document.querySelectorAll<HTMLElement>("[data-slide]"));
   flashAtEls = Array.from(document.querySelectorAll<HTMLElement>("[data-flash-at]")).map((el) => ({ el, past: trackProgress(el) >= Number(el.dataset.flashAt) }));
 }
 
@@ -37,6 +39,13 @@ function drive() {
   }
   for (const el of atEls) el.classList.toggle("in", trackProgress(el) >= Number(el.dataset.at));
   for (const el of untilEls) el.style.opacity = trackProgress(el) >= Number(el.dataset.until) ? "0" : "";
+  // a line wider than the screen slides from entering on the right to leaving its last letter on screen
+  for (const el of slideEls) {
+    const [a, b] = (el.dataset.slide || "0,1").split(",").map(Number);
+    const q = Math.min(1, Math.max(0, (trackProgress(el) - a) / (b - a)));
+    const vw = window.innerWidth, travel = el.scrollWidth - vw * 0.92;
+    el.style.transform = `translate3d(${vw * 0.55 * (1 - q) - Math.max(0, travel) * q}px,0,0)`;
+  }
   for (const f of flashAtEls) {
     const past = trackProgress(f.el) >= Number(f.el.dataset.flashAt);
     if (past && !f.past) flash((f.el.dataset.flash || "cobalt").split(","), (f.el.dataset.kind as FlashKind) || "flash");

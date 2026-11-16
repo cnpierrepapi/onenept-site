@@ -196,7 +196,7 @@ function fugitiva(kit: Kit): ClayScene {
       });
       ear.scale.set(0.09, 0.09, 0.09);
       const slam = ease(smooth(0.7, 0.8, P));
-      bar.position.set(mix(-6, 0, slam), 0.22, 0.24);
+      bar.position.set(mix(-16, 0, slam), 0.22, 0.24);
       bar.rotation.z = 0.06;
       const settle = ease(smooth(0.3, 0.5, P));
       sh.scale.set(2.8, 1.2, 1);
@@ -210,6 +210,8 @@ function fugitiva(kit: Kit): ClayScene {
 const bump = (t: number, P: number) => smooth(t - 0.025, t, P) * (1 - smooth(t + 0.02, t + 0.05, P));
 const pressOf = (k: number, P: number) =>
   k === 11 ? Math.max(bump(0.34, P), bump(0.665, P)) : k === 1 ? bump(0.405, P) : k === 4 ? bump(0.47, P) : k === 7 ? bump(0.535, P) : k === 10 ? bump(0.6, P) : 0;
+/* # 2 5 8 0 #, as key indices (row * 3 + column) */
+const DIALS = [11, 1, 4, 7, 10, 11];
 function melax(kit: Kit): ClayScene {
   const { root, solids, shadows, add, shade } = base(kit);
   const phone = new Transform(); phone.setParent(root);
@@ -226,20 +228,20 @@ function melax(kit: Kit): ClayScene {
   return {
     root, solids, shadows, clipY: -100,
     cam: (_a, icon) => (icon ? { pos: [0, 0.3, 5], target: [0, -0.05, 0] } : { pos: [0, 0.45, 6.4], target: [0, 0.25, 0] }),
-    update(p, t, _intro, icon) {
+    update(p, t, _intro, icon, frame) {
       const P = icon ? 0.62 : p;
-      const fly = ease(smooth(0, 0.24, P));
+      const fly = frame ? ease(Math.min(1, p / 0.12)) : ease(smooth(0, 0.24, P));
       phone.position.set(mix(3, 0, fly), mix(2.6, 0, fly), mix(-6, 0, fly));
       phone.rotation.set(0.1, -(mix(3.4, 0.42, fly) + (icon ? 0.45 * Math.sin(t * 0.7) : 0.1 * Math.sin(t * 0.6))), 0);
-      const lit = ease(smooth(0.26, 0.32, P));
+      const lit = frame ? (p > 0.02 ? 1 : 0) : ease(smooth(0.26, 0.32, P));
       setColour(screen, lit > 0.5 ? C.cobalt : C.ink, lit > 0.5 ? 1 : 0);
       keys.forEach((m, k) => {
         const r = Math.floor(k / 3), c = k % 3;
-        const press = pressOf(k, P);
+        const press = frame ? (frame.index < 6 && DIALS[frame.index] === k ? 1 : 0) : pressOf(k, P);
         m.position.set(-0.32 + 0.32 * c, 0.02 - 0.27 * r, 0.15 - 0.045 * press);
         setColour(m, press > 0.3 ? C.orange : C.ink);
       });
-      const g = ease(smooth(0.8, 0.9, P)) * (1 - smooth(0.97, 1, P));
+      const g = frame ? (frame.index >= frame.count ? ease(smooth(0.15, 0.45, frame.rest)) : 0) : ease(smooth(0.8, 0.9, P)) * (1 - smooth(0.97, 1, P));
       let a = [0, 1.45, 0];
       bolt.forEach((m, i) => {
         const b0 = [((i % 2) * 2 - 1) * (0.28 + 0.1 * hash(i + Math.floor(t * 8))), 1.45 + (i + 1) * 0.55, 0];

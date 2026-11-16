@@ -2,6 +2,20 @@
 
 Newest first.
 
+## 17 Nov 2026: kinetic type, the whole breadth
+
+14. **Every section is a run of full-screen frames.** Two lines of giant type on opposite edges, the clay
+    object in the open band between them, so nothing covers the words. No section puts copy in one
+    column and media in the other. The reference was the grammar of a kinetic-type music video: words as
+    the picture, the colour changing on the cut. Ours uses our palette, our words and our objects.
+15. **The flash is the cut.** Colour only changes when a word arrives. One cut every 340 ms at most,
+    counted across the whole page (a per-section count let two sections cut 150 ms apart; the browser
+    test caught it). Calm mode cross-fades and changes at most once every 0.9 s.
+16. **Each story moves with the cuts.** Islands rise, the face assembles and the phone presses the key
+    on screen one frame at a time, easing to each new state.
+17. **Phones are their own layout.** Lines stack centred, the object comes closer, details follow the
+    scene instead of sitting in columns.
+
 ## 16 Nov 2026, evening: meshes, not raymarching
 
 11. **The scenes are rasterised meshes now.** The raymarched version ran at about 2 fps on a laptop with

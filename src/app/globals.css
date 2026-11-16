@@ -31,6 +31,8 @@
 html {
   color-scheme: light;
   background: var(--paper);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -199,4 +201,21 @@ html.js [data-at].char {
 html.js:not(.ready) .intro-fade {
   opacity: 0;
   transform: translateY(40px);
+}
+
+/* a hard cut: the element is either there or not, no fade, no slide */
+html.js [data-at][data-cut] {
+  transform: none;
+  transition: none;
+}
+html[data-motion="calm"] [data-at][data-cut] {
+  transition: opacity 0.3s ease;
+}
+
+/* shown only when there is no WebGL (the kinetic type is drawn by the 3D) */
+.gl-off-only {
+  display: none;
+}
+html.gl-off .gl-off-only {
+  display: block;
 }
