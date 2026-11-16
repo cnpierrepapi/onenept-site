@@ -47,7 +47,8 @@ export default function Experience() {
   const canvas = useRef<HTMLCanvasElement>(null);
   const loader = useRef<HTMLDivElement>(null);
   const count = useRef<HTMLSpanElement>(null);
-  const ring = useRef<SVGPathElement>(null);
+  const ring = useRef<SVGCircleElement>(null);
+  const doorFill = useRef<SVGPathElement>(null);
   const flashEl = useRef<HTMLDivElement>(null);
   const tearEl = useRef<HTMLDivElement>(null);
   const shutter = useRef<HTMLDivElement>(null);
@@ -157,6 +158,7 @@ export default function Experience() {
       const v = Math.min(100, Math.round(shown.v));
       if (count.current) count.current.textContent = String(v).padStart(3, "0");
       if (ring.current) ring.current.style.strokeDashoffset = `${len * (1 - shown.v / 100)}`;
+      if (doorFill.current) doorFill.current.style.opacity = shown.v > 97 ? "1" : "0";
     };
     gsap.ticker.add(paint);
     const t0 = performance.now();
@@ -182,7 +184,7 @@ export default function Experience() {
     const id = window.setTimeout(scan, 30);
     const fly = new IntersectionObserver(
       (es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); fly.unobserve(e.target); } }),
-      { threshold: 0.18 },
+      { threshold: 0, rootMargin: "0px 0px -12% 0px" },
     );
     document.querySelectorAll("[data-fly]").forEach((el) => fly.observe(el));
     const edges = new IntersectionObserver(
@@ -312,7 +314,8 @@ export default function Experience() {
           </div>
           <div className="flex flex-1 items-center justify-center">
             <svg viewBox="-60 -60 120 120" className="h-[38vmin] w-[38vmin]" aria-hidden="true">
-              <path ref={ring} d={DOOR_PATH} fill="none" stroke="#FF6B2C" strokeWidth="3" strokeLinejoin="round" />
+              <circle ref={ring} r="50" fill="none" stroke="#FF6B2C" strokeWidth="3" transform="rotate(90)" />
+              <path ref={doorFill} d={DOOR_PATH} fill="#FF6B2C" fillRule="evenodd" style={{ opacity: 0, transition: "opacity 0.35s" }} />
             </svg>
           </div>
           <div className="flex items-end justify-between">

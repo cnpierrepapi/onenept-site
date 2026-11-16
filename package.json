@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --test tests/fx.test.ts"
+    "test": "node --test tests/fx.test.ts tests/mesh.test.ts"
   },
   "dependencies": {
     "gsap": "^3.15.1",

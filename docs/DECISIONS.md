@@ -2,6 +2,17 @@
 
 Newest first.
 
+## 16 Nov 2026, evening: meshes, not raymarching
+
+11. **The scenes are rasterised meshes now.** The raymarched version ran at about 2 fps on a laptop with
+    Intel Iris Xe graphics; headless tests had said 60 because headless Chrome doesn't wait for the GPU.
+    Same shapes, same formulas: each one is meshed once at load, and the frame cost is a few dozen draw
+    calls. Measured in a real Chrome on that laptop: every section holds the browser's own frame cap.
+12. **The layout fits short windows.** Headline and scene sizes follow the screen's height as well as
+    its width; the hero's product row is a compact strip so the door is never covered.
+13. **Shorter tracks.** About a third less scrolling, and chapter text arrives as each section enters
+    instead of waiting for the scene.
+
 ## 16 Nov 2026: the bright redesign
 
 1. **Paper, not night.** Warm paper #FFF8EE, ink #15120F, onenept orange #FF6B2C. Cobalt and lemon
@@ -28,6 +39,5 @@ Newest first.
 
 ## Known costs
 
-- Shader compiling runs during the loader. On Lighthouse's slow mobile profile that shows up as
-  blocking time (about 0.8 s) and a late largest paint (the headline waits for the loader on purpose).
-  Performance scores about 71 there; accessibility, best practices and SEO score 96 to 100.
+- Meshing runs during the loader. The headline waits for the loader on purpose, so Lighthouse's slow
+  mobile profile reports a late largest paint.

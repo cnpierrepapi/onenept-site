@@ -2,9 +2,12 @@
 // the stage finds the slots on screen and draws each scene into its slot's rectangle (viewport +
 // scissor), so there is one GL context however many scenes the page has. Behind the content, never
 // in the way of the pointer. No WebGL: html gets .gl-off and every slot shows a still instead.
-import { Renderer, Program, Mesh, Triangle, Geometry } from "ogl";
-import { HEAD, MAIN, VERT } from "./common";
-import { SCENES, type ClayKey } from "./scenes";
+//
+// 16 Nov 2026: scenes are rasterised clay meshes (clay.ts, scenes.ts). The first version raymarched every
+// pixel and ran at about 2 fps on a laptop GPU.
+import { Renderer, Program, Mesh, Geometry, Camera } from "ogl";
+import { Kit } from "./clay";
+import { BUILDERS, type ClayKey, type ClayScene } from "./scenes";
 import { PORTRAIT_FRAG, PORTRAIT_VERT, samplePortrait } from "./portrait";
 
 export type SceneKey = ClayKey | "portrait";
@@ -23,18 +26,27 @@ export function trackProgress(el: Element): number {
   return span <= 0 ? 1 : clamp01(-r.top / span);
 }
 
+/** Lens: vertical field of view so the scene keeps its framing on wide and narrow slots alike. */
+const FOCAL = 1.7;
+function fovFor(aspect: number) {
+  const half = aspect >= 1.25 ? 0.5 / FOCAL : (0.5 * 1.25) / aspect / FOCAL;
+  return (2 * Math.atan(half) * 180) / Math.PI;
+}
+
 class Stage {
   renderer: Renderer | null = null;
   gl: Renderer["gl"] | null = null;
   slots = new Set<Slot>();
-  clay = new Map<ClayKey, Mesh>();
+  scenes = new Map<ClayKey, ClayScene>();
+  kit: Kit | null = null;
+  camera: Camera | null = null;
   portrait: { mesh: Mesh; aspect: number; gather: number } | null = null;
   private portraitLoading = false;
   intro = 0;
   quality = 1;
   /** false behind the gate and loader: nothing is drawn until the iris opens */
   active = false;
-  frameMs = 0;
+  frameMs = 16;
   ok = false;
   private slow = 0;
   private w = 0;
@@ -43,19 +55,18 @@ class Stage {
 
   init(canvas: HTMLCanvasElement) {
     if (this.renderer) return this.ok;
-    // 16 Nov: the raymarched scenes ran at ~2 fps on a real laptop GPU. Live 3D stays off (stills show
-    // instead) until the rasterised rebuild lands. ?live3d turns it on for testing.
-    if (!location.search.includes("live3d")) {
-      this.ok = false;
-      document.documentElement.classList.add("gl-off");
-      return false;
-    }
     try {
-      // Clay is soft and all text is HTML, so the 3D draws below screen resolution.
-      this.dpr = matchMedia("(pointer: coarse)").matches ? 0.7 : 0.8;
-      this.renderer = new Renderer({ canvas, dpr: this.dpr, alpha: true, antialias: false, premultipliedAlpha: false, powerPreference: "high-performance", preserveDrawingBuffer: location.search.includes("stills") });
+      this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+      this.renderer = new Renderer({
+        canvas, dpr: this.dpr, alpha: true, depth: true, antialias: true, premultipliedAlpha: false,
+        powerPreference: "high-performance", preserveDrawingBuffer: location.search.includes("stills"),
+      });
       this.gl = this.renderer.gl;
       this.ok = !!this.gl;
+      if (this.ok) {
+        this.kit = new Kit(this.gl);
+        this.camera = new Camera(this.gl, { fov: 30, near: 0.1, far: 80 });
+      }
     } catch {
       this.ok = false;
     }
@@ -63,30 +74,23 @@ class Stage {
     return this.ok;
   }
 
-  /** Build every clay program now, one per animation frame, reporting progress (the loader uses this). */
+  /** Build every scene's meshes now, one per animation frame, reporting progress (the loader uses this). */
   async compileAll(onStep: (done: number, total: number) => void) {
-    const keys = Object.keys(SCENES) as ClayKey[];
+    const keys = Object.keys(BUILDERS) as ClayKey[];
     for (let i = 0; i < keys.length; i++) {
-      if (this.ok) this.mesh(keys[i]);
+      if (this.ok) this.scene(keys[i]);
       onStep(i + 1, keys.length);
       await new Promise((r) => requestAnimationFrame(r));
     }
   }
 
-  private mesh(key: ClayKey) {
-    let m = this.clay.get(key);
-    if (m || !this.gl) return m;
-    const gl = this.gl;
-    const program = new Program(gl, {
-      vertex: VERT,
-      fragment: `${HEAD}\nvarying vec2 vUv;\n${SCENES[key]}\n${MAIN}`,
-      uniforms: { uRes: { value: [1, 1] }, uP: { value: 0 }, uT: { value: 0 }, uIntro: { value: 0 }, uIcon: { value: 0 }, uShift: { value: 0 }, uQ: { value: 1 } },
-      depthTest: false,
-      depthWrite: false,
-    });
-    m = new Mesh(gl, { geometry: new Triangle(gl), program });
-    this.clay.set(key, m);
-    return m;
+  private scene(key: ClayKey) {
+    let s = this.scenes.get(key);
+    if (s || !this.kit) return s;
+    s = BUILDERS[key](this.kit);
+    for (const m of s.solids) m.program.uniforms.uClipY.value = s.clipY;
+    this.scenes.set(key, s);
+    return s;
   }
 
   async loadPortrait(src: string) {
@@ -117,8 +121,8 @@ class Stage {
 
   /** Called every frame from the GSAP ticker, after Lenis has moved the page. */
   render(time: number, dt: number) {
-    const r = this.renderer, gl = this.gl;
-    if (!r || !gl) return;
+    const r = this.renderer, gl = this.gl, cam = this.camera;
+    if (!r || !gl || !cam) return;
     this.frameMs += (dt - this.frameMs) * 0.05;
     (window as unknown as { __glms: number }).__glms = this.frameMs;
     const W = window.innerWidth, H = window.innerHeight;
@@ -129,19 +133,18 @@ class Stage {
       r.setSize(W, H);
     }
     // Slow device: step the resolution down (never up mid-visit, so it doesn't flicker).
-    if (dt > 26) this.slow += dt; else this.slow = Math.max(0, this.slow - dt * 0.5);
-    if (this.slow > 900 && this.quality > 0.55) {
-      this.quality = Math.max(0.55, this.quality - 0.15);
+    if (this.active && dt > 26) this.slow += dt; else this.slow = Math.max(0, this.slow - dt * 0.5);
+    if (this.slow > 900 && this.quality > 0.5) {
+      this.quality = Math.max(0.5, this.quality - 0.2);
       this.slow = 0;
       r.dpr = this.dpr * this.quality;
       r.setSize(W, H);
     }
     const D = r.dpr;
     gl.disable(gl.SCISSOR_TEST);
-    // paper colour at zero alpha: when the browser scales the canvas up, slot edges blend
-    // toward paper instead of toward black (that drew a dark hairline round every scene)
+    // paper colour at zero alpha: when the browser scales the canvas, slot edges blend toward paper
     gl.clearColor(1, 0.973, 0.933, 0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     if (!this.active) return;
     gl.enable(gl.SCISSOR_TEST);
     for (const s of this.slots) {
@@ -152,11 +155,11 @@ class Stage {
       const cw = (Math.min(W, b.right) - Math.max(0, b.left)) * D, ch = (Math.min(H, b.bottom) - Math.max(0, b.top)) * D;
       gl.viewport(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
       gl.scissor(Math.round(cx), Math.round(cy), Math.ceil(cw), Math.ceil(ch));
+      gl.clearColor(1, 0.973, 0.933, 1);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       const p = s.icon ? 1 : trackProgress(s.el);
       if (s.key === "portrait") {
         if (!this.portrait) { void this.loadPortrait("/founder.jpg"); continue; }
-        gl.clearColor(1, 0.973, 0.933, 1);
-        gl.clear(gl.COLOR_BUFFER_BIT);
         const u = this.portrait.mesh.program.uniforms;
         const slotAspect = b.width / b.height, imgAspect = this.portrait.aspect;
         const fit = 0.92;
@@ -168,18 +171,27 @@ class Stage {
         this.portrait.mesh.draw();
         continue;
       }
-      const m = this.mesh(s.key);
-      if (!m) continue;
-      const u = m.program.uniforms;
-      u.uRes.value = [w, h];
-      u.uP.value = p;
-      u.uT.value = time;
-      u.uIntro.value = this.intro;
-      u.uIcon.value = s.icon ? 1 : 0;
-      // side-by-side layouts start at the md breakpoint; below it the subject stays centred
-      u.uShift.value = W >= 768 ? s.shift : s.shiftNarrow;
-      u.uQ.value = s.icon ? 0.6 : this.quality;
-      m.draw();
+      const sc = this.scene(s.key);
+      if (!sc) continue;
+      sc.update(p, time, this.intro, s.icon);
+      const aspect = b.width / b.height;
+      const c = sc.cam(aspect, s.icon);
+      const back = c.back ?? 1;
+      cam.perspective({ fov: fovFor(aspect), aspect, near: 0.1, far: 80 });
+      cam.position.set(
+        c.target[0] + (c.pos[0] - c.target[0]) * back,
+        c.target[1] + (c.pos[1] - c.target[1]) * back,
+        c.target[2] + (c.pos[2] - c.target[2]) * back,
+      );
+      cam.lookAt(c.target);
+      // lens shift: move the subject sideways to make room for text (wide layouts only)
+      const shift = s.icon ? 0 : W >= 768 ? s.shift : s.shiftNarrow;
+      const scale = Math.min(b.height, b.width / 1.25);
+      cam.projectionMatrix[8] = -((shift * 2 * scale) / b.width);
+      cam.updateMatrixWorld();
+      sc.root.updateMatrixWorld();
+      for (const m of sc.shadows) if (m.visible && m.program.uniforms.uOpacity.value > 0.001) m.draw({ camera: cam });
+      for (const m of sc.solids) if (m.visible && m.parent?.visible !== false) m.draw({ camera: cam });
     }
     gl.disable(gl.SCISSOR_TEST);
   }

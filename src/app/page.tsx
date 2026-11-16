@@ -117,34 +117,31 @@ export default function Home() {
 
       <main className="relative z-10">
         {/* 1. hero: the plumbing sinks through the paper, the door rises */}
-        <section data-track className="relative h-[230vh]" aria-labelledby="hero-title">
+        <section data-track className="relative h-[170vh]" aria-labelledby="hero-title">
           <div className="sticky top-0 h-[100svh] overflow-hidden">
             <GLSlot scene="hero" shift={0.46} shiftNarrow={0} className="absolute inset-x-0 top-[7svh] h-[34svh] md:top-0 md:h-full" />
-            <div className="relative mx-auto flex h-full max-w-[1500px] flex-col justify-end px-5 pb-8 sm:px-8 md:pb-14">
+            <div className="relative mx-auto flex h-full max-w-[1500px] flex-col justify-end px-5 pb-6 sm:px-8 md:justify-center md:pb-0 md:pt-16">
+              <div className="md:max-w-[58%]">
               <p className="font-mono text-[11px] uppercase tracking-[0.26em] text-mute">Onenept Studios · applied AI</p>
-              <h1 id="hero-title" className="mt-4 max-w-[11ch] font-display text-[15vw] font-extrabold leading-[0.84] tracking-[-0.055em] md:text-[8.4vw] 2xl:text-[132px]">
+              <h1 id="hero-title" className="mt-3 max-w-[11ch] font-display text-[min(14vw,8.2svh)] font-extrabold leading-[0.86] tracking-[-0.055em] md:text-[min(7.4vw,12.5svh)]">
                 <Split text="AI products for people" />
                 <span className="text-orange">
                   <Split text="who never asked for AI." from={4} />
                 </span>
               </h1>
-              <div className="mt-6 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-                <p className="intro-fade max-w-md text-base leading-relaxed sm:text-lg" style={{ "--fly-delay": "0.7s" } as React.CSSProperties}>
-                  We hide the plumbing. Models, wallets, tokens and APIs stay under the floor. What&apos;s left on the screen is something you can use in the first thirty seconds.
-                </p>
-                <ul className="flex gap-2 sm:gap-3">
-                  {PRODUCTS.map((p, i) => (
-                    <li key={p.scene} className="intro-fade" style={{ "--fly-delay": `${0.9 + i * 0.12}s` } as React.CSSProperties}>
-                      <a href={p.href} className="group flex w-[29vw] max-w-[13rem] flex-col overflow-hidden rounded-2xl border-2 border-ink transition-transform hover:-translate-y-1">
-                        <GLSlot scene={p.scene} icon className="aspect-square w-full" />
-                        <span className="block border-t-2 border-ink bg-paper px-2 pb-2 pt-1.5 sm:px-3">
-                          <span className="block font-display text-sm font-extrabold tracking-[-0.02em] sm:text-base">{p.name}</span>
-                          <span className="hidden text-xs leading-snug text-mute sm:block">{p.line}</span>
-                        </span>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
+              <p className="intro-fade mt-5 max-w-md text-base leading-relaxed [@media(min-height:720px)]:text-lg" style={{ "--fly-delay": "0.7s" } as React.CSSProperties}>
+                We hide the plumbing. Models, wallets, tokens and APIs stay under the floor. What&apos;s left on the screen is something you can use in the first thirty seconds.
+              </p>
+              <ul className="mt-5 flex flex-wrap gap-2" aria-label="What we've built">
+                {PRODUCTS.map((p, i) => (
+                  <li key={p.scene} className="intro-fade" style={{ "--fly-delay": `${0.9 + i * 0.1}s` } as React.CSSProperties}>
+                    <a href={p.href} title={p.line} className="group flex items-center gap-2 rounded-full border-2 border-ink py-1 pl-1 pr-4 transition-transform hover:-translate-y-0.5">
+                      <GLSlot scene={p.scene} icon className="h-11 w-11 shrink-0 rounded-full" />
+                      <span className="font-display text-sm font-extrabold tracking-[-0.02em]">{p.name}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
               </div>
             </div>
             <p className="absolute right-6 top-24 hidden max-w-[12rem] text-right font-mono text-[11px] uppercase leading-5 tracking-[0.2em] md:block" data-at="0.7">
@@ -157,7 +154,7 @@ export default function Home() {
         </section>
 
         {/* 2. the line */}
-        <section data-track className="relative h-[220vh]" aria-label="What we do">
+        <section data-track className="relative h-[150vh]" aria-label="What we do">
           <div className="sticky top-0 flex h-[100svh] flex-col justify-center px-5 sm:px-8">
             <div className="mx-auto w-full max-w-[1500px]" data-lit>
               <p className="max-w-[16ch] font-display text-[12vw] font-extrabold leading-[0.9] tracking-[-0.05em] md:text-[7.4vw]">
@@ -183,24 +180,24 @@ export default function Home() {
           </div>
 
           {/* 01 AD FONTES */}
-          <article id="adfontes" data-track className="relative h-[320vh] scroll-mt-0">
+          <article id="adfontes" data-track className="relative h-[230vh] scroll-mt-0">
             <span data-flash="lemon" data-flash-at="0.015" />
             <div className="sticky top-0 h-[100svh] overflow-hidden">
-              <GLSlot scene="adfontes" shift={0.42} shiftNarrow={0} className="absolute inset-x-0 top-0 h-[50svh] md:inset-y-0 md:left-[34%] md:right-0 md:h-full" />
+              <GLSlot scene="adfontes" shift={0.3} shiftNarrow={0} className="absolute inset-x-0 top-0 h-[50svh] md:inset-y-0 md:left-[34%] md:right-0 md:h-full" />
               <div className="relative mx-auto flex h-full max-w-[1500px] flex-col justify-end px-5 pb-8 sm:px-8 md:justify-center md:pb-0">
                 <div className="max-w-md">
-                  <div className="flex items-center gap-3" data-at="0.02">
+                  <div className="flex items-center gap-3" data-fly>
                     <span className="font-mono text-xs">01</span>
                     <span className="chip"><span className="live-dot" />Live · NEAR testnet</span>
                   </div>
-                  <h3 className="mt-4 font-display text-[13vw] font-extrabold leading-[0.85] tracking-[-0.05em] md:text-7xl" data-at="0.05">AD FONTES</h3>
-                  <p className="mt-3 font-display text-xl font-bold leading-snug text-cobalt sm:text-2xl" data-at="0.1">
+                  <h3 className="mt-4 font-display text-[13vw] font-extrabold leading-[0.85] tracking-[-0.05em] md:text-7xl" data-fly>AD FONTES</h3>
+                  <p className="mt-3 font-display text-xl font-bold leading-snug text-cobalt sm:text-2xl" data-fly>
                     A blockchain game where you never see the blockchain.
                   </p>
-                  <p className="mt-4 text-[15px] leading-relaxed sm:text-base" data-at="0.16">
+                  <p className="mt-4 text-[15px] leading-relaxed sm:text-base" data-fly>
                     A world of small nations run by AI. Their citizens read real research papers, trade what they learn and sometimes go to war. You fund one and become its god. Underneath there are DAOs, agent wallets and a contract that seals every turn. On screen you sign up with an email and give grace.
                   </p>
-                  <dl className="mt-6 hidden max-w-sm grid-cols-3 gap-4 border-t-2 border-ink pt-4 md:grid" data-at="0.3">
+                  <dl className="mt-6 hidden max-w-sm grid-cols-3 gap-4 border-t-2 border-ink pt-4 md:grid [@media(max-height:700px)]:hidden" data-fly>
                     {[["email", "to start"], ["0", "wallet popups"], ["3D", "world map"]].map(([v, k]) => (
                       <div key={k}>
                         <dt className="font-display text-3xl font-extrabold">{v}</dt>
@@ -208,12 +205,12 @@ export default function Home() {
                       </div>
                     ))}
                   </dl>
-                  <div className="mt-6" data-at="0.2">
+                  <div className="mt-6" data-fly>
                     <Visit href="https://adfontes.fun">adfontes.fun</Visit>
                   </div>
                 </div>
               </div>
-              <div className="absolute bottom-8 right-6 hidden w-72 rotate-[-3deg] rounded-3xl border-2 border-ink bg-paper p-5 shadow-[8px_8px_0_#15120F] md:block" data-at="0.8" style={{ "--fly-rot": "-12deg" } as React.CSSProperties}>
+              <div className="absolute bottom-8 right-6 hidden w-72 rotate-[-3deg] rounded-3xl border-2 border-ink bg-paper p-5 shadow-[8px_8px_0_#15120F] md:block" data-at="0.72" style={{ "--fly-rot": "-12deg" } as React.CSSProperties}>
                 <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-mute">How you start</p>
                 <p className="mt-3 rounded-xl border-2 border-ink/20 px-3 py-2 font-mono text-[12px] text-mute">you@email.com</p>
                 <p className="mt-3 rounded-full bg-orange px-4 py-2.5 text-center text-sm font-bold">Play with email</p>
@@ -223,31 +220,31 @@ export default function Home() {
           </article>
 
           {/* 02 FUGITIVA */}
-          <article id="fugitiva" data-track className="relative h-[320vh] scroll-mt-0">
+          <article id="fugitiva" data-track className="relative h-[230vh] scroll-mt-0">
             <span data-flash="red" data-kind="tear" data-flash-at="0.015" />
             <div className="sticky top-0 h-[100svh] overflow-hidden">
-              <GLSlot scene="fugitiva" shift={-0.42} shiftNarrow={0} className="absolute inset-x-0 top-0 h-[48svh] md:inset-y-0 md:left-0 md:right-[38%] md:h-full" />
+              <GLSlot scene="fugitiva" shift={-0.24} shiftNarrow={0} className="absolute inset-x-0 top-0 h-[48svh] md:inset-y-0 md:left-0 md:right-[38%] md:h-full" />
               <div className="relative mx-auto flex h-full max-w-[1500px] flex-col justify-end px-5 pb-8 sm:px-8 md:items-end md:justify-center md:pb-0">
                 <div className="max-w-md">
-                  <div className="flex items-center gap-3" data-at="0.02">
+                  <div className="flex items-center gap-3" data-fly>
                     <span className="font-mono text-xs">02</span>
                     <span className="chip"><span className="live-dot" />Live · fugitiva.onenept.com</span>
                   </div>
-                  <h3 className="mt-4 font-display text-[13vw] font-extrabold leading-[0.85] tracking-[-0.05em] md:text-7xl" data-at="0.05">FUGITIVA</h3>
-                  <p className="mt-3 font-display text-xl font-bold leading-snug text-red sm:text-2xl" data-at="0.1">
+                  <h3 className="mt-4 font-display text-[13vw] font-extrabold leading-[0.85] tracking-[-0.05em] md:text-7xl" data-fly>FUGITIVA</h3>
+                  <p className="mt-3 font-display text-xl font-bold leading-snug text-red sm:text-2xl" data-fly>
                     The crimes nobody expects from a woman.
                   </p>
-                  <p className="mt-4 text-[15px] leading-relaxed sm:text-base" data-at="0.16">
+                  <p className="mt-4 text-[15px] leading-relaxed sm:text-base" data-fly>
                     A journal of case files on women behind the crimes people assume men commit. File 01 is the 18 women on Europol&apos;s 2019 most wanted list: what each one did, and where she is now.
                   </p>
-                  <ol className="mt-5 hidden space-y-1.5 border-l-2 border-ink pl-5 md:block" data-at="0.28">
+                  <ol className="mt-5 hidden space-y-1.5 border-l-2 border-ink pl-5 md:block" data-fly>
                     {FILE.map(([name, job], k) => (
-                      <li key={name} className="text-sm" data-at={String(0.3 + k * 0.07)}>
+                      <li key={name} className="text-sm" data-fly style={{ "--fly-delay": `${0.15 + k * 0.06}s` } as React.CSSProperties}>
                         <span className="font-mono font-medium">{name}</span> <span className="text-mute">{job}</span>
                       </li>
                     ))}
                   </ol>
-                  <div className="mt-6" data-at="0.22">
+                  <div className="mt-6" data-fly>
                     <Visit href="https://fugitiva.onenept.com">read file 01</Visit>
                   </div>
                 </div>
@@ -259,22 +256,22 @@ export default function Home() {
           </article>
 
           {/* 03 Melax */}
-          <article id="melax" data-track className="relative h-[340vh] scroll-mt-0">
+          <article id="melax" data-track className="relative h-[250vh] scroll-mt-0">
             <span data-flash="orange" data-flash-at="0.015" />
             <span data-flash="lemon,cobalt" data-flash-at="0.86" />
             <div className="sticky top-0 h-[100svh] overflow-hidden">
               <GLSlot scene="melax" shift={0.4} shiftNarrow={0} className="absolute inset-x-0 top-0 h-[50svh] md:inset-y-0 md:left-[30%] md:right-0 md:h-full" />
               <div className="relative mx-auto flex h-full max-w-[1500px] flex-col justify-end px-5 pb-8 sm:px-8 md:justify-center md:pb-0">
                 <div className="max-w-md">
-                  <div className="flex items-center gap-3" data-at="0.02">
+                  <div className="flex items-center gap-3" data-fly>
                     <span className="font-mono text-xs">03</span>
                     <span className="chip">Learning project · not deployed</span>
                   </div>
-                  <h3 className="mt-4 font-display text-[13vw] font-extrabold leading-[0.85] tracking-[-0.05em] md:text-7xl" data-at="0.05">Melax</h3>
-                  <p className="mt-3 font-display text-xl font-bold leading-snug text-orange sm:text-2xl" data-at="0.1">
+                  <h3 className="mt-4 font-display text-[13vw] font-extrabold leading-[0.85] tracking-[-0.05em] md:text-7xl" data-fly>Melax</h3>
+                  <p className="mt-3 font-display text-xl font-bold leading-snug text-orange sm:text-2xl" data-fly>
                     Bitcoin for the phone you already have.
                   </p>
-                  <p className="mt-4 text-[15px] leading-relaxed sm:text-base" data-at="0.16">
+                  <p className="mt-4 text-[15px] leading-relaxed sm:text-base" data-fly>
                     Dial a short code and a menu opens, in Wolof, French or English. No app, no internet. Under the menu it&apos;s Lightning and Cashu, and a local agent swaps francs for sats with you. It runs on a test network on one machine, and the repo says so up front.
                   </p>
                   <p className="mt-5 font-display text-5xl font-extrabold tracking-[-0.02em]" aria-label="Dial #2580#">
@@ -282,12 +279,12 @@ export default function Home() {
                       <span key={i} className="char" data-at={String(DIAL_AT[i])}>{c}</span>
                     ))}
                   </p>
-                  <div className="mt-6" data-at="0.22">
+                  <div className="mt-6" data-fly>
                     <Visit href="https://github.com/cnpierrepapi/melax">the code on GitHub</Visit>
                   </div>
                 </div>
               </div>
-              <div className="absolute right-6 top-24 hidden w-56 rotate-[4deg] rounded-3xl border-2 border-ink bg-cobalt p-5 font-mono text-[13px] leading-6 text-paper shadow-[8px_8px_0_#15120F] md:block" data-at="0.68" style={{ "--fly-rot": "10deg" } as React.CSSProperties}>
+              <div className="absolute left-[40%] top-1/3 hidden w-56 rotate-[4deg] rounded-3xl border-2 border-ink bg-cobalt p-5 font-mono text-[13px] leading-6 text-paper shadow-[8px_8px_0_#15120F] md:block" data-at="0.68" style={{ "--fly-rot": "10deg" } as React.CSSProperties}>
                 <p className="text-[10px] uppercase tracking-[0.18em] text-lemon">What opens</p>
                 <p className="mt-2">Melax</p>
                 <p>1 Balance</p>
@@ -303,13 +300,13 @@ export default function Home() {
         </section>
 
         {/* 4. merged upstream: branches merge into the trunk, each PR lands as its branch does */}
-        <section id="open-source" data-track className="relative h-[300vh] scroll-mt-0">
+        <section id="open-source" data-track className="relative h-[220vh] scroll-mt-0">
           <span data-flash="cobalt" data-kind="tear" data-flash-at="0.015" />
           <div className="sticky top-0 flex h-[100svh] flex-col pt-20">
             <h2 className="mx-auto w-full max-w-[1500px] px-5 font-display text-5xl font-extrabold leading-[0.9] tracking-[-0.05em] sm:px-8 md:text-7xl" data-at="0.01">
               Merged upstream.
             </h2>
-            <div className="relative min-h-[26svh] flex-1">
+            <div className="relative min-h-[34svh] flex-1">
               <GLSlot scene="merge" className="absolute inset-0" />
             </div>
             <div className="mx-auto grid w-full max-w-[1500px] grid-cols-1 content-start gap-2 px-5 sm:px-8 md:grid-cols-4 md:gap-4">
@@ -327,7 +324,7 @@ export default function Home() {
                     <p className="font-mono text-[10px] text-mute">{m.repo}</p>
                     <p className="font-display text-2xl font-extrabold group-hover:text-orange md:mt-1 md:text-4xl">{m.pr}</p>
                   </div>
-                  <p className="mt-2 hidden text-sm leading-snug md:block">{m.what}</p>
+                  <p className="mt-2 hidden text-sm leading-snug md:block [@media(max-height:700px)]:hidden">{m.what}</p>
                   <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-orange md:mt-3">Merged {m.date}</p>
                 </a>
               ))}

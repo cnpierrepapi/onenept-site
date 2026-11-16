@@ -1,264 +1,292 @@
-// One clay scene per section. Each supplies floorY(), cam() and map(p) -> (distance, material id).
-// Material ids are in common.ts: 1 orange, 2 cobalt, 3 lemon, 4 ink, 5 cream, 6 red, 7 screen, 8 lightning.
-// uP is the scroll progress through the scene's track; each scene tells its story along it.
+// One clay scene per section, as rasterised meshes. Shapes are meshed once from distance functions
+// (src/lib/mesh.ts); each frame only moves, turns and recolours them. uP-style progress `p` is the
+// scroll progress through the scene's track; each scene tells its story along it.
+import { Geometry, Transform, type Mesh, type OGLRenderingContext } from "ogl";
+import { meshSDF, sd } from "@/lib/mesh";
+import { C, Kit, ease, mix, setColour, smooth, stretch, type ClayMesh, type Colour } from "./clay";
 
-// The onenept door: a thick ring with an arched doorway cut through the bottom of the band.
-const DOOR = /* glsl */ `
-float door2(vec2 p) {
-  float r = length(p);
-  float d = max(r - 1.0, 0.52 - r);
-  vec2 q = p - vec2(0.0, -0.78);
-  float hole = min(max(abs(q.x) - 0.18, q.y), length(q) - 0.18);
-  return max(d, -hole);
+export type ClayKey = "hero" | "adfontes" | "fugitiva" | "melax" | "merge";
+
+export interface Cam { pos: [number, number, number]; target: [number, number, number]; back?: number }
+export interface ClayScene {
+  root: Transform;
+  solids: ClayMesh[];
+  shadows: ClayMesh[];
+  clipY: number;
+  cam(aspect: number, icon: boolean): Cam;
+  update(p: number, t: number, intro: number, icon: boolean): void;
 }
-`;
 
-/* Hero. A knot of pipes and cables (the plumbing) hangs over the paper. Scroll pulls it down through
-   the floor until it is gone, and the orange door rises in its place. */
-const hero = /* glsl */ `
-${DOOR}
-float floorY() { return -1.0; }
-void cam(out vec3 ro, out vec3 ta) { ro = vec3(0.0, 1.0, 6.4); ta = vec3(0.0, -0.05, 0.0); }
-vec2 map(vec3 p) {
-  float sink = ease(smoothstep(0.04, 0.62, uP));
-  float drop = -3.6 * sink + (1.0 - ease(uIntro)) * 4.0;
-  vec3 q = p - vec3(0.0, 0.45 + drop, 0.0);
-  vec2 res = vec2(1e9, 0.0);
-  float bound = length(q) - 2.4;
-  if (bound > 0.25) res = vec2(bound, 4.0);
-  else {
-  q.xz = rot(uT * 0.12) * q.xz;
-  for (int i = 0; i < 7; i++) {
-    float fi = float(i);
-    vec3 r = q + vec3(sin(fi * 2.1) * 0.55, cos(fi * 1.7) * 0.42, sin(fi * 1.3) * 0.45);
-    r.yz = rot(fi * 1.13 + uT * 0.18) * r.yz;
-    r.xy = rot(fi * 0.71) * r.xy;
-    float d = sdTorus(r, vec2(0.62 + 0.18 * sin(fi * 1.9), 0.075 + 0.02 * mod(fi, 2.0)));
-    res = U(res, vec2(d, 2.0 + mod(fi, 4.0)));
+/** Where each branch finishes merging. The PR cards appear at these points. */
+export const MERGE_AT = [0.26, 0.46, 0.66, 0.86];
+
+const hash = (n: number) => { const s = Math.sin(n) * 43758.5453; return s - Math.floor(s); };
+
+function geo(gl: OGLRenderingContext, f: (x: number, y: number, z: number) => number, min: [number, number, number], max: [number, number, number], step: number) {
+  const d = meshSDF(f, min, max, step);
+  return new Geometry(gl, { position: { size: 3, data: d.position }, normal: { size: 3, data: d.normal }, index: { data: d.index } });
+}
+
+function base(kit: Kit) {
+  const root = new Transform();
+  const solids: ClayMesh[] = [], shadows: ClayMesh[] = [];
+  const add = (m: ClayMesh) => { solids.push(m); return m; };
+  const shade = (parent: Transform = root) => { const s = kit.shadow(parent); shadows.push(s); return s; };
+  return { root, solids, shadows, add, shade };
+}
+
+/* Hero. A knot of pipes and cables hangs over the paper. Scroll pulls it down through the floor until
+   it is gone, and the orange door rises in its place. */
+function hero(kit: Kit): ClayScene {
+  const { root, solids, shadows, add, shade } = base(kit);
+  const knot = new Transform(); knot.setParent(root);
+  const cols: Colour[] = [C.cobalt, C.lemon, C.ink, C.cream];
+  const tori: ClayMesh[] = [];
+  for (let i = 0; i < 7; i++) {
+    const m = add(kit.torus(0.62 + 0.18 * Math.sin(i * 1.9), 0.075 + 0.02 * (i % 2), cols[i % 4], knot));
+    m.position.set(-Math.sin(i * 2.1) * 0.55, -Math.cos(i * 1.7) * 0.42, -Math.sin(i * 1.3) * 0.45);
+    m.rotation.z = i * 0.71;
+    tori.push(m);
   }
-  // straight runs with elbows, like conduit
-  vec3 a = vec3(-1.5, 0.9, 0.2), b = vec3(-0.4, 0.1, 0.5), c = vec3(0.5, 0.75, -0.3), d2 = vec3(1.5, -0.2, 0.2);
-  res = U(res, vec2(min(sdCapsule(q, a, b, 0.07), min(sdCapsule(q, b, c, 0.07), sdCapsule(q, c, d2, 0.07))), 4.0));
-  res = U(res, vec2(sdCapsule(q, vec3(-1.2, -0.6, -0.4), vec3(1.1, 0.95, 0.6), 0.055), 3.0));
-  }
-  // the door
-  float rise = ease(smoothstep(0.5, 0.92, uP));
-  vec3 dp = p - vec3(0.0, mix(-2.3, -0.18, rise), 0.0);
-  float db = length(dp) - 1.05;
-  if (db > 0.25) return U(res, vec2(db, 1.0));
-  dp.xz = rot(0.35 * (1.0 - rise) + 0.12 * sin(uT * 0.5)) * dp.xz;
-  res = U(res, vec2(slab(door2(dp.xy / 0.82) * 0.82, dp.z, 0.14), 1.0));
-  return res;
-}
-`;
+  const pts = [[-1.5, 0.9, 0.2], [-0.4, 0.1, 0.5], [0.5, 0.75, -0.3], [1.5, -0.2, 0.2]];
+  for (let i = 0; i < 3; i++) stretch(add(kit.rod(C.ink, knot)), pts[i], pts[i + 1], 0.07);
+  for (const q of pts) { const s = add(kit.sphere(C.ink, knot)); s.position.set(q[0], q[1], q[2]); s.scale.set(0.07, 0.07, 0.07); }
+  stretch(add(kit.rod(C.lemon, knot)), [-1.2, -0.6, -0.4], [1.1, 0.95, 0.6], 0.055);
 
-/* AD FONTES ("to the sources"). Small islands rise out of the paper one by one; a cobalt spring
-   wells up from the middle one; then trade lines run from the spring to every island. */
-const adfontes = /* glsl */ `
-float floorY() { return -2.3; }
-void cam(out vec3 ro, out vec3 ta) {
-  if (uIcon > 0.5) { ro = vec3(0.0, 2.6, 6.8); ta = vec3(0.0, 0.0, 0.0); return; }
-  ro = vec3(0.0, 2.3, 6.4); ta = vec3(0.0, -0.05, 0.0);
+  const door = new Transform(); door.setParent(root);
+  add(kit.wrap(geo(kit.gl, (x, y, z) => sd.slab(sd.door(x / 0.82, y / 0.82) * 0.82, z, 0.14), [-0.9, -0.9, -0.2], [0.9, 0.9, 0.2], 0.016), C.orange, door));
+  const knotShadow = shade(), doorShadow = shade();
+  knotShadow.position.set(0, -0.995, 0);
+  doorShadow.position.set(0, -0.995, 0.05);
+
+  return {
+    root, solids, shadows, clipY: -1,
+    cam: () => ({ pos: [0, 1, 6.4], target: [0, -0.05, 0] }),
+    update(p, t, intro) {
+      const sink = ease(smooth(0.04, 0.6, p));
+      knot.position.y = 0.45 - 3.6 * sink + (1 - ease(intro)) * 4;
+      knot.rotation.y = -t * 0.12;
+      tori.forEach((m, i) => { m.rotation.x = i * 1.13 + t * 0.18; });
+      const rise = ease(smooth(0.45, 0.85, p));
+      door.position.y = mix(-2.3, -0.18, rise);
+      door.rotation.y = -(0.35 * (1 - rise) + 0.12 * Math.sin(t * 0.5));
+      knotShadow.scale.set(3.4, 2.2, 1);
+      knotShadow.program.uniforms.uOpacity.value = 0.26 * (1 - sink) * ease(intro);
+      doorShadow.scale.set(2.2, 0.7, 1);
+      doorShadow.program.uniforms.uOpacity.value = 0.34 * rise;
+    },
+  };
 }
-vec4 isl(int i) { // xyz centre, radius
-  if (i == 0) return vec4(0.0, 0.0, 0.0, 0.62);
-  if (i == 1) return vec4(-1.75, 0.35, -0.7, 0.44);
-  if (i == 2) return vec4(1.7, 0.22, -0.5, 0.48);
-  if (i == 3) return vec4(-1.0, -0.35, 1.05, 0.36);
-  return vec4(1.05, -0.28, 1.15, 0.4);
-}
-vec2 map(vec3 p) {
-  float P = uIcon > 0.5 ? 1.0 : uP;
-  p.xz = rot(uT * 0.05 + (uIcon > 0.5 ? uT * 0.25 : 0.0)) * p.xz;
-  vec2 res = vec2(1e9, 0.0);
-  vec3 top0 = vec3(0.0);
-  for (int i = 0; i < 5; i++) {
-    float fi = float(i);
-    vec4 c = isl(i);
-    float a = ease(smoothstep(0.02 + fi * 0.07, 0.3 + fi * 0.07, P));
-    c.y = mix(-4.5, c.y, a) + 0.06 * sin(uT * 0.8 + fi * 1.7);
-    vec3 q = p - c.xyz;
-    float grass = sdCyl(q, c.w - 0.04, 0.035) - 0.04;
-    float h = c.w * 0.5;
-    float rock = sdCappedCone(q - vec3(0.0, -0.06 - h, 0.0), h, c.w * 0.14, c.w * 0.9) - 0.02;
-    res = U(res, vec2(grass, 3.0));
-    res = U(res, vec2(rock, 1.0));
+
+/* AD FONTES ("to the sources"). Small islands rise out of the paper one by one; a cobalt spring wells
+   up from the middle one; then trade lines run from the spring to every island. */
+const ISLES: [number, number, number, number][] = [
+  [0, 0, 0, 0.62], [-1.75, 0.35, -0.7, 0.44], [1.7, 0.22, -0.5, 0.48], [-1.0, -0.35, 1.05, 0.36], [1.05, -0.28, 1.15, 0.4],
+];
+function adfontes(kit: Kit): ClayScene {
+  const { root, solids, shadows, add, shade } = base(kit);
+  const world = new Transform(); world.setParent(root);
+  const house = geo(kit.gl, (x, y, z) => sd.roundBox(x, y, z, 0.085, 0.075, 0.085, 0.018), [-0.1, -0.1, -0.1], [0.1, 0.1, 0.1], 0.012);
+  const roof = geo(kit.gl, (x, y, z) => sd.roundBox(x, y, z, 0.1, 0.03, 0.1, 0.012), [-0.12, -0.05, -0.12], [0.12, 0.05, 0.12], 0.01);
+  const isles = ISLES.map(([, , , r], i) => {
+    const g = new Transform(); g.setParent(world);
+    const h = r * 0.5;
+    add(kit.wrap(geo(kit.gl, (x, y, z) => sd.cyl(x, y, z, r - 0.04, 0.035) - 0.04, [-r - 0.05, -0.1, -r - 0.05], [r + 0.05, 0.1, r + 0.05], 0.02), C.lemon, g));
+    add(kit.wrap(geo(kit.gl, (x, y, z) => sd.cappedCone(x, y + 0.06 + h, z, h, r * 0.14, r * 0.9) - 0.02, [-r, -0.12 - 2 * h, -r], [r, 0.0, r], 0.02), C.orange, g));
     if (i > 0) {
-      vec3 hq = q - vec3(c.w * 0.32, 0.15, c.w * 0.12);
-      res = U(res, vec2(sdRoundBox(hq, vec3(0.085, 0.075, 0.085), 0.018), 5.0));
-      res = U(res, vec2(sdRoundBox(hq - vec3(0.0, 0.1, 0.0), vec3(0.1, 0.03, 0.1), 0.012), 2.0));
+      const hs = add(kit.wrap(house, C.cream, g)); hs.position.set(r * 0.32, 0.15, r * 0.12);
+      const rf = add(kit.wrap(roof, C.cobalt, g)); rf.position.set(r * 0.32, 0.25, r * 0.12);
     }
-    if (i == 0) top0 = c.xyz + vec3(0.0, 0.11, 0.0);
-  }
-  // the spring
-  float well = ease(smoothstep(0.38, 0.55, P));
-  for (int k = 0; k < 7; k++) {
-    float ph = fract(uT * 0.32 + float(k) / 7.0);
-    vec3 b = top0 + vec3(0.06 * sin(float(k) * 2.3 + uT), 0.08 + ph * 1.7 * well, 0.06 * cos(float(k) * 1.7));
-    res = U(res, vec2(length(p - b) - 0.15 * (1.0 - ph * 0.75) * well, 2.0));
-  }
-  // trade lines from the spring's crown to every island
-  vec3 crown = top0 + vec3(0.0, 1.25 * well, 0.0);
-  for (int i = 1; i < 5; i++) {
-    float fi = float(i);
-    float g = ease(smoothstep(0.56 + fi * 0.05, 0.72 + fi * 0.05, P));
-    if (g > 0.0) {
-      vec4 c = isl(i);
-      vec3 end = c.xyz + vec3(0.0, 0.12, 0.0);
-      res = U(res, vec2(sdCapsule(p, crown, mix(crown, end, g), 0.028), 2.0));
-    }
-  }
-  return res;
-}
-`;
+    const s = shade(world);
+    return { g, s };
+  });
+  const drops = Array.from({ length: 7 }, () => add(kit.sphere(C.cobalt, world)));
+  const lines = Array.from({ length: 4 }, () => add(kit.rod(C.cobalt, world)));
 
-/* FUGITIVA. A woman's face built from Bauhaus shapes flies together from scattered shards, then a
-   red redaction bar slams across the eyes. */
-const fugitiva = /* glsl */ `
-float floorY() { return -1.42; }
-void cam(out vec3 ro, out vec3 ta) {
-  if (uIcon > 0.5) { ro = vec3(0.0, 0.25, 5.4); ta = vec3(0.0, -0.1, 0.0); return; }
-  ro = vec3(0.0, 0.35, 5.9); ta = vec3(0.0, -0.12, 0.0);
+  return {
+    root, solids, shadows, clipY: -100,
+    cam: (_a, icon) => (icon ? { pos: [0, 2.6, 6.8], target: [0, 0, 0] } : { pos: [0, 2.7, 7.6], target: [0, 0.2, 0] }),
+    update(p, t, _intro, icon) {
+      const P = icon ? 1 : p;
+      world.rotation.y = -(t * 0.05 + (icon ? t * 0.25 : 0));
+      const tops: number[][] = [];
+      ISLES.forEach(([x, y, z, r], i) => {
+        const a = ease(smooth(0.02 + i * 0.07, 0.3 + i * 0.07, P));
+        const yy = mix(-4.5, y, a) + 0.06 * Math.sin(t * 0.8 + i * 1.7);
+        isles[i].g.position.set(x, yy, z);
+        tops.push([x, yy + 0.12, z]);
+        isles[i].s.position.set(x, -2.295, z);
+        isles[i].s.scale.set(r * 2.6, r * 2.6, 1);
+        isles[i].s.program.uniforms.uOpacity.value = 0.22 * a;
+      });
+      const well = ease(smooth(0.38, 0.55, P));
+      const t0 = tops[0];
+      drops.forEach((m, k) => {
+        const ph = (t * 0.32 + k / 7) % 1;
+        m.position.set(t0[0] + 0.06 * Math.sin(k * 2.3 + t), t0[1] + 0.08 + ph * 1.7 * well, t0[2] + 0.06 * Math.cos(k * 1.7));
+        const s = 0.15 * (1 - ph * 0.75) * well;
+        m.scale.set(s, s, s);
+        m.visible = s > 0.001;
+      });
+      const crown = [t0[0], t0[1] + 1.25 * well, t0[2]];
+      lines.forEach((m, j) => {
+        const i = j + 1;
+        const g = ease(smooth(0.56 + i * 0.05, 0.72 + i * 0.05, P));
+        const e = tops[i];
+        stretch(m, crown, [mix(crown[0], e[0], g), mix(crown[1], e[1], g), mix(crown[2], e[2], g)], g > 0 ? 0.028 : 0);
+      });
+    },
+  };
 }
-float halfDisc(vec2 q, float r, float side) { return max(length(q) - r, -side * q.y); }
-float tri(vec2 q, float s) { // pointing down
-  q.y = -q.y; const float k = 1.7320508; q.x = abs(q.x) - s; q.y = q.y + s / k;
-  if (q.x + k * q.y > 0.0) q = vec2(q.x - k * q.y, -k * q.x - q.y) / 2.0;
-  q.x -= clamp(q.x, -2.0 * s, 0.0); return -length(q) * sign(q.y);
+
+/* FUGITIVA. A woman's face built from Bauhaus shapes flies together from scattered shards, then a red
+   redaction bar slams across the eyes. */
+function fugitiva(kit: Kit): ClayScene {
+  const { root, solids, shadows, add, shade } = base(kit);
+  const face = new Transform(); face.setParent(root);
+  const gl = kit.gl;
+  type Piece = { m: ClayMesh; c: [number, number, number] };
+  const piece = (g: Geometry, colour: Colour, c: [number, number, number]): Piece => ({ m: add(kit.wrap(g, colour, face)), c });
+  const B = (r: number, zh: number): [[number, number, number], [number, number, number]] => [[-r - 0.05, -r - 0.05, -zh - 0.05], [r + 0.05, r + 0.05, zh + 0.05]];
+  const pieces: Piece[] = [
+    piece(geo(gl, (x, y, z) => sd.slab(sd.halfDisc(x, y, 1.08, 1), z, 0.07), ...B(1.08, 0.07), 0.02), C.ink, [0, 0.18, -0.14]),
+    piece(geo(gl, (x, y, z) => sd.slab(Math.hypot(x, y) - 0.9, z, 0.08), ...B(0.9, 0.08), 0.018), C.cobalt, [0, 0.05, 0]),
+    piece(geo(gl, (x, y, z) => sd.slab(sd.halfDisc(x, y, 0.17, -1), z, 0.05), ...B(0.17, 0.05), 0.008), C.ink, [-0.33, 0.2, 0.11]),
+    piece(geo(gl, (x, y, z) => sd.slab(Math.hypot(x, y) - 0.15, z, 0.05), ...B(0.15, 0.05), 0.008), C.lemon, [0.33, 0.22, 0.11]),
+    piece(geo(gl, (x, y, z) => sd.slab(sd.tri(x, y, 0.15), z, 0.05), ...B(0.2, 0.05), 0.008), C.orange, [0, -0.06, 0.11]),
+    piece(geo(gl, (x, y, z) => sd.roundBox(x, y, z, 0.3, 0.06, 0.05, 0.03), [-0.35, -0.1, -0.1], [0.35, 0.1, 0.1], 0.01), C.cream, [0, -0.44, 0.11]),
+    piece(geo(gl, (x, y, z) => sd.slab(sd.halfDisc(x, y, 1.05, 1), z, 0.09), ...B(1.05, 0.09), 0.02), C.orange, [0, -1.42, -0.06]),
+  ];
+  const ear = add(kit.sphere(C.lemon, face));
+  pieces.push({ m: ear, c: [0.93, -0.28, 0.06] });
+  const bar = add(kit.wrap(geo(gl, (x, y, z) => sd.roundBox(x, y, z, 1.45, 0.14, 0.05, 0.025), [-1.5, -0.2, -0.1], [1.5, 0.2, 0.1], 0.015), C.red, face));
+  const sh = shade(root);
+  sh.position.set(0, -1.415, 0);
+
+  return {
+    root, solids, shadows, clipY: -100,
+    cam: (_a, icon) => (icon ? { pos: [0, 0.25, 5.4], target: [0, -0.1, 0] } : { pos: [0, 0.4, 7.0], target: [0, -0.2, 0] }),
+    update(p, t, _intro, icon) {
+      const P = icon ? 1 : p;
+      face.rotation.y = 0.18 * Math.sin(t * 0.4);
+      pieces.forEach(({ m, c }, fi) => {
+        const a = ease(smooth(0.05 + fi * 0.045, 0.34 + fi * 0.045, P));
+        m.position.set(c[0] + Math.sin(fi * 3.7) * 3.6 * (1 - a), c[1] + Math.cos(fi * 2.3) * 2.6 * (1 - a), c[2] + Math.sin(fi * 1.9) * 2.4 * (1 - a));
+        m.rotation.z = -(1 - a) * (fi * 1.4 + 0.8);
+      });
+      ear.scale.set(0.09, 0.09, 0.09);
+      const slam = ease(smooth(0.7, 0.8, P));
+      bar.position.set(mix(-6, 0, slam), 0.22, 0.24);
+      bar.rotation.z = 0.06;
+      const settle = ease(smooth(0.3, 0.5, P));
+      sh.scale.set(2.8, 1.2, 1);
+      sh.program.uniforms.uOpacity.value = 0.3 * settle;
+    },
+  };
 }
-// move a piece in from its scattered start; returns the local point
-vec3 piece(vec3 p, vec2 c, float z, float fi, float P) {
-  float a = ease(smoothstep(0.05 + fi * 0.045, 0.34 + fi * 0.045, P));
-  vec3 off = vec3(sin(fi * 3.7) * 3.6, cos(fi * 2.3) * 2.6, sin(fi * 1.9) * 2.4) * (1.0 - a);
-  vec3 q = p - vec3(c, z) - off;
-  q.xy = rot((1.0 - a) * (fi * 1.4 + 0.8)) * q.xy;
-  return q;
-}
-vec2 map(vec3 p) {
-  float P = uIcon > 0.5 ? 1.0 : uP;
-  p.xz = rot(0.18 * sin(uT * 0.4)) * p.xz;
-  vec2 res = vec2(1e9, 0.0);
-  vec3 q;
-  q = piece(p, vec2(0.0, 0.18), -0.14, 0.0, P); res = U(res, vec2(slab(halfDisc(q.xy, 1.08, 1.0), q.z, 0.07), 4.0));      // hair
-  q = piece(p, vec2(0.0, 0.05), 0.0, 1.0, P);   res = U(res, vec2(slab(length(q.xy) - 0.9, q.z, 0.08), 2.0));             // face
-  q = piece(p, vec2(-0.33, 0.2), 0.11, 2.0, P); res = U(res, vec2(slab(halfDisc(q.xy, 0.17, -1.0), q.z, 0.05), 4.0));    // eye
-  q = piece(p, vec2(0.33, 0.22), 0.11, 3.0, P); res = U(res, vec2(slab(length(q.xy) - 0.15, q.z, 0.05), 3.0));             // eye
-  q = piece(p, vec2(0.0, -0.06), 0.11, 4.0, P); res = U(res, vec2(slab(tri(q.xy, 0.15), q.z, 0.05), 1.0));                 // nose
-  q = piece(p, vec2(0.0, -0.44), 0.11, 5.0, P); res = U(res, vec2(sdRoundBox(q, vec3(0.3, 0.06, 0.05), 0.03), 5.0));      // mouth
-  q = piece(p, vec2(0.0, -1.42), -0.06, 6.0, P); res = U(res, vec2(slab(halfDisc(q.xy, 1.05, 1.0), q.z, 0.09), 1.0));     // shoulders
-  q = piece(p, vec2(0.93, -0.28), 0.06, 7.0, P); res = U(res, vec2(length(q) - 0.09, 3.0));                                // earring
-  // the redaction bar
-  float slam = ease(smoothstep(0.7, 0.8, P));
-  vec3 r = p - vec3(mix(-6.0, 0.0, slam), 0.22, 0.24);
-  r.xy = rot(-0.06) * r.xy;
-  res = U(res, vec2(sdRoundBox(r, vec3(1.45, 0.14, 0.05), 0.025), 6.0));
-  return res;
-}
-`;
 
 /* Melax. A button phone spins in, its keys press # 2 5 8 0 # in step with the scroll, its screen lights,
    then a lightning bolt cracks out of the top (melax is Wolof for lightning). */
-const melax = /* glsl */ `
-float floorY() { return -1.62; }
-void cam(out vec3 ro, out vec3 ta) {
-  if (uIcon > 0.5) { ro = vec3(0.0, 0.3, 5.0); ta = vec3(0.0, -0.05, 0.0); return; }
-  ro = vec3(0.0, 0.45, 6.4); ta = vec3(0.0, 0.25, 0.0);
-}
-float bump(float t, float P) { return smoothstep(t - 0.025, t, P) * (1.0 - smoothstep(t + 0.02, t + 0.05, P)); }
-// keys pressed in order: # 2 5 8 0 #  (key index = row * 3 + column)
-float pressOf(float k, float P) {
-  if (k > 10.5) return max(bump(0.34, P), bump(0.665, P));
-  if (abs(k - 1.0) < 0.5) return bump(0.405, P);
-  if (abs(k - 4.0) < 0.5) return bump(0.47, P);
-  if (abs(k - 7.0) < 0.5) return bump(0.535, P);
-  if (abs(k - 10.0) < 0.5) return bump(0.6, P);
-  return 0.0;
-}
-vec2 map(vec3 p) {
-  float P = uIcon > 0.5 ? 0.62 : uP;
-  float fly = ease(smoothstep(0.0, 0.24, P));
-  vec3 q = p - vec3(mix(3.0, 0.0, fly), mix(2.6, 0.0, fly), mix(-6.0, 0.0, fly));
-  q.xz = rot(mix(3.4, 0.42, fly) + (uIcon > 0.5 ? 0.45 * sin(uT * 0.7) : 0.1 * sin(uT * 0.6))) * q.xz; // the icon rocks, facing you
-  q.yz = rot(-0.1) * q.yz;
-  vec2 res = vec2(1e9, 0.0);
-  float pb = sdBox(q, vec3(0.75, 1.42, 0.32));
-  if (pb > 0.3) res = vec2(pb, 3.0);
-  else {
-  float body = sdRoundBox(q, vec3(0.62, 1.28, 0.14), 0.11);
-  vec3 sq = q - vec3(0.0, 0.62, 0.14);
-  body = max(body, -sdRoundBox(sq, vec3(0.5, 0.38, 0.05), 0.04));
-  res = U(res, vec2(body, 3.0));
-  float lit = ease(smoothstep(0.26, 0.32, P));
-  res = U(res, vec2(sdRoundBox(sq + vec3(0.0, 0.0, 0.035), vec3(0.47, 0.35, 0.01), 0.02), mix(4.0, 7.0, step(0.5, lit))));
-  if (sdBox(q - vec3(0.0, -0.39, 0.15), vec3(0.5, 0.48, 0.1)) < 0.05) {
-  for (int r = 0; r < 4; r++) {
-    for (int c = 0; c < 3; c++) {
-      float k = float(r * 3 + c);
-      float press = pressOf(k, P);
-      vec3 kq = q - vec3(-0.32 + 0.32 * float(c), 0.02 - 0.27 * float(r), 0.15 - 0.045 * press);
-      res = U(res, vec2(sdRoundBox(kq, vec3(0.12, 0.075, 0.045), 0.03), press > 0.3 ? 1.0 : 4.0));
-    }
-  }
-  }
-  }
-  // the lightning bolt
-  float g = ease(smoothstep(0.8, 0.9, P)) * (1.0 - smoothstep(0.97, 1.0, P));
-  if (g > 0.0) {
-    vec3 a = vec3(0.0, 1.45, 0.0);
-    for (int i = 0; i < 6; i++) {
-      float fi = float(i);
-      vec3 b = vec3((mod(fi, 2.0) * 2.0 - 1.0) * (0.28 + 0.1 * hash(fi + floor(uT * 8.0))), 1.45 + (fi + 1.0) * 0.55, 0.0);
-      b = mix(a, b, clamp(g * 6.0 - fi, 0.0, 1.0));
-      res = U(res, vec2(sdCapsule(p, a, b, 0.06), 8.0));
-      a = b;
-    }
-  }
-  return res;
-}
-`;
+const bump = (t: number, P: number) => smooth(t - 0.025, t, P) * (1 - smooth(t + 0.02, t + 0.05, P));
+const pressOf = (k: number, P: number) =>
+  k === 11 ? Math.max(bump(0.34, P), bump(0.665, P)) : k === 1 ? bump(0.405, P) : k === 4 ? bump(0.47, P) : k === 7 ? bump(0.535, P) : k === 10 ? bump(0.6, P) : 0;
+function melax(kit: Kit): ClayScene {
+  const { root, solids, shadows, add, shade } = base(kit);
+  const phone = new Transform(); phone.setParent(root);
+  const gl = kit.gl;
+  add(kit.wrap(geo(gl, (x, y, z) => Math.max(sd.roundBox(x, y, z, 0.62, 1.28, 0.14, 0.11), -sd.roundBox(x, y - 0.62, z - 0.14, 0.5, 0.38, 0.05, 0.04)), [-0.68, -1.34, -0.2], [0.68, 1.34, 0.2], 0.02), C.lemon, phone));
+  const screen = add(kit.wrap(geo(gl, (x, y, z) => sd.roundBox(x, y, z, 0.47, 0.35, 0.012, 0.01), [-0.5, -0.38, -0.04], [0.5, 0.38, 0.04], 0.012), C.ink, phone));
+  screen.position.set(0, 0.62, 0.105);
+  const keyG = geo(gl, (x, y, z) => sd.roundBox(x, y, z, 0.12, 0.075, 0.045, 0.03), [-0.14, -0.1, -0.07], [0.14, 0.1, 0.07], 0.01);
+  const keys = Array.from({ length: 12 }, () => add(kit.wrap(keyG, C.ink, phone)));
+  const bolt = Array.from({ length: 6 }, () => add(kit.rod(C.lemon, root)));
+  bolt.forEach((b) => setColour(b, C.lemon, 1));
+  const sh = shade(root);
 
-/* Merged upstream. A trunk line with four branches; each one grows out, runs along and merges back in,
-   and its merge node turns orange. The DOM cards use the same thresholds (MERGE_AT below). */
-const merge = /* glsl */ `
-float floorY() { return -0.9; }
-void cam(out vec3 ro, out vec3 ta) {
-  float back = max(1.0, 2.7 / (uRes.x / uRes.y));
-  ta = vec3(0.0, 0.35, 0.0);
-  ro = ta + (vec3(0.0, 3.0, 6.6) - ta) * back;
+  return {
+    root, solids, shadows, clipY: -100,
+    cam: (_a, icon) => (icon ? { pos: [0, 0.3, 5], target: [0, -0.05, 0] } : { pos: [0, 0.45, 6.4], target: [0, 0.25, 0] }),
+    update(p, t, _intro, icon) {
+      const P = icon ? 0.62 : p;
+      const fly = ease(smooth(0, 0.24, P));
+      phone.position.set(mix(3, 0, fly), mix(2.6, 0, fly), mix(-6, 0, fly));
+      phone.rotation.set(0.1, -(mix(3.4, 0.42, fly) + (icon ? 0.45 * Math.sin(t * 0.7) : 0.1 * Math.sin(t * 0.6))), 0);
+      const lit = ease(smooth(0.26, 0.32, P));
+      setColour(screen, lit > 0.5 ? C.cobalt : C.ink, lit > 0.5 ? 1 : 0);
+      keys.forEach((m, k) => {
+        const r = Math.floor(k / 3), c = k % 3;
+        const press = pressOf(k, P);
+        m.position.set(-0.32 + 0.32 * c, 0.02 - 0.27 * r, 0.15 - 0.045 * press);
+        setColour(m, press > 0.3 ? C.orange : C.ink);
+      });
+      const g = ease(smooth(0.8, 0.9, P)) * (1 - smooth(0.97, 1, P));
+      let a = [0, 1.45, 0];
+      bolt.forEach((m, i) => {
+        const b0 = [((i % 2) * 2 - 1) * (0.28 + 0.1 * hash(i + Math.floor(t * 8))), 1.45 + (i + 1) * 0.55, 0];
+        const k = Math.min(1, Math.max(0, g * 6 - i));
+        const b = [mix(a[0], b0[0], k), mix(a[1], b0[1], k), mix(a[2], b0[2], k)];
+        stretch(m, a, b, k > 0 ? 0.06 : 0);
+        a = b;
+      });
+      sh.position.set(phone.position.x, -1.615, phone.position.z);
+      sh.scale.set(1.9, 0.8, 1);
+      sh.program.uniforms.uOpacity.value = 0.32 * fly;
+    },
+  };
 }
-vec3 node(int i, int k, float side) {
-  float s = -3.3 + float(i) * 1.75, e = s + 1.35;
-  float hy = 0.85, z = 0.38 * side;
-  if (k == 0) return vec3(s, 0.0, 0.0);
-  if (k == 1) return vec3(s + 0.32, hy, z);
-  if (k == 2) return vec3(e - 0.32, hy, z);
-  return vec3(e, 0.0, 0.0);
-}
-vec2 map(vec3 p) {
-  vec2 res = vec2(sdCapsule(p, vec3(-4.4, 0.0, 0.0), vec3(4.4, 0.0, 0.0), 0.08), 4.0);
-  for (int i = 0; i < 4; i++) {
-    float fi = float(i);
-    float side = mod(fi, 2.0) * 2.0 - 1.0;
-    float g = smoothstep(0.08 + fi * 0.2, 0.26 + fi * 0.2, uP);
-    float m = fi < 0.5 ? 2.0 : (fi < 1.5 ? 3.0 : (fi < 2.5 ? 1.0 : 2.0));
-    if (g > 0.0) {
-      for (int k = 0; k < 3; k++) {
-        float seg = clamp(g * 3.0 - float(k), 0.0, 1.0);
-        if (seg > 0.0) {
-          vec3 a = node(i, k, side), b = node(i, k + 1, side);
-          res = U(res, vec2(sdCapsule(p, a, mix(a, b, seg), 0.07), m));
-        }
-      }
-    }
-    res = U(res, vec2(length(p - node(i, 0, side)) - 0.13, 5.0));
-    res = U(res, vec2(length(p - node(i, 3, side)) - 0.15 * (0.6 + 0.4 * step(0.999, g)), g > 0.999 ? 1.0 : 5.0));
-  }
-  return res;
-}
-`;
 
-export const SCENES = { hero, adfontes, fugitiva, melax, merge } as const;
-export type ClayKey = keyof typeof SCENES;
+/* Merged upstream. A trunk line with four branches; each grows out, runs along and merges back in, and
+   its merge node turns orange. The DOM cards use the same thresholds (MERGE_AT). */
+function merge(kit: Kit): ClayScene {
+  const { root, solids, shadows, add, shade } = base(kit);
+  stretch(add(kit.rod(C.ink, root)), [-4.4, 0, 0], [4.4, 0, 0], 0.08);
+  for (const x of [-4.4, 4.4]) { const s = add(kit.sphere(C.ink, root)); s.position.set(x, 0, 0); s.scale.set(0.08, 0.08, 0.08); }
+  const cols: Colour[] = [C.cobalt, C.lemon, C.orange, C.cobalt];
+  const node = (i: number, k: number) => {
+    const s = -3.3 + i * 1.75, e = s + 1.35, z = 0.38 * ((i % 2) * 2 - 1);
+    return [[s, 0, 0], [s + 0.32, 0.85, z], [e - 0.32, 0.85, z], [e, 0, 0]][k];
+  };
+  const branches = [0, 1, 2, 3].map((i) => ({
+    segs: [0, 1, 2].map(() => add(kit.rod(cols[i], root))),
+    joints: [1, 2].map(() => add(kit.sphere(cols[i], root))),
+    start: add(kit.sphere(C.cream, root)),
+    end: add(kit.sphere(C.cream, root)),
+  }));
+  const sh = shade(root);
+  sh.position.set(0, -0.895, 0);
+  sh.scale.set(10, 1.6, 1);
+  sh.program.uniforms.uOpacity.value = 0.2;
 
-/** Where each branch finishes merging (uP). The PR cards appear at these points. */
-export const MERGE_AT = [0.26, 0.46, 0.66, 0.86];
+  return {
+    root, solids, shadows, clipY: -100,
+    cam: (aspect) => ({ pos: [0, 3, 6.6], target: [0, 0.35, 0], back: Math.max(1, 2.7 / aspect) }),
+    update(p) {
+      branches.forEach((b, i) => {
+        const g = smooth(0.08 + i * 0.2, 0.26 + i * 0.2, p);
+        b.segs.forEach((m, k) => {
+          const seg = Math.min(1, Math.max(0, g * 3 - k));
+          const a = node(i, k), e = node(i, k + 1);
+          stretch(m, a, [mix(a[0], e[0], seg), mix(a[1], e[1], seg), mix(a[2], e[2], seg)], seg > 0 ? 0.07 : 0);
+        });
+        b.joints.forEach((m, k) => {
+          const on = g * 3 > k + 1;
+          const q = node(i, k + 1);
+          m.position.set(q[0], q[1], q[2]);
+          m.scale.set(0.07, 0.07, 0.07);
+          m.visible = on;
+        });
+        const s0 = node(i, 0), s3 = node(i, 3);
+        b.start.position.set(s0[0], s0[1], s0[2]);
+        b.start.scale.set(0.13, 0.13, 0.13);
+        const done = g > 0.999;
+        b.end.position.set(s3[0], s3[1], s3[2]);
+        const r = 0.15 * (done ? 1 : 0.6);
+        b.end.scale.set(r, r, r);
+        setColour(b.end, done ? C.orange : C.cream);
+      });
+    },
+  };
+}
+
+export const BUILDERS: Record<ClayKey, (kit: Kit) => ClayScene> = { hero, adfontes, fugitiva, melax, merge };
+export type { Mesh };
