@@ -43,6 +43,13 @@ class Stage {
 
   init(canvas: HTMLCanvasElement) {
     if (this.renderer) return this.ok;
+    // 16 Nov: the raymarched scenes ran at ~2 fps on a real laptop GPU. Live 3D stays off (stills show
+    // instead) until the rasterised rebuild lands. ?live3d turns it on for testing.
+    if (!location.search.includes("live3d")) {
+      this.ok = false;
+      document.documentElement.classList.add("gl-off");
+      return false;
+    }
     try {
       // Clay is soft and all text is HTML, so the 3D draws below screen resolution.
       this.dpr = matchMedia("(pointer: coarse)").matches ? 0.7 : 0.8;
