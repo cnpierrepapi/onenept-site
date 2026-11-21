@@ -7,8 +7,8 @@ import { DoorMark } from "./brand";
 
 const EMAIL = "admin@onenept.com";
 const LINKS: [string, string, boolean][] = [
-  ["/#work", "Work", false],
-  ["/#open-source", "Open source", false],
+  ["/#adfontes", "AD FONTES", false],
+  ["/labs", "Labs", true],
   ["/#company", "Company", false],
   ["/emmanuel", "Founder", true],
 ];

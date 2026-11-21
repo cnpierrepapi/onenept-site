@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import GLSlot from "./fx/GLSlot";
 import type { Frame } from "./fx/gl/type";
-import { MERGE_AT } from "./fx/gl/scenes";
+import { PriceBars, TENCHA_SOURCE } from "./matcha";
 import { Arrow, COMPANY, Footer, Nav } from "./site";
 
 /* The page is a run of full-screen frames, like a title sequence. Each section opens with a burst of
@@ -39,39 +39,18 @@ function Mast({ children, className = "" }: { children: React.ReactNode; classNa
 /* ---------- content ---------- */
 
 const HERO_FRAMES: Frame[] = [
-  { top: "AI", bottom: "PRODUCTS", bg: "cobalt", fg: "paper" },
-  { top: "FOR", bottom: "PEOPLE", bg: "lemon", fg: "ink" },
-  { top: "WHO", bottom: "NEVER", bg: "orange", fg: "ink" },
-  { top: "ASKED", bottom: "FOR AI.", bg: "ink", fg: "lemon" },
+  { top: "AGENTS", bottom: "PASS TESTS.", bg: "cobalt", fg: "paper" },
+  { top: "THEN THEY", bottom: "GET A JOB.", bg: "lemon", fg: "ink" },
+  { top: "AND THE", bottom: "JOB WINS.", bg: "orange", fg: "ink" },
+  { top: "PRACTICE", bottom: "FIRST.", bg: "ink", fg: "lemon" },
 ];
 
+/* the matcha years, one cut at a time: the real price the agent walks into without knowing */
 const ADF_FRAMES: Frame[] = [
-  { top: "A WORLD", bottom: "OF NATIONS", bg: "ink", fg: "lemon" },
-  { top: "RUN", bottom: "BY AI", bg: "paper", fg: "cobalt" },
-  { top: "NO", bottom: "WALLET", bg: "ink", fg: "orange" },
-  { top: "JUST AN", bottom: "EMAIL.", bg: "paper", fg: "ink" },
-];
-
-/* one piece of road per cut, the way the game builds it from a coin's trades */
-const HWAY_FRAMES: Frame[] = [
-  { top: "EVERY TRADE", bottom: "BUILDS ROAD.", bg: "lemon", fg: "ink" },
-  { top: "BUY:", bottom: "UPHILL.", bg: "cobalt", fg: "lemon" },
-  { top: "SELL:", bottom: "DOWNHILL.", bg: "orange", fg: "ink" },
-  { top: "SILENCE:", bottom: "POTHOLE.", bg: "ink", fg: "lemon" },
-  { top: "BIG BUY:", bottom: "BOOST PAD.", bg: "paper", fg: "orange" },
-  { top: "RUG PULL.", bottom: "JEET BOMB.", bg: "cobalt", fg: "paper" },
-];
-
-/* one frame per key press: the phone dials as the glyphs cut */
-const MELAX_FRAMES: Frame[] = [
-  { glyph: "#", bg: "cobalt", fg: "paper" },
-  { glyph: "2", bg: "orange", fg: "ink" },
-  { glyph: "5", bg: "ink", fg: "lemon" },
-  { glyph: "8", bg: "paper", fg: "orange" },
-  { glyph: "0", bg: "cobalt", fg: "lemon" },
-  { glyph: "#", bg: "ink", fg: "paper" },
-  { top: "NO", bottom: "APP.", bg: "orange", fg: "ink" },
-  { top: "NO", bottom: "INTERNET.", bg: "cobalt", fg: "paper" },
+  { top: "MARCH 2024.", bottom: "YOU SELL MATCHA.", bg: "ink", fg: "lemon" },
+  { top: "THE LEAF:", bottom: "¥5,402 A KILO.", bg: "paper", fg: "cobalt" },
+  { top: "TWO YEARS ON:", bottom: "¥17,797.", bg: "orange", fg: "ink" },
+  { top: "NOBODY TOLD", bottom: "THE AGENT.", bg: "paper", fg: "ink" },
 ];
 
 const NAME_FRAMES: Frame[] = [
@@ -79,98 +58,42 @@ const NAME_FRAMES: Frame[] = [
   { top: "WE RISE BY", bottom: "LIFTING OTHERS.", bg: "lemon", fg: "ink" },
 ];
 
-const PRODUCTS: { scene: "adfontes" | "hopium" | "melax"; name: string; line: string; href: string }[] = [
-  { scene: "adfontes", name: "AD FONTES", line: "a blockchain game you start with an email", href: "#work" },
-  { scene: "hopium", name: "HOPIUM HIGHWAY", line: "a kart race on a road built from a coin's trades (in the works)", href: "#hopium-highway" },
-  { scene: "melax", name: "Melax", line: "bitcoin on a phone with buttons", href: "#melax" },
-];
-
-const MERGED: { repo: string; pr: string; href: string; what: string; date: string }[] = [
-  { repo: "datahub-project/datahub", pr: "#19115", href: "https://github.com/datahub-project/datahub/pull/19115", what: "Incidents on a single column, not only a whole dataset.", date: "20 Aug 2026" },
-  { repo: "datahub-project/datahub", pr: "#19405", href: "https://github.com/datahub-project/datahub/pull/19405", what: "Their permission check runs against the parent dataset, where access rules live.", date: "24 Aug 2026" },
-  { repo: "CALLE-AI/awesome-phone-call-agents", pr: "#337", href: "https://github.com/CALLE-AI/awesome-phone-call-agents/pull/337", what: "Reads what really happened to a phone call, not just the status field.", date: "11 Sep 2026" },
-  { repo: "google/adk-python", pr: "#6935", href: "https://github.com/google/adk-python/pull/6935", what: "Tools in the wrong half of a custom model's config were quietly dropped. Fixed, with our founder as co-author.", date: "7 Nov 2026" },
-];
+const PITCH =
+  "Pilots don't learn on a full plane. They learn in a simulator that can crash a thousand times. We build that for AI agents, out of real businesses. Labs train and test their agents in our worlds, and people play the same shifts right next to them.";
 
 const QUOTE =
   "The name comes from the oneness concept. I started building because I love bringing new things into existence. The longer I do it, the clearer it gets that the point is other people: what they love doing in their spare time, and what can make them money. We rise by lifting others.";
 
-/* ---------- product detail blocks (rest frames: columns on desktop, a stack on phones) ---------- */
+const OFFERS: { name: string; what: string }[] = [
+  { name: "A private run", what: "Your agent, start dates we've never published, and a scored report back. Fill rate, stock-outs, margin, cash, and how well it called the price." },
+  { name: "The world", what: "Licensed to run on your own machines. Reset it as often as you like." },
+  { name: "Human shifts", what: "People who've worked in food and drink play the same weeks, turn by turn, so your agent has someone real to beat." },
+];
+
+/* ---------- the AD FONTES rest frame (columns on desktop, a stack on phones) ---------- */
 
 function AdfDetails() {
   return (
     <>
       <div>
-        <span className="chip"><span className="live-dot" />Live · NEAR testnet</span>
-        <p className="mt-3 font-display text-[min(2.2vw,4svh)] font-bold leading-[1.05] text-cobalt max-md:text-2xl">A blockchain game where you never see the blockchain.</p>
+        <span className="chip">Season two · in the works · NEAR</span>
+        <p className="mt-3 font-display text-[min(2.2vw,4svh)] font-bold leading-[1.05] text-cobalt max-md:text-2xl">A matcha business, farm to cup.</p>
+        <p className="mt-3 font-mono text-[11px] leading-5">5 links · 1 week a turn · a stone mill grinds about 40 g an hour · every turn sealed on NEAR</p>
       </div>
       <p className="text-[15px] leading-relaxed">
-        A world of small nations run by AI. Their citizens read real research papers, trade what they learn and sometimes go to war. You fund one and become its god. Underneath there are DAOs, agent wallets and a contract that seals every turn. On screen you sign up with an email and give grace.
-      </p>
-      <div className="flex flex-col items-start gap-4">
-        <p className="font-mono text-xs leading-5">email to start · 0 wallet popups · a 3D world map</p>
-        <Visit href="https://adfontes.fun">adfontes.fun</Visit>
-      </div>
-    </>
-  );
-}
-
-function HwayDetails() {
-  return (
-    <>
-      <div>
-        <span className="chip">In the works · Solana</span>
-        <p className="mt-3 font-display text-[min(2.2vw,4svh)] font-bold leading-[1.05] text-cobalt max-md:text-2xl">A kart race on a road built from a coin&apos;s trades.</p>
-      </div>
-      <p className="text-[15px] leading-relaxed">
-        Pick a Solana coin and race its road. Every real trade lays the next piece: a buy goes uphill with the buyer&apos;s wallet painted on it, a sell goes downhill, a quiet spell leaves a pothole to hop, a big buy drops a boost pad. Everyone on that coin races the same road. Two-minute races, steering by thumb on a phone.
+        Five islands, one chain: tea farm, stone mill, exporter, importer, café. An agent opens its shop on a real date and runs it a week at a time. It buys leaf, books freight, sets prices and decides which cafés get stock when there isn&apos;t enough. When it needs hands, like tasting a lot or packing tins, it hires a person. Harvests, prices and the yen play back what really happened.
       </p>
       <div className="flex flex-col items-start gap-3">
-        <p className="font-mono text-[11px] leading-5">Item boxes come from new holders: Rug Pull · Jeet Bomb · Bot Swarm · FUD Cloud · Liquidation · Diamond Hands · Pump · Airdrop</p>
-        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-mute">Not built yet. Coming soon.</p>
-      </div>
-    </>
-  );
-}
-
-function MelaxDetails() {
-  return (
-    <>
-      <div>
-        <span className="chip">Learning project · not deployed</span>
-        <p className="mt-3 font-display text-[min(2.2vw,4svh)] font-bold leading-[1.05] text-orange max-md:text-2xl">Bitcoin for the phone you already have.</p>
-      </div>
-      <p className="text-[15px] leading-relaxed">
-        Dial #2580# and a menu opens, in Wolof, French or English. No app, no internet. Under the menu it&apos;s Lightning and Cashu, and a local agent swaps francs for sats with you. It runs on a test network on one machine, and the repo says so up front.
-      </p>
-      <div className="flex flex-col items-start gap-4">
-        <p className="font-mono text-[11px] leading-5">1 Balance · 2 Send · 3 Receive · 4 Pay a shop · 5 Cash in · 6 Cash out</p>
-        <Visit href="https://github.com/cnpierrepapi/melax">the code on GitHub</Visit>
-      </div>
-    </>
-  );
-}
-
-/** One product: a burst of frames, then the rest frame with the name across the top and the details
- *  in three columns across the bottom. On phones the details follow the scene as a normal stack. */
-function Chapter({ id, scene, frames, restFrom, fit, name, nameClass, details }: {
-  id: string; scene: "adfontes" | "hopium" | "melax"; frames: Frame[]; restFrom: number; fit: number;
-  name: string; nameClass: string; details: React.ReactNode;
-}) {
-  return (
-    <>
-      <article id={id} data-track className="relative h-[330vh] scroll-mt-0" aria-label={name}>
-        <div className="sticky top-0 h-[100svh] overflow-hidden">
-          <GLSlot scene={scene} frames={frames} restFrom={restFrom} fit={fit} className="absolute inset-0" />
-          <Mast className={nameClass}>
-            <span data-at={String(restFrom + 0.04)} data-cut className="block">{name}</span>
-          </Mast>
-          <div className="absolute inset-x-0 bottom-0 hidden grid-cols-3 gap-[4vw] px-[3.5vmin] pb-7 md:grid" data-at={String(restFrom + 0.1)}>
-            {details}
-          </div>
+        <PriceBars className="w-full max-w-[19rem]" />
+        <p className="font-mono text-[10px] leading-4 text-mute">
+          What it&apos;s scored against: Kyoto matcha leaf, first flush, average price a kilo. 2026 is to 19 June.{" "}
+          <a href={TENCHA_SOURCE} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-orange">Source</a>
+        </p>
+        <div className="flex flex-wrap gap-x-6 gap-y-2">
+          <Visit href="/labs" internal>For labs</Visit>
+          <Visit href="https://adfontes.fun">Season one is live</Visit>
         </div>
-      </article>
-      <div className="flex flex-col gap-6 px-5 pb-20 pt-4 md:hidden">{details}</div>
+      </div>
     </>
   );
 }
@@ -187,97 +110,116 @@ export default function Home() {
         <section data-track className="relative h-[360vh]" aria-labelledby="hero-title">
           <div className="sticky top-0 h-[100svh] overflow-hidden">
             <GLSlot scene="hero" frames={HERO_FRAMES} restFrom={0.5} fit={1.65} className="absolute inset-0" />
-            <h1 id="hero-title" className="sr-only">AI products for people who never asked for AI.</h1>
+            <h1 id="hero-title" className="sr-only">We build worlds where AI agents practice running real businesses.</h1>
             <p className="gl-off-only absolute inset-x-0 top-[24svh] px-[3.5vmin] font-display text-[min(12vw,16svh)] font-extrabold leading-[0.85] tracking-[-0.06em]" aria-hidden="true">
-              AI products for people who never asked for AI.
+              Agents pass tests. Then they get a job.
             </p>
             <p className="pointer-events-none absolute inset-x-0 bottom-5 text-center font-mono text-[10px] uppercase tracking-[0.3em] transition-opacity" data-until="0.04" aria-hidden="true">
               scroll
             </p>
-            {/* rest frame: WE BUILD along the top edge, THE DOOR. along the bottom, the door between */}
+            {/* rest frame: WE BUILD along the top edge, WORLDS. along the bottom, the door between */}
             <p className="pointer-events-none absolute left-0 right-0 top-[72px] whitespace-nowrap px-[3.5vmin] text-center font-display text-[min(15vw,15svh)] font-extrabold leading-[0.8] tracking-[-0.06em] md:top-[78px] md:text-left" data-at="0.6" data-cut aria-hidden="true">
               WE BUILD
             </p>
             <p className="pointer-events-none absolute bottom-[5svh] left-0 right-0 whitespace-nowrap px-[3.5vmin] text-center font-display text-[min(15vw,15svh)] font-extrabold leading-[0.8] tracking-[-0.06em] text-orange md:bottom-6 md:text-right" data-at="0.66" data-cut aria-hidden="true">
-              THE DOOR.
+              WORLDS.
             </p>
             <div className="absolute right-[3.5vmin] top-[80px] hidden w-[min(30vw,26rem)] md:block" data-at="0.74">
-              <p className="text-[15px] leading-relaxed">
-                We hide the plumbing. Models, wallets, tokens and APIs stay under the floor. What&apos;s left on the screen is something you can use in the first thirty seconds.
-              </p>
+              <p className="text-[15px] leading-relaxed">{PITCH}</p>
             </div>
-            <ul className="absolute bottom-7 left-[3.5vmin] hidden flex-col items-start gap-2 md:flex" aria-label="What we've built" data-at="0.8">
-              {PRODUCTS.map((p) => (
-                <li key={p.scene}>
-                  <a href={p.href} title={p.line} className="group flex items-center gap-2 rounded-full border-2 border-ink py-1 pl-1 pr-4 transition-transform hover:translate-x-1">
-                    <GLSlot scene={p.scene} icon className="h-10 w-10 shrink-0 rounded-full" />
-                    <span className="font-display text-sm font-extrabold tracking-[-0.02em]">{p.name}</span>
-                  </a>
-                </li>
-              ))}
+            <ul className="absolute bottom-7 left-[3.5vmin] hidden flex-col items-start gap-2 md:flex" aria-label="Where to look" data-at="0.8">
+              <li>
+                <a href="#adfontes" title="A matcha business, farm to cup" className="group flex items-center gap-2 rounded-full border-2 border-ink py-1 pl-1 pr-4 transition-transform hover:translate-x-1">
+                  <GLSlot scene="adfontes" icon className="h-10 w-10 shrink-0 rounded-full" />
+                  <span className="font-display text-sm font-extrabold tracking-[-0.02em]">AD FONTES</span>
+                </a>
+              </li>
+              <li>
+                <Link href="/labs" data-shutter className="group flex items-center gap-2 rounded-full border-2 border-ink bg-ink px-4 py-2.5 text-paper transition-transform hover:translate-x-1">
+                  <span className="font-display text-sm font-extrabold tracking-[-0.02em]">For labs</span>
+                  <Arrow className="h-3.5 w-3.5" />
+                </Link>
+              </li>
             </ul>
           </div>
         </section>
         <div className="px-5 pb-16 md:hidden">
-          <p className="text-base leading-relaxed">
-            We hide the plumbing. Models, wallets, tokens and APIs stay under the floor. What&apos;s left on the screen is something you can use in the first thirty seconds.
-          </p>
-          <ul className="mt-5 flex flex-wrap gap-2" aria-label="What we've built">
-            {PRODUCTS.map((p) => (
-              <li key={p.scene}>
-                <a href={p.href} className="flex items-center rounded-full border-2 border-ink px-4 py-2 font-display text-sm font-extrabold">{p.name}</a>
-              </li>
-            ))}
+          <p className="text-base leading-relaxed">{PITCH}</p>
+          <ul className="mt-5 flex flex-wrap gap-2" aria-label="Where to look">
+            <li><a href="#adfontes" className="flex items-center rounded-full border-2 border-ink px-4 py-2 font-display text-sm font-extrabold">AD FONTES</a></li>
+            <li><Link href="/labs" data-shutter className="flex items-center gap-2 rounded-full bg-ink px-4 py-2 font-display text-sm font-extrabold text-paper">For labs <Arrow className="h-3.5 w-3.5" /></Link></li>
           </ul>
         </div>
 
         {/* 2. the line: one sentence slides across the whole width, then cuts to ink for the turn */}
-        <section data-track className="relative h-[300vh]" aria-label="What we do">
+        <section data-track className="relative h-[300vh]" aria-label="Why worlds">
           <div className="sticky top-0 flex h-[100svh] items-center overflow-hidden">
             <p className="whitespace-nowrap pl-[3.5vmin] font-display text-[min(30vw,40svh)] font-extrabold leading-none tracking-[-0.06em] will-change-transform max-md:text-[24svh]" data-slide="0,0.48">
-              Most AI products work.
+              Agents ace the exam.
             </p>
             <div className="absolute inset-0 flex items-center bg-ink text-lemon" data-at="0.5" data-cut>
               <p className="whitespace-nowrap pl-[3.5vmin] font-display text-[min(30vw,40svh)] font-extrabold leading-none tracking-[-0.06em] will-change-transform max-md:text-[24svh]" data-slide="0.5,0.9">
-                Most people still can&apos;t use them.
+                Then a supplier is late.
               </p>
               <p className="absolute bottom-6 left-[3.5vmin] right-[3.5vmin] max-w-2xl text-base leading-relaxed text-paper md:text-lg" data-at="0.86">
-                A blockchain game asks for a wallet before you&apos;ve seen anything. A bitcoin wallet assumes a smartphone and data. The clever part is done, and the person in front of it is stuck at the door. We build the door.
+                Most tests hand an agent a tidy question with one right answer. A business never does. Stock runs out, a price triples, a café wants its order by Friday. Our worlds start on a real date and play back what actually happened next. The agent doesn&apos;t get the answers. History already wrote them.
               </p>
             </div>
           </div>
         </section>
 
-        {/* 3. the work: three products, each a burst of frames and one rest frame */}
-        <div id="work" className="scroll-mt-0">
-          <Chapter id="adfontes" scene="adfontes" frames={ADF_FRAMES} restFrom={0.5} fit={1.7} name="AD FONTES" nameClass="text-ink" details={<AdfDetails />} />
-          <Chapter id="hopium-highway" scene="hopium" frames={HWAY_FRAMES} restFrom={0.55} fit={1.5} name="HOPIUM HIGHWAY" nameClass="text-cobalt text-[min(10vw,17svh)]" details={<HwayDetails />} />
-          <Chapter id="melax" scene="melax" frames={MELAX_FRAMES} restFrom={0.62} fit={1.9} name="MELAX" nameClass="text-orange" details={<MelaxDetails />} />
-        </div>
-
-        {/* 4. merged upstream: the trunk runs edge to edge, each PR number lands as its branch merges */}
-        <section id="open-source" data-track className="relative h-[240vh] scroll-mt-0">
+        {/* 3. the showcase: AD FONTES, a burst of frames and one rest frame */}
+        <article id="adfontes" data-track className="relative h-[330vh] scroll-mt-0" aria-label="AD FONTES">
           <div className="sticky top-0 h-[100svh] overflow-hidden">
-            <GLSlot scene="merge" className="absolute inset-x-0 top-[24svh] h-[36svh] md:top-[26svh] md:h-[40svh]" />
-            <h2 className="pointer-events-none absolute inset-x-0 top-[72px] whitespace-nowrap px-[3.5vmin] text-center font-display text-[min(11vw,15svh)] font-extrabold leading-[0.85] tracking-[-0.06em] md:top-[78px]" data-at="0.01">
-              Merged upstream.
-            </h2>
-            <ol className="absolute inset-x-0 bottom-0 grid grid-cols-2 gap-x-[4vw] gap-y-4 px-[3.5vmin] pb-6 md:grid-cols-4">
-              {MERGED.map((m, i) => (
-                <li key={m.pr + m.repo} data-at={String(MERGE_AT[i])} data-cut>
-                  <a href={m.href} target="_blank" rel="noopener noreferrer" className="group block">
-                    <p className="font-display text-[min(7vw,10svh)] font-extrabold leading-none tracking-[-0.05em] group-hover:text-orange max-md:text-4xl">{m.pr}</p>
-                    <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-orange">Merged {m.date}</p>
-                    <p className="mt-1 font-mono text-[10px] text-mute">{m.repo}</p>
-                    <p className="mt-2 hidden text-sm leading-snug md:block [@media(max-height:720px)]:hidden">{m.what}</p>
-                  </a>
-                </li>
+            <GLSlot scene="adfontes" frames={ADF_FRAMES} restFrom={0.5} fit={1.7} className="absolute inset-0" />
+            <Mast className="text-ink">
+              <span data-at="0.54" data-cut className="block">AD FONTES</span>
+            </Mast>
+            <div className="absolute inset-x-0 bottom-0 hidden grid-cols-3 items-end gap-[4vw] px-[3.5vmin] pb-7 md:grid" data-at="0.6">
+              <AdfDetails />
+            </div>
+          </div>
+        </article>
+        <div className="flex flex-col gap-6 px-5 pb-20 pt-4 md:hidden"><AdfDetails /></div>
+
+        {/* 4. labs: lemon field, the ask set big on the left, the offers ragged on the right */}
+        <section id="labs" className="relative scroll-mt-16 bg-lemon">
+          <div className="grid gap-12 px-[3.5vmin] py-20 md:grid-cols-[1.1fr_1fr] md:py-32">
+            <div>
+              <p className="font-mono text-[11px] uppercase tracking-[0.26em]">For labs</p>
+              <p className="mt-4 font-display text-[min(13vw,9rem)] font-extrabold leading-[0.85] tracking-[-0.06em]" data-fly>
+                Bring your agent.
+              </p>
+              <p className="mt-6 max-w-md text-lg leading-relaxed">We run it through the matcha years and hand back the ledger.</p>
+            </div>
+            <div className="flex flex-col justify-end gap-8 md:pb-3">
+              {OFFERS.map((o, i) => (
+                <div key={o.name} className={i === 1 ? "md:pl-[12%]" : ""}>
+                  <p className="font-display text-3xl font-extrabold tracking-[-0.03em]">{o.name}</p>
+                  <p className="mt-2 max-w-md text-[15px] leading-relaxed">{o.what}</p>
+                </div>
               ))}
-            </ol>
+              <div className="flex flex-col items-start gap-3 border-t-2 border-ink pt-5">
+                <p className="max-w-md text-[15px] leading-relaxed">Season two is being built now. Ask, and we&apos;ll tell you when the first private runs open.</p>
+                <Visit href="/labs" internal>What labs get</Visit>
+              </div>
+            </div>
           </div>
         </section>
 
-        {/* 5. the company: two frames of the founder's line, then the cobalt rest frame */}
+        {/* 5. the other two parts of the company, one line lower down */}
+        <section className="px-[3.5vmin] py-14 md:py-20" aria-label="Also from us">
+          <p className="max-w-4xl text-lg leading-relaxed md:text-xl">
+            Also from us:{" "}
+            <a href="https://warmleads.app" target="_blank" rel="noopener noreferrer" className="font-semibold underline decoration-2 underline-offset-4 hover:text-orange">Warmleads</a>
+            , which finds leads worth calling, paid in naira or dollars. And the shows:{" "}
+            <span className="font-semibold">The Come Up</span>, where people work off real debt and you vote on their next move,{" "}
+            <span className="font-semibold">Spot Her</span>, an alternate reality game, and{" "}
+            <span className="font-semibold">League of Supernatural Gentlemen</span>.
+          </p>
+        </section>
+
+        {/* 6. the company: two frames of the founder's line, then the cobalt rest frame */}
         <section id="company" data-track className="relative h-[260vh] scroll-mt-0 text-paper">
           <div className="sticky top-0 h-[100svh] overflow-hidden">
             <GLSlot scene="type" frames={NAME_FRAMES} restFrom={0.4} restBg="cobalt" className="absolute inset-0" />
@@ -309,11 +251,11 @@ export default function Home() {
           </Link>
         </div>
 
-        {/* 6. contact: the address set across the whole width */}
+        {/* 7. contact: the address set across the whole width */}
         <section className="relative overflow-hidden">
           <div className="px-[3.5vmin] py-24 md:py-36">
             <p className="font-display text-3xl font-extrabold leading-tight tracking-[-0.03em] md:text-5xl" data-fly>
-              Got an AI product people keep bouncing off?
+              Got an agent that needs a job?
             </p>
             <a
               href={`mailto:${COMPANY.email}`}

@@ -187,12 +187,6 @@ html[data-motion="calm"] [data-at] {
   background: rgb(255 107 44 / 0.22);
 }
 
-/* typed-in characters (the Melax dial line) */
-html.js [data-at].char {
-  transform: none;
-  transition: opacity 0.05s;
-}
-
 /* hero items that wait for the loader to open */
 .intro-fade {
   transition: opacity 0.9s ease, transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);

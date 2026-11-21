@@ -89,14 +89,14 @@ async def main():
         await ctx.add_init_script("localStorage.setItem('onenept-motion','calm')")
         pg = await ctx.new_page()
         bad = []
-        for path in ["/", "/emmanuel", "/privacy"]:
+        for path in ["/", "/labs", "/emmanuel", "/privacy"]:
             for w in [320, 390, 768, 1024, 1280, 1440, 1600]:
                 await pg.set_viewport_size({"width": w, "height": 900})
                 await pg.goto(BASE + path, wait_until="networkidle")
                 sw, cw = await pg.evaluate("[document.documentElement.scrollWidth, document.documentElement.clientWidth]")
                 if sw > cw:
                     bad.append(f"{path}@{w}:{sw}>{cw}")
-        check(not bad, "no sideways overflow at 7 widths on 3 pages", ", ".join(bad))
+        check(not bad, "no sideways overflow at 7 widths on 4 pages", ", ".join(bad))
         await ctx.close()
 
         # 6. without JavaScript the page still reads (the loader can't trap anyone)
@@ -105,7 +105,7 @@ async def main():
         await pg.goto(BASE + "/", wait_until="load")
         check(not await pg.locator(".loader").is_visible(), "no JavaScript: no loader in the way")
         txt = await pg.locator("main").inner_text()
-        check("AD FONTES" in txt and "Merged upstream" in txt and "oneness concept" in txt, "no JavaScript: all the text is there")
+        check("AD FONTES" in txt and "Bring your agent" in txt and "oneness concept" in txt, "no JavaScript: all the text is there")
         await ctx.close()
         await b.close()
 

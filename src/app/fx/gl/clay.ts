@@ -11,6 +11,7 @@ export const C = {
   ink: [0.022, 0.018, 0.015],   // #15120F, lifted a touch
   cream: [0.9, 0.82, 0.7],
   red: [0.807, 0.048, 0.02],    // #E8402B
+  matcha: [0.266, 0.491, 0.042], // #8DBA3A
 } as const;
 export type Colour = readonly [number, number, number];
 

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Fragment } from "react";
-import Link from "next/link";
 import GLSlot from "../fx/GLSlot";
 import { Arrow, COMPANY, Footer, Nav } from "../site";
 
@@ -17,15 +16,16 @@ const SHIPPED: { name: string; href: string; what: string; state: string }[] = [
   {
     name: "AD FONTES",
     href: "https://adfontes.fun",
-    what: "A blockchain game you start with an email. No wallet popup and no crypto words on screen, while every move underneath is a real transaction.",
-    state: "Live on NEAR testnet",
+    what: "A world where AI agents run a matcha business, farm to cup, against two real years of prices. Season one, a world of AI nations trading research papers, is still running.",
+    state: "Season one live on NEAR testnet",
   },
-  {
-    name: "Melax",
-    href: "https://github.com/cnpierrepapi/melax",
-    what: "A bitcoin wallet in Wolof, French and English for phones with buttons. Its setup guide only ticks a step when the server proves it happened.",
-    state: "Learning project",
-  },
+];
+
+const MERGED: { repo: string; pr: string; href: string; what: string; date: string }[] = [
+  { repo: "datahub-project/datahub", pr: "#19115", href: "https://github.com/datahub-project/datahub/pull/19115", what: "Incidents on a single column, not only a whole dataset.", date: "20 Aug 2026" },
+  { repo: "datahub-project/datahub", pr: "#19405", href: "https://github.com/datahub-project/datahub/pull/19405", what: "Their permission check runs against the parent dataset, where access rules live.", date: "24 Aug 2026" },
+  { repo: "CALLE-AI/awesome-phone-call-agents", pr: "#337", href: "https://github.com/CALLE-AI/awesome-phone-call-agents/pull/337", what: "Reads what really happened to a phone call, not just the status field.", date: "11 Sep 2026" },
+  { repo: "google/adk-python", pr: "#6935", href: "https://github.com/google/adk-python/pull/6935", what: "Tools in the wrong half of a custom model's config were quietly dropped. Fixed, as co-author.", date: "7 Nov 2026" },
 ];
 
 const ROLES = ["Design Engineer", "UX Engineer", "AI Product Engineer"];
@@ -110,12 +110,21 @@ export default function Founder() {
                 </li>
               ))}
             </ol>
-            <p className="mt-10 max-w-xl leading-relaxed" data-fly>
-              When a platform I build on is wrong, I send the fix back. Four are merged, in Google&apos;s ADK, DataHub and CALL-E.{" "}
-              <Link href="/#open-source" data-shutter className="font-semibold underline decoration-2 underline-offset-4 hover:text-orange">
-                See them
-              </Link>
-            </p>
+            <div id="merged" className="mt-14 scroll-mt-24">
+              <p className="max-w-xl leading-relaxed" data-fly>When a platform I build on is wrong, I send the fix back. Four are merged.</p>
+              <ol className="mt-6 grid gap-x-[4vw] gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+                {MERGED.map((m) => (
+                  <li key={m.pr + m.repo} data-fly>
+                    <a href={m.href} target="_blank" rel="noopener noreferrer" className="group block">
+                      <p className="font-display text-5xl font-extrabold leading-none tracking-[-0.05em] group-hover:text-orange">{m.pr}</p>
+                      <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-orange">Merged {m.date}</p>
+                      <p className="mt-1 font-mono text-[10px] text-mute">{m.repo}</p>
+                      <p className="mt-2 text-sm leading-snug">{m.what}</p>
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </div>
           </div>
         </section>
 

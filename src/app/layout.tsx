@@ -20,9 +20,9 @@ const mono = JetBrains_Mono({
   weight: ["400", "500"],
 });
 
-const TITLE = "Onenept Studios: AI products for people who never asked for AI";
+const TITLE = "Onenept Studios: worlds where AI agents learn to run real businesses";
 const DESC =
-  "Onenept Studios is an applied AI company. We hide the plumbing so anyone can use what we build: AD FONTES, a blockchain game you start with an email, and Melax, bitcoin on a phone with buttons. Next: Hopium Highway, a kart race on a road built from a coin's trades. Plus merged work in Google's ADK, DataHub and CALL-E.";
+  "Onenept Studios builds simulators for AI agents out of real businesses. Labs train and test their agents in them, and people play the same shifts. First up, AD FONTES season two: a matcha supply chain that starts on a real date and plays back what really happened.";
 
 export const metadata: Metadata = {
   title: { default: TITLE, template: "%s :: Onenept Studios" },
