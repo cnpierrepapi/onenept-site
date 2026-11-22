@@ -105,7 +105,7 @@ async def main():
         await pg.goto(BASE + "/", wait_until="load")
         check(not await pg.locator(".loader").is_visible(), "no JavaScript: no loader in the way")
         txt = await pg.locator("main").inner_text()
-        check("AD FONTES" in txt and "Merged upstream" in txt and "oneness concept" in txt, "no JavaScript: all the text is there")
+        check(all(w in txt for w in ("Warmleads", "The Come Up", "League of Supernatural Gentlemen", "Merged upstream", "oneness concept")), "no JavaScript: all the text is there")
         await ctx.close()
         await b.close()
 

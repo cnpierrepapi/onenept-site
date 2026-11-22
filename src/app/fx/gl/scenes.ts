@@ -5,7 +5,7 @@ import { Geometry, Transform, type Mesh, type OGLRenderingContext } from "ogl";
 import { meshSDF, sd } from "@/lib/mesh";
 import { C, Kit, ease, mix, setColour, smooth, stretch, type ClayMesh, type Colour } from "./clay";
 
-export type ClayKey = "hero" | "adfontes" | "hopium" | "melax" | "merge";
+export type ClayKey = "hero" | "platforms" | "streets" | "series" | "merge";
 
 export interface Cam { pos: [number, number, number]; target: [number, number, number]; back?: number }
 /** which kinetic-type frame is on screen; index === count means the rest frame. rest: 0..1 through it */
@@ -22,7 +22,6 @@ export interface ClayScene {
 /** Where each branch finishes merging. The PR cards appear at these points. */
 export const MERGE_AT = [0.26, 0.46, 0.66, 0.86];
 
-const hash = (n: number) => { const s = Math.sin(n) * 43758.5453; return s - Math.floor(s); };
 
 function geo(gl: OGLRenderingContext, f: (x: number, y: number, z: number) => number, min: [number, number, number], max: [number, number, number], step: number) {
   const d = meshSDF(f, min, max, step);
@@ -98,192 +97,180 @@ function hero(kit: Kit): ClayScene {
   };
 }
 
-/* AD FONTES ("to the sources"). Small islands rise out of the paper one by one; a cobalt spring wells
-   up from the middle one; then trade lines run from the spring to every island. */
-const ISLES: [number, number, number, number][] = [
-  [0, 0, 0, 0.62], [-1.75, 0.35, -0.7, 0.44], [1.7, 0.22, -0.5, 0.48], [-1.0, -0.35, 1.05, 0.36], [1.05, -0.28, 1.15, 0.4],
-];
-function adfontes(kit: Kit): ClayScene {
+/* Part 1, the platforms. Three plinths rise one by one. On the first a sheet of paper and a pencil
+   (Warmleads: writers and designers). On the second an item box spins (Folofolo: the games). On the third
+   three spheres swing round and come into one line (SYZYGY, which is the word for exactly that). */
+function platforms(kit: Kit): ClayScene {
   const { root, solids, shadows, add, shade } = base(kit);
+  const gl = kit.gl;
   const world = new Transform(); world.setParent(root);
-  const house = geo(kit.gl, (x, y, z) => sd.roundBox(x, y, z, 0.085, 0.075, 0.085, 0.018), [-0.1, -0.1, -0.1], [0.1, 0.1, 0.1], 0.012);
-  const roof = geo(kit.gl, (x, y, z) => sd.roundBox(x, y, z, 0.1, 0.03, 0.1, 0.012), [-0.12, -0.05, -0.12], [0.12, 0.05, 0.12], 0.01);
-  const isles = ISLES.map(([, , , r], i) => {
+  const plinthG = geo(gl, (x, y, z) => sd.cyl(x, y, z, 0.5, 0.42) - 0.04, [-0.58, -0.5, -0.58], [0.58, 0.5, 0.58], 0.02);
+  const cols: Colour[] = [C.cobalt, C.orange, C.lemon];
+  const X = [-1.55, 0, 1.55];
+  const plinths = X.map((x, i) => {
     const g = new Transform(); g.setParent(world);
-    const h = r * 0.5;
-    add(kit.wrap(geo(kit.gl, (x, y, z) => sd.cyl(x, y, z, r - 0.04, 0.035) - 0.04, [-r - 0.05, -0.1, -r - 0.05], [r + 0.05, 0.1, r + 0.05], 0.02), C.lemon, g));
-    add(kit.wrap(geo(kit.gl, (x, y, z) => sd.cappedCone(x, y + 0.06 + h, z, h, r * 0.14, r * 0.9) - 0.02, [-r, -0.12 - 2 * h, -r], [r, 0.0, r], 0.02), C.orange, g));
-    if (i > 0) {
-      const hs = add(kit.wrap(house, C.cream, g)); hs.position.set(r * 0.32, 0.15, r * 0.12);
-      const rf = add(kit.wrap(roof, C.cobalt, g)); rf.position.set(r * 0.32, 0.25, r * 0.12);
-    }
-    const s = shade(world);
+    add(kit.wrap(plinthG, cols[i], g));
+    const s = shade(world); s.position.set(x, -0.995, 0); s.scale.set(1.5, 1.1, 1);
     return { g, s };
   });
-  const drops = Array.from({ length: 7 }, () => add(kit.sphere(C.cobalt, world)));
-  const lines = Array.from({ length: 4 }, () => add(kit.rod(C.cobalt, world)));
+  // Warmleads: a sheet and a pencil laid across it
+  const sheet = add(kit.wrap(geo(gl, (x, y, z) => sd.roundBox(x, y, z, 0.3, 0.012, 0.38, 0.01), [-0.33, -0.03, -0.41], [0.33, 0.03, 0.41], 0.01), C.cream, plinths[0].g));
+  sheet.position.set(0, 0.47, 0); sheet.rotation.y = 0.25;
+  const pencil = new Transform(); pencil.setParent(plinths[0].g);
+  stretch(add(kit.rod(C.orange, pencil)), [-0.32, 0, 0], [0.22, 0, 0], 0.045);
+  const tip = add(kit.wrap(geo(gl, (x, y, z) => sd.cappedCone(y, -x, z, 0.06, 0.045, 0.004), [-0.08, -0.06, -0.06], [0.08, 0.06, 0.06], 0.006), C.ink, pencil));
+  tip.position.set(0.28, 0, 0);
+  // Folofolo: the item box
+  const box = add(kit.wrap(geo(gl, (x, y, z) => sd.roundBox(x, y, z, 0.22, 0.22, 0.22, 0.06), [-0.26, -0.26, -0.26], [0.26, 0.26, 0.26], 0.012), C.lemon, plinths[1].g));
+  const dotG = geo(gl, (x, y, z) => sd.roundBox(x, y, z, 0.05, 0.05, 0.02, 0.02), [-0.07, -0.07, -0.04], [0.07, 0.07, 0.04], 0.008);
+  const dots = [0, 1, 2, 3].map(() => add(kit.wrap(dotG, C.ink, box)));
+  dots[0].position.set(0, 0, 0.225); dots[1].position.set(0, 0, -0.225);
+  dots[2].position.set(0.225, 0, 0); dots[2].rotation.y = Math.PI / 2;
+  dots[3].position.set(-0.225, 0, 0); dots[3].rotation.y = Math.PI / 2;
+  // SYZYGY: sun, planet, moon swing into a line
+  const sun = add(kit.sphere(C.orange, plinths[2].g));
+  const planet = add(kit.sphere(C.cobalt, plinths[2].g));
+  const moon = add(kit.sphere(C.cream, plinths[2].g));
 
   return {
     root, solids, shadows, clipY: -100,
-    cam: (_a, icon) => (icon ? { pos: [0, 2.6, 6.8], target: [0, 0, 0] } : { pos: [0, 2.7, 7.6], target: [0, 0.2, 0] }),
+    cam: (_a, icon) => (icon ? { pos: [0, 1.6, 6.6], target: [0, 0.2, 0] } : { pos: [0, 1.7, 7.2], target: [0, 0.25, 0] }),
     update(p, t, _intro, icon) {
       const P = icon ? 1 : p;
-      world.rotation.y = -(t * 0.05 + (icon ? t * 0.25 : 0));
-      const tops: number[][] = [];
-      ISLES.forEach(([x, y, z, r], i) => {
-        const a = ease(smooth(0.02 + i * 0.07, 0.3 + i * 0.07, P));
-        const yy = mix(-4.5, y, a) + 0.06 * Math.sin(t * 0.8 + i * 1.7);
-        isles[i].g.position.set(x, yy, z);
-        tops.push([x, yy + 0.12, z]);
-        isles[i].s.position.set(x, -2.295, z);
-        isles[i].s.scale.set(r * 2.6, r * 2.6, 1);
-        isles[i].s.program.uniforms.uOpacity.value = 0.22 * a;
+      world.rotation.y = 0.05 * Math.sin(t * 0.35) + (icon ? 0.2 * Math.sin(t * 0.5) : 0);
+      plinths.forEach(({ g, s }, i) => {
+        const a = ease(smooth(0.04 + i * 0.18, 0.24 + i * 0.18, P));
+        g.position.set(X[i], mix(-3.2, -0.55, a) + 0.03 * Math.sin(t * 0.9 + i * 2), 0);
+        s.program.uniforms.uOpacity.value = 0.24 * a;
       });
-      const well = ease(smooth(0.38, 0.55, P));
-      const t0 = tops[0];
-      drops.forEach((m, k) => {
-        const ph = (t * 0.32 + k / 7) % 1;
-        m.position.set(t0[0] + 0.06 * Math.sin(k * 2.3 + t), t0[1] + 0.08 + ph * 1.7 * well, t0[2] + 0.06 * Math.cos(k * 1.7));
-        const s = 0.15 * (1 - ph * 0.75) * well;
-        m.scale.set(s, s, s);
-        m.visible = s > 0.001;
-      });
-      const crown = [t0[0], t0[1] + 1.25 * well, t0[2]];
-      lines.forEach((m, j) => {
-        const i = j + 1;
-        const g = ease(smooth(0.56 + i * 0.05, 0.72 + i * 0.05, P));
-        const e = tops[i];
-        stretch(m, crown, [mix(crown[0], e[0], g), mix(crown[1], e[1], g), mix(crown[2], e[2], g)], g > 0 ? 0.028 : 0);
-      });
+      const draw = ease(smooth(0.2, 0.4, P));
+      pencil.position.set(mix(0.35, 0.02, draw), 0.53, mix(-0.3, 0.05, draw));
+      pencil.rotation.set(0, 0.25 + 0.7 * (1 - draw) + 0.05 * Math.sin(t * 1.3), 0.08);
+      box.position.set(0, 0.78 + 0.06 * Math.sin(t * 2), 0);
+      box.rotation.set(0.35, t * 1.2, 0.2);
+      // orbit angles that all land on 0 (one line) as the rest frame arrives
+      const free = 1 - ease(smooth(0.55, 0.78, P));
+      const a1 = free * (t * 0.9 + 1.4), a2 = free * (t * 1.7 + 3.1);
+      sun.position.set(-0.32, 0.82, 0); sun.scale.set(0.16, 0.16, 0.16);
+      planet.position.set(-0.32 + 0.38 * Math.cos(a1), 0.82, 0.38 * Math.sin(a1)); planet.scale.set(0.1, 0.1, 0.1);
+      moon.position.set(planet.position.x + 0.2 * Math.cos(a2), 0.82, planet.position.z + 0.2 * Math.sin(a2)); moon.scale.set(0.055, 0.055, 0.055);
     },
   };
 }
 
-/* HOPIUM HIGHWAY (in the works). A kart race on a road built from a coin's trades. One piece of road
-   appears per cut: flat start, a buy uphill, another buy, a sell downhill, a silence pothole, a big-buy
-   boost pad, then an item box. The kart drives the road as it gets built and hops the pothole. */
-type Piece = { kind: "flat" | "up" | "down" | "gap" | "boost" | "box"; h0: number; h1: number; colour: Colour };
-const ROAD: Piece[] = [
-  { kind: "flat", h0: 0, h1: 0, colour: C.cream },
-  { kind: "up", h0: 0, h1: 0.4, colour: C.cobalt },
-  { kind: "up", h0: 0.4, h1: 0.8, colour: C.cobalt },
-  { kind: "down", h0: 0.8, h1: 0.35, colour: C.orange },
-  { kind: "gap", h0: 0.35, h1: 0.35, colour: C.cream },
-  { kind: "boost", h0: 0.35, h1: 0.35, colour: C.lemon },
-  { kind: "box", h0: 0.35, h1: 0.35, colour: C.cream },
+/* Part 2, real-life games. A small town of clay blocks rises; a trail of orange stones winds through
+   the streets as the cuts land, and a pin drops on the spot where the mission ends. */
+const BLOCKS: [number, number, number, number][] = [
+  [-1.9, -0.9, 0.55, 0], [-0.7, -1.0, 0.85, 1], [0.6, -0.95, 0.45, 2], [1.85, -0.85, 0.7, 0],
+  [-1.3, 0.3, 0.4, 2], [0.0, 0.35, 0.65, 0], [1.25, 0.3, 0.5, 1], [-0.6, 1.4, 0.75, 1], [0.7, 1.45, 0.4, 2], [1.95, 1.35, 0.6, 0],
 ];
-const ROAD_X0 = -3.5;
-function roadHeight(x: number) {
-  const i = Math.min(ROAD.length - 1, Math.max(0, Math.floor(x - ROAD_X0)));
-  const p = ROAD[i], f = x - ROAD_X0 - i;
-  return mix(p.h0, p.h1, Math.min(1, Math.max(0, f)));
-}
-function hopium(kit: Kit): ClayScene {
+const TRAIL_PTS: [number, number][] = [[-2.45, -0.3], [-0.65, -0.3], [-0.65, 0.85], [0.65, 0.85], [0.65, -0.3], [1.9, -0.3], [1.9, 0.85], [2.35, 0.85]];
+/* stones laid every ~0.22 along the corners above */
+const TRAIL: [number, number][] = (() => {
+  const out: [number, number][] = [];
+  for (let i = 0; i < TRAIL_PTS.length - 1; i++) {
+    const [ax, az] = TRAIL_PTS[i], [bx, bz] = TRAIL_PTS[i + 1];
+    const n = Math.max(1, Math.round(Math.hypot(bx - ax, bz - az) / 0.22));
+    for (let k = 0; k < n; k++) out.push([ax + ((bx - ax) * k) / n, az + ((bz - az) * k) / n]);
+  }
+  out.push(TRAIL_PTS[TRAIL_PTS.length - 1]);
+  return out;
+})();
+function streets(kit: Kit): ClayScene {
   const { root, solids, shadows, add, shade } = base(kit);
   const gl = kit.gl;
   const world = new Transform(); world.setParent(root);
-  const slab = geo(gl, (x, y, z) => sd.roundBox(x, y, z, 0.5, 0.09, 0.5, 0.04), [-0.55, -0.12, -0.55], [0.55, 0.12, 0.55], 0.02);
-  const stripe = geo(gl, (x, y, z) => sd.roundBox(x, y, z, 0.07, 0.02, 0.32, 0.015), [-0.1, -0.04, -0.36], [0.1, 0.04, 0.36], 0.012);
-  const cube = geo(gl, (x, y, z) => sd.roundBox(x, y, z, 0.17, 0.17, 0.17, 0.05), [-0.2, -0.2, -0.2], [0.2, 0.2, 0.2], 0.012);
-  const pieces = ROAD.map((p, i) => {
-    const g = new Transform(); g.setParent(world);
-    const len = Math.hypot(1, p.h1 - p.h0);
-    const m = p.kind === "gap" ? null : add(kit.wrap(slab, p.colour, g));
-    if (m) { m.scale.set(len, 1, 1); m.rotation.z = Math.atan2(p.h1 - p.h0, 1); }
-    const extras: ClayMesh[] = [];
-    if (p.kind === "boost") for (const dx of [-0.25, 0, 0.25]) { const s = add(kit.wrap(stripe, C.orange, g)); s.position.set(dx, 0.1, 0); extras.push(s); }
-    if (p.kind === "box") { const b = add(kit.wrap(cube, C.lemon, g)); b.position.set(0, 0.55, 0); extras.push(b); }
-    return { g, p, i, extras };
-  });
-  // the kart: a body, a seat back, a helmet and four wheels
-  const kart = new Transform(); kart.setParent(world);
-  add(kit.wrap(geo(gl, (x, y, z) => sd.roundBox(x, y, z, 0.32, 0.09, 0.2, 0.06), [-0.36, -0.12, -0.24], [0.36, 0.12, 0.24], 0.014), C.orange, kart)).position.set(0, 0.14, 0);
-  add(kit.wrap(geo(gl, (x, y, z) => sd.roundBox(x, y, z, 0.05, 0.12, 0.14, 0.04), [-0.08, -0.15, -0.17], [0.08, 0.15, 0.17], 0.012), C.ink, kart)).position.set(-0.14, 0.3, 0);
-  const helmet = add(kit.sphere(C.cobalt, kart)); helmet.position.set(-0.04, 0.4, 0); helmet.scale.set(0.11, 0.11, 0.11);
-  for (const [x, z] of [[-0.2, 0.22], [-0.2, -0.22], [0.2, 0.22], [0.2, -0.22]]) {
-    const w = add(kit.rod(C.ink, kart));
-    w.rotation.x = Math.PI / 2; w.position.set(x, 0.08, z); w.scale.set(0.08, 0.07, 0.08);
-  }
-  const sh = shade(world);
+  const ground = add(kit.wrap(geo(gl, (x, y, z) => sd.roundBox(x, y, z, 2.7, 0.06, 1.8, 0.05), [-2.75, -0.1, -1.85], [2.75, 0.1, 1.85], 0.03), C.cream, world));
+  ground.position.set(0, -0.06, 0);
+  const blockG = geo(gl, (x, y, z) => sd.roundBox(x, y, z, 0.26, 0.5, 0.26, 0.05), [-0.3, -0.54, -0.3], [0.3, 0.54, 0.3], 0.02);
+  const bcols: Colour[] = [C.cobalt, C.lemon, C.ink];
+  const blocks = BLOCKS.map(([, , h, c]) => { const m = add(kit.wrap(blockG, bcols[c], world)); m.scale.set(1, h, 1); return m; });
+  const stones = TRAIL.map(() => add(kit.sphere(C.orange, world)));
+  const pin = new Transform(); pin.setParent(world);
+  const head = add(kit.sphere(C.orange, pin)); head.position.set(0, 0.62, 0); head.scale.set(0.18, 0.18, 0.18);
+  add(kit.wrap(geo(gl, (x, y, z) => sd.cappedCone(x, y, z, 0.26, 0.012, 0.13), [-0.15, -0.28, -0.15], [0.15, 0.28, 0.15], 0.01), C.orange, pin)).position.set(0, 0.36, 0);
+  const hole = add(kit.sphere(C.cream, pin)); hole.position.set(0, 0.66, 0.13); hole.scale.set(0.06, 0.06, 0.03);
+  const sh = shade(world); sh.position.set(0, -0.125, 0); sh.scale.set(7, 4.6, 1);
 
   return {
     root, solids, shadows, clipY: -100,
-    cam: (_a, icon) => (icon ? { pos: [0.4, 2.4, 6.4], target: [0, 0.3, 0] } : { pos: [0.6, 1.8, 7.2], target: [0.1, 0.35, 0] }),
+    // the board is wide: on a tall phone frame the camera steps back so the pin at the far end stays in shot
+    cam: (aspect, icon) => (icon ? { pos: [0, 4.2, 5.2], target: [0, 0, 0.1] } : { pos: [0, 4.0, 6.4], target: [0, -0.1, 0.25], back: aspect < 1 ? 1.3 : 1 }),
     update(p, t, _intro, icon) {
-      const P = icon ? 0.62 : p;
-      world.rotation.y = -0.25 + 0.06 * Math.sin(t * 0.4) + (icon ? 0.15 * Math.sin(t * 0.6) : 0);
-      // one piece per step of the story; each rises into place
-      const built = Math.min(ROAD.length, (P / 0.62) * ROAD.length);
-      pieces.forEach(({ g, p: pc, i, extras }) => {
-        const a = ease(Math.min(1, Math.max(0, built - i)));
-        const x = ROAD_X0 + i + 0.5;
-        g.position.set(x, (pc.h0 + pc.h1) / 2 - 0.09 - (1 - a) * 1.1, 0);
-        g.visible = a > 0.001;
-        if (pc.kind === "box") extras.forEach((e) => { e.rotation.y = t * 1.4; e.position.y = 0.55 + 0.05 * Math.sin(t * 2); });
+      const P = icon ? 1 : p;
+      world.rotation.y = -0.18 + 0.05 * Math.sin(t * 0.3) + (icon ? 0.25 * Math.sin(t * 0.4) : 0);
+      sh.program.uniforms.uOpacity.value = 0.18;
+      BLOCKS.forEach(([x, z, h], i) => {
+        const a = ease(smooth(i * 0.025, 0.2 + i * 0.025, P));
+        blocks[i].position.set(x, mix(-1.2, h / 2, a), z);
+        blocks[i].visible = a > 0.01;
       });
-      // the kart drives the built road, hopping the pothole
-      const front = ROAD_X0 + Math.max(0.5, built) - 0.45;
-      const x = Math.min(ROAD_X0 + ROAD.length - 0.4, front);
-      const f = x - ROAD_X0;
-      const hop = f > 4 && f < 5 ? Math.sin((f - 4) * Math.PI) * 0.45 : 0;
-      kart.position.set(x, roadHeight(x) + hop + 0.02 * Math.sin(t * 9), 0.02);
-      const slope = Math.atan2(roadHeight(x + 0.05) - roadHeight(x - 0.05), 0.1);
-      kart.rotation.z = hop > 0 ? 0.25 * Math.cos((f - 4) * Math.PI) : slope;
-      sh.position.set(0, -0.75, 0);
-      sh.scale.set(8, 1.8, 1);
-      sh.program.uniforms.uOpacity.value = 0.22 * Math.min(1, built / 3);
+      const walked = smooth(0.22, 0.66, P) * TRAIL.length;
+      TRAIL.forEach(([x, z], i) => {
+        const a = ease(Math.min(1, Math.max(0, walked - i)));
+        stones[i].position.set(x, 0.06, z);
+        const r = 0.065 * a; stones[i].scale.set(r, r * 0.5, r);
+        stones[i].visible = a > 0.01;
+      });
+      const drop = ease(smooth(0.64, 0.74, P));
+      const end = TRAIL[TRAIL.length - 1];
+      pin.position.set(end[0], mix(3.5, 0, drop) + (drop > 0.99 ? 0.04 * Math.sin(t * 2.2) : 0), end[1]);
+      pin.rotation.y = t * 0.8;
+      pin.visible = drop > 0.01;
     },
   };
 }
 
-/* Melax. A button phone spins in, its keys press # 2 5 8 0 # in step with the scroll, its screen lights,
-   then a lightning bolt cracks out of the top (melax is Wolof for lightning). */
-const bump = (t: number, P: number) => smooth(t - 0.025, t, P) * (1 - smooth(t + 0.02, t + 0.05, P));
-const pressOf = (k: number, P: number) =>
-  k === 11 ? Math.max(bump(0.34, P), bump(0.665, P)) : k === 1 ? bump(0.405, P) : k === 4 ? bump(0.47, P) : k === 7 ? bump(0.535, P) : k === 10 ? bump(0.6, P) : 0;
-/* # 2 5 8 0 #, as key indices (row * 3 + column) */
-const DIALS = [11, 1, 4, 7, 10, 11];
-function melax(kit: Kit): ClayScene {
+/* Part 3, stories. A hand mirror stands on the paper between two candles. The candles light, then a
+   crack runs down the glass (vanity horror) and the flames lean towards it. */
+const CRACK: number[][] = [[-0.05, 0.55], [0.12, 0.3], [-0.06, 0.08], [0.16, -0.14], [0.02, -0.34], [0.18, -0.55]];
+function series(kit: Kit): ClayScene {
   const { root, solids, shadows, add, shade } = base(kit);
-  const phone = new Transform(); phone.setParent(root);
   const gl = kit.gl;
-  add(kit.wrap(geo(gl, (x, y, z) => Math.max(sd.roundBox(x, y, z, 0.62, 1.28, 0.14, 0.11), -sd.roundBox(x, y - 0.62, z - 0.14, 0.5, 0.38, 0.05, 0.04)), [-0.68, -1.34, -0.2], [0.68, 1.34, 0.2], 0.02), C.lemon, phone));
-  const screen = add(kit.wrap(geo(gl, (x, y, z) => sd.roundBox(x, y, z, 0.47, 0.35, 0.012, 0.01), [-0.5, -0.38, -0.04], [0.5, 0.38, 0.04], 0.012), C.ink, phone));
-  screen.position.set(0, 0.62, 0.105);
-  const keyG = geo(gl, (x, y, z) => sd.roundBox(x, y, z, 0.12, 0.075, 0.045, 0.03), [-0.14, -0.1, -0.07], [0.14, 0.1, 0.07], 0.01);
-  const keys = Array.from({ length: 12 }, () => add(kit.wrap(keyG, C.ink, phone)));
-  const bolt = Array.from({ length: 6 }, () => add(kit.rod(C.lemon, root)));
-  bolt.forEach((b) => setColour(b, C.lemon, 1));
-  const sh = shade(root);
+  const mirror = new Transform(); mirror.setParent(root);
+  const oval = (x: number, y: number, a: number, b: number) => (Math.hypot(x / a, y / b) - 1) * Math.min(a, b);
+  add(kit.wrap(geo(gl, (x, y, z) => sd.slab(Math.max(oval(x, y, 0.62, 0.86), -oval(x, y, 0.5, 0.74)), z, 0.07), [-0.7, -0.95, -0.1], [0.7, 0.95, 0.1], 0.015), C.lemon, mirror));
+  const glass = add(kit.wrap(geo(gl, (x, y, z) => sd.slab(oval(x, y, 0.52, 0.76), z, 0.025), [-0.56, -0.8, -0.05], [0.56, 0.8, 0.05], 0.015), C.cobalt, mirror));
+  stretch(add(kit.rod(C.lemon, mirror)), [0, -0.86, 0], [0, -1.55, 0], 0.075);
+  const knob = add(kit.sphere(C.lemon, mirror)); knob.position.set(0, -1.58, 0); knob.scale.set(0.11, 0.11, 0.11);
+  const crack = CRACK.slice(1).map(() => add(kit.rod(C.cream, mirror)));
+  crack.forEach((m) => setColour(m, C.cream, 0.6));
+  const candles = [-1.45, 1.45].map((x) => {
+    const g = new Transform(); g.setParent(root);
+    add(kit.wrap(geo(gl, (x2, y, z) => sd.cyl(x2, y, z, 0.13, 0.3) - 0.02, [-0.17, -0.34, -0.17], [0.17, 0.34, 0.17], 0.012), C.cream, g)).position.set(0, 0.3, 0);
+    const flame = add(kit.sphere(C.orange, g));
+    setColour(flame, C.orange, 1);
+    const s = shade(root); s.position.set(x, -0.995, 0.2); s.scale.set(0.8, 0.5, 1);
+    g.position.set(x, -1, 0.2);
+    return { flame, s };
+  });
+  const sh = shade(root); sh.position.set(0, -0.995, 0); sh.scale.set(2.4, 0.8, 1);
 
   return {
     root, solids, shadows, clipY: -100,
-    cam: (_a, icon) => (icon ? { pos: [0, 0.3, 5], target: [0, -0.05, 0] } : { pos: [0, 0.45, 6.4], target: [0, 0.25, 0] }),
-    update(p, t, _intro, icon, frame) {
-      const P = icon ? 0.62 : p;
-      const fly = frame ? ease(Math.min(1, p / 0.12)) : ease(smooth(0, 0.24, P));
-      phone.position.set(mix(3, 0, fly), mix(2.6, 0, fly), mix(-6, 0, fly));
-      phone.rotation.set(0.1, -(mix(3.4, 0.42, fly) + (icon ? 0.45 * Math.sin(t * 0.7) : 0.1 * Math.sin(t * 0.6))), 0);
-      const lit = frame ? (p > 0.02 ? 1 : 0) : ease(smooth(0.26, 0.32, P));
-      setColour(screen, lit > 0.5 ? C.cobalt : C.ink, lit > 0.5 ? 1 : 0);
-      keys.forEach((m, k) => {
-        const r = Math.floor(k / 3), c = k % 3;
-        const press = frame ? (frame.index < 6 && DIALS[frame.index] === k ? 1 : 0) : pressOf(k, P);
-        m.position.set(-0.32 + 0.32 * c, 0.02 - 0.27 * r, 0.15 - 0.045 * press);
-        setColour(m, press > 0.3 ? C.orange : C.ink);
+    cam: (_a, icon) => (icon ? { pos: [0, 0.2, 5.4], target: [0, -0.15, 0] } : { pos: [0, 0.4, 6.6], target: [0, -0.05, 0] }),
+    update(p, t, intro, icon) {
+      const P = icon ? 1 : p;
+      const rise = ease(smooth(0, 0.18, P));
+      mirror.position.set(0, mix(-3, 0.62, rise) + 0.03 * Math.sin(t * 0.7), 0);
+      mirror.rotation.set(0, -0.35 * (1 - rise) + 0.18 * Math.sin(t * 0.35) + (icon ? 0.3 * Math.sin(t * 0.6) : 0), 0.04 * Math.sin(t * 0.5));
+      sh.program.uniforms.uOpacity.value = 0.3 * rise * ease(intro);
+      const lit = ease(smooth(0.18, 0.34, P));
+      const cr = smooth(0.4, 0.68, P);
+      candles.forEach(({ flame, s }, i) => {
+        const fl = 1 + 0.12 * Math.sin(t * 11 + i * 3) + 0.06 * Math.sin(t * 17 + i);
+        const r = 0.085 * lit * fl;
+        flame.position.set(0.08 * cr * (i === 0 ? 1 : -1), 0.72 + r * 0.6, 0);
+        flame.scale.set(r * 0.75, r * 1.5, r * 0.75);
+        flame.visible = r > 0.003;
+        s.program.uniforms.uOpacity.value = 0.22;
       });
-      const g = frame ? (frame.index >= frame.count ? ease(smooth(0.15, 0.45, frame.rest)) : 0) : ease(smooth(0.8, 0.9, P)) * (1 - smooth(0.97, 1, P));
-      let a = [0, 1.45, 0];
-      bolt.forEach((m, i) => {
-        const b0 = [((i % 2) * 2 - 1) * (0.28 + 0.1 * hash(i + Math.floor(t * 8))), 1.45 + (i + 1) * 0.55, 0];
-        const k = Math.min(1, Math.max(0, g * 6 - i));
-        const b = [mix(a[0], b0[0], k), mix(a[1], b0[1], k), mix(a[2], b0[2], k)];
-        stretch(m, a, b, k > 0 ? 0.06 : 0);
-        a = b;
+      crack.forEach((m, i) => {
+        const k = Math.min(1, Math.max(0, cr * crack.length - i));
+        const a = CRACK[i], e = CRACK[i + 1];
+        stretch(m, [a[0], a[1], 0.03], [mix(a[0], e[0], k), mix(a[1], e[1], k), 0.03], k > 0 ? 0.018 : 0);
       });
-      sh.position.set(phone.position.x, -1.615, phone.position.z);
-      sh.scale.set(1.9, 0.8, 1);
-      sh.program.uniforms.uOpacity.value = 0.32 * fly;
+      setColour(glass, cr > 0.95 ? C.ink : C.cobalt);
     },
   };
 }
@@ -341,5 +328,5 @@ function merge(kit: Kit): ClayScene {
   };
 }
 
-export const BUILDERS: Record<ClayKey, (kit: Kit) => ClayScene> = { hero, adfontes, hopium, melax, merge };
+export const BUILDERS: Record<ClayKey, (kit: Kit) => ClayScene> = { hero, platforms, streets, series, merge };
 export type { Mesh };

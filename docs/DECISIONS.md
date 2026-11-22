@@ -55,3 +55,16 @@ Newest first.
 
 - Meshing runs during the loader. The headline waits for the loader on purpose, so Lighthouse's slow
   mobile profile reports a late largest paint.
+
+## 22 Nov 2026: the triad homepage
+
+- Onenept is three parts now: platforms (Warmleads, Folofolo, SYZYGY), real-life games (The Come Up, Spot Her) and
+  stories (League of Supernatural Gentlemen). One chapter each. AD FONTES, Hopium Highway and Melax chapters are gone.
+- "Real-life games" instead of "ARGs": he asked for a friendlier word.
+- Same symbol rule as before. Platforms = three plinths: paper and pencil (Warmleads), an item box (Folofolo), three
+  spheres swinging into one line (SYZYGY, which is the word for that). Real-life games = a clay town with a trail of
+  stones and a pin dropping where the mission ends. Stories = a hand mirror between two candles that cracks (vanity horror).
+- A chapter's kinetic-type frame must never use a plinth's own colour as its background (the orange plinth vanished on
+  orange); the platforms frames alternate ink and paper.
+- The streets board is wide, so on tall phone frames its camera steps back 1.3x to keep the pin in shot.
+

@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { DOOR_PATH } from "./brand";
 
-export const alt = "Onenept Studios: AI products for people who never asked for AI.";
+export const alt = "Onenept Studios: platforms, real-life games and stories.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -27,9 +27,9 @@ export default function OG() {
             onenept
           </div>
           <div style={{ display: "flex", flexDirection: "column", marginTop: 120, fontSize: 76, fontWeight: 800, lineHeight: 0.95, letterSpacing: -4 }}>
-            <span>AI products</span>
-            <span>for people who</span>
-            <span style={{ color: "#FF6B2C" }}>never asked for AI.</span>
+            <span>Platforms.</span>
+            <span>Real-life games.</span>
+            <span style={{ color: "#FF6B2C" }}>Stories.</span>
           </div>
         </div>
       </div>

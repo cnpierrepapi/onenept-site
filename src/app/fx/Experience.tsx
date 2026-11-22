@@ -332,7 +332,7 @@ export default function Experience() {
           </div>
           <div className="flex items-end justify-between">
             <span ref={count} className="font-display text-[22vw] font-extrabold leading-[0.8] tracking-[-0.06em] sm:text-[14vw]">000</span>
-            <span className="mb-3 max-w-[12rem] text-right font-mono text-[11px] uppercase leading-5 tracking-[0.2em] text-mute">AI products for people who never asked for AI</span>
+            <span className="mb-3 max-w-[12rem] text-right font-mono text-[11px] uppercase leading-5 tracking-[0.2em] text-mute">Platforms, real-life games and stories</span>
           </div>
         </div>
       ) : null}

@@ -11,7 +11,7 @@ moves lives in one client component mounted once in the root layout, so it survi
 | `src/app/fx/gl/stage.ts` | One WebGL canvas for the whole site, fixed behind the content. Each frame it finds the scene slots on screen and draws each scene into its slot's rectangle (viewport plus scissor). |
 | `src/lib/mesh.ts` | Turns a distance function into a triangle mesh (surface nets), once, at load. |
 | `src/app/fx/gl/clay.ts` | The clay material (one cheap shader for every object) and soft blob shadows on the paper. |
-| `src/app/fx/gl/scenes.ts` | The five clay scenes as meshes: hero, adfontes, fugitiva, melax, merge. |
+| `src/app/fx/gl/scenes.ts` | The five clay scenes as meshes: hero, platforms, streets, series, merge. |
 | `src/app/fx/gl/portrait.ts` | The founder portrait: the photo sampled into dots that gather into the face. |
 | `src/app/fx/GLSlot.tsx` | Marks where a scene goes on the page. Decoration only, hidden from screen readers. |
 | `src/app/fx/flashbus.ts` | Every full-screen flash goes through here. |
