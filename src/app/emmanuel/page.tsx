@@ -7,7 +7,7 @@ import { Arrow, COMPANY, Footer, Nav } from "../site";
 export const metadata: Metadata = {
   title: "Emmanuel Nnawuogo",
   description:
-    "Founder of Onenept Studios and a design engineer. He builds the part of an AI product people actually touch. Open to remote and contract work.",
+    "Founder of Onenept Studios, which builds platforms, runs real-life games and tells stories. Also a design engineer, open to remote and contract work.",
   alternates: { canonical: "/emmanuel" },
 };
 
@@ -21,10 +21,10 @@ const SHIPPED: { name: string; href: string; what: string; state: string }[] = [
     state: "Live on NEAR testnet",
   },
   {
-    name: "Melax",
-    href: "https://github.com/cnpierrepapi/melax",
-    what: "A bitcoin wallet in Wolof, French and English for phones with buttons. Its setup guide only ticks a step when the server proves it happened.",
-    state: "Learning project",
+    name: "FUGITIVA",
+    href: "https://fugitiva.onenept.com",
+    what: "Case files on the women behind crimes people assume a man committed. It started with the 18 women on Europol's 2019 most wanted list.",
+    state: "Live",
   },
 ];
 
@@ -61,13 +61,13 @@ export default function Founder() {
                 <Split text="NNAWUOGO" from={1} />
               </span>
             </h1>
-            <p className="intro-fade absolute right-[3.5vmin] top-[80px] hidden w-[min(28vw,24rem)] text-[15px] leading-relaxed md:block" style={{ "--fly-delay": "0.8s" } as React.CSSProperties}>
-              Founder of Onenept Studios. I&apos;m a design engineer: I build the part of an AI product people actually touch, and I keep at it until someone who has never seen it can use it without asking me anything.
+            <p className="intro-fade absolute right-[3.5vmin] top-[80px] hidden w-[min(24vw,22rem)] text-[15px] leading-relaxed xl:block" style={{ "--fly-delay": "0.8s" } as React.CSSProperties}>
+              I run Onenept Studios. We build platforms, run real-life games and tell stories. I&apos;m also a design engineer: I build the part of a product people actually touch, and I keep at it until someone who has never seen it can use it without asking me anything.
             </p>
           </div>
         </section>
-        <p className="px-5 pb-12 text-base leading-relaxed md:hidden">
-          Founder of Onenept Studios. I&apos;m a design engineer: I build the part of an AI product people actually touch, and I keep at it until someone who has never seen it can use it without asking me anything.
+        <p className="px-5 pb-12 text-base leading-relaxed md:px-[3.5vmin] md:max-w-3xl md:text-lg xl:hidden">
+          I run Onenept Studios. We build platforms, run real-life games and tell stories. I&apos;m also a design engineer: I build the part of a product people actually touch, and I keep at it until someone who has never seen it can use it without asking me anything.
         </p>
 
         {/* the line: slides across the whole width, then cuts to ink */}
